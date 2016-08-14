@@ -38,7 +38,7 @@ module TLAW
             .with(Endpoint).and_return(endpoint)
 
           expect(endpoint).to receive(:api=).with(api)
-          expect(endpoint).to receive(:name=).with(:ep1)
+          expect(endpoint).to receive(:path=).with(:ep1)
 
           expect(DSL::EndpointWrapper).to receive(:new)
             .with(endpoint)

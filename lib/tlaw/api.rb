@@ -1,0 +1,43 @@
+module TLAW
+  class API
+    attr_reader :endpoints
+
+    def initialize(**param)
+      @initial_param = param
+      @endpoints = self.class.endpoints.map { |name, klass| [name, klass.new(self)] }.to_h
+    end
+
+    def call(path)
+      open(self.class.base_url + '/' + path).read
+        .derp { |response| JSON.parse(response) }
+        .derp(&Util.method(:flatten_hashes))
+    end
+
+    private
+
+    class << self
+      attr_accessor :base_url
+
+      def define(&block)
+        DSL::APIWrapper.new(self).define(&block)
+      end
+
+      def add_param(**opts)
+      end
+
+      def add_endpoint(name, endpoint)
+        # TODO: validate a) if it already exists b) if it is classifiable
+        const_set(Util::camelize(name), endpoint)
+        endpoints[name] = endpoint
+
+        define_method(name) { |*arg, **param|
+          @endpoints[name].call(*arg, **@initial_param.merge(param))
+        }
+      end
+
+      def endpoints
+        @endpoints ||= {}
+      end
+    end
+  end
+end
