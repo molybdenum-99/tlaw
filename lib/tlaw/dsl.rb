@@ -1,44 +1,59 @@
 module TLAW
   module DSL
-    class APIWrapper
-      def initialize(api)
-        @api = api
-      end
-
-      def define(&block)
-        instance_eval(&block)
-      end
-
-      def base(url)
-        @api.__send__(:base_url=, url)
-      end
-
+    module ParamDefiner
       def param(name, type, **opts)
-        @api.__send__(:add_param, **opts.merge(name: name, type: type))
+        @object.__send__(:add_param, **opts.merge(name: name, type: type))
       end
+    end
 
+    module EndpointDefiner
       def endpoint(path, **opts, &block)
         Class.new(Endpoint).tap do |ep|
-          ep.api = @api
+          ep.api = @object
           ep.path = path
+          ep.endpoint_name = opts.delete(:as) || path
           EndpointWrapper.new(ep).define(&block)
-          @api.__send__(:add_endpoint, path, ep)
+          @object.__send__(:add_endpoint, ep)
         end
       end
     end
 
-    class EndpointWrapper
-      def initialize(endpoint)
-        @endpoint = endpoint
+    class BaseWrapper
+      def initialize(object)
+        @object = object
       end
 
       def define(&block)
         instance_eval(&block)
       end
+    end
 
-      def param(name, type, **opts)
-        @endpoint.__send__(:add_param, **opts.merge(name: name, type: type))
+    class APIWrapper < BaseWrapper
+      def base(url)
+        @object.__send__(:base_url=, url)
       end
+
+      include ParamDefiner
+      include EndpointDefiner
+
+      def namespace(path, **opts, &block)
+        Class.new(Namespace).tap do |ns|
+          ns.api = @object
+          ns.path = path
+          ns.namespace_name = opts.delete(:as) || path
+          NamespaceWrapper.new(ns).define(&block)
+          @object.__send__(:add_namespace, ns)
+        end
+      end
+    end
+
+    class EndpointWrapper < BaseWrapper
+      include ParamDefiner
+    end
+
+    class NamespaceWrapper < BaseWrapper
+      include ParamDefiner
+      include EndpointDefiner
     end
   end
 end

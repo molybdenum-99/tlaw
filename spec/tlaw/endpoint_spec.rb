@@ -13,6 +13,14 @@ module TLAW
         expect(api).to receive(:call).with('/weather?q=Kharkiv')
         endpoint.call(q: 'Kharkiv')
       end
+
+      context 'with namsepace' do
+
+      it 'calls back API with constructed URL' do
+        expect(api).to receive(:call).with('/boo/weather?q=Kharkiv')
+        endpoint.call(q: 'Kharkiv', _namespace: 'boo')
+      end
+      end
     end
   end
 end

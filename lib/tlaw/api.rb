@@ -25,7 +25,9 @@ module TLAW
       def add_param(**opts)
       end
 
-      def add_endpoint(name, endpoint)
+      def add_endpoint(endpoint)
+        name = endpoint.endpoint_name
+
         # TODO: validate a) if it already exists b) if it is classifiable
         const_set(Util::camelize(name), endpoint)
         endpoints[name] = endpoint
@@ -35,8 +37,22 @@ module TLAW
         }
       end
 
+      def add_namespace(namespace)
+        name = namespace.namespace_name
+
+        # TODO: validate a) if it already exists b) if it is classifiable
+        const_set(Util::camelize(name), namespace)
+        namespaces[name] = namespace
+
+        define_method(name) { @namespaces[name] }
+      end
+
       def endpoints
         @endpoints ||= {}
+      end
+
+      def namespaces
+        @namespaces ||= {}
       end
     end
   end

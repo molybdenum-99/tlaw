@@ -10,11 +10,27 @@ module TLAW
       describe '.add_endpoint' do
         let(:endpoint) { Class.new(Endpoint) }
         subject(:api) { Class.new(API) }
-        before { api.__send__(:add_endpoint, :some_endpoint, endpoint) }
+        before {
+          endpoint.endpoint_name = :some_endpoint
+          api.__send__(:add_endpoint, endpoint)
+        }
 
         its(:constants) { is_expected.to include(:SomeEndpoint) }
         its(:instance_methods) { is_expected.to include(:some_endpoint) }
         its(:endpoints) { is_expected.to include(some_endpoint: endpoint) }
+      end
+
+      describe '.add_namespace' do
+        let(:namespace) { Class.new(Namespace) }
+        subject(:api) { Class.new(API) }
+        before {
+          namespace.namespace_name = :some_namespace
+          api.__send__(:add_namespace, namespace)
+        }
+
+        its(:constants) { is_expected.to include(:SomeNamespace) }
+        its(:instance_methods) { is_expected.to include(:some_namespace) }
+        its(:namespaces) { is_expected.to include(some_namespace: namespace) }
       end
     end
 

@@ -15,13 +15,21 @@ module TLAW
     private
 
     def construct_url(**param)
+      namespace = param.delete(:_namespace)
+
       uri = Addressable::URI.new
       uri.query_values = param
-      "/#{self.class.path}?" + uri.query
+
+
+      if namespace
+        "/#{namespace}/#{self.class.path}?" + uri.query
+      else
+        "/#{self.class.path}?" + uri.query
+      end
     end
 
     class << self
-      attr_accessor :api, :path
+      attr_accessor :api, :path, :endpoint_name
 
       def add_param(**opts)
       end

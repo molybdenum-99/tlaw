@@ -39,6 +39,7 @@ module TLAW
 
           expect(endpoint).to receive(:api=).with(api)
           expect(endpoint).to receive(:path=).with(:ep1)
+          expect(endpoint).to receive(:endpoint_name=).with(:ep1)
 
           expect(DSL::EndpointWrapper).to receive(:new)
             .with(endpoint)
@@ -46,12 +47,57 @@ module TLAW
 
           expect(endpoint_wrapper).to receive(:define){|&b| expect(b).to eq block }
 
-          expect(api).to receive(:add_endpoint).with(:ep1, endpoint)
+          expect(api).to receive(:add_endpoint).with(endpoint)
 
           wrapper.endpoint :ep1, &block
         end
+
+        context 'with :as' do
+          it 'creates endpoint and adds it' do
+            expect(Class).to receive(:new)
+              .with(Endpoint).and_return(endpoint)
+
+            expect(endpoint).to receive(:api=).with(api)
+            expect(endpoint).to receive(:path=).with('ns1/ns2/ep1')
+            expect(endpoint).to receive(:endpoint_name=).with(:ep1)
+
+            expect(DSL::EndpointWrapper).to receive(:new)
+              .with(endpoint)
+              .and_return(endpoint_wrapper)
+
+            expect(endpoint_wrapper).to receive(:define){|&b| expect(b).to eq block }
+
+            expect(api).to receive(:add_endpoint).with(endpoint)
+
+            wrapper.endpoint 'ns1/ns2/ep1', as: :ep1, &block
+          end
+        end
       end
 
+      describe '#namespace' do
+        let(:namespace) { class_double('TLAW::Namespace') }
+        let(:namespace_wrapper) { instance_double('TLAW::DSL::NamespaceWrapper') }
+        let(:block) { ->{} }
+
+        it 'creates namespace and adds it' do
+          expect(Class).to receive(:new)
+            .with(Namespace).and_return(namespace)
+
+          expect(namespace).to receive(:api=).with(api)
+          expect(namespace).to receive(:path=).with(:ns1)
+          expect(namespace).to receive(:namespace_name=).with(:ns1)
+
+          expect(DSL::NamespaceWrapper).to receive(:new)
+            .with(namespace)
+            .and_return(namespace_wrapper)
+
+          expect(namespace_wrapper).to receive(:define){|&b| expect(b).to eq block }
+
+          expect(api).to receive(:add_namespace).with(namespace)
+
+          wrapper.namespace :ns1, &block
+        end
+      end
     end
 
     describe DSL::EndpointWrapper do
