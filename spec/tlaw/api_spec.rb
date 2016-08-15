@@ -42,6 +42,9 @@ module TLAW
 
             endpoint :some_ep do
             end
+
+            namespace :some_ns do
+            end
           end
         end
       }
@@ -52,6 +55,10 @@ module TLAW
       describe '#initialize' do
         it 'instantiates endpoints' do
           expect(api.endpoints[:some_ep]).to be_an Endpoint
+        end
+
+        it 'instantiates namespaces' do
+          expect(api.namespaces[:some_ns]).to be_an Namespace
         end
 
         it 'parses and validates initial params'

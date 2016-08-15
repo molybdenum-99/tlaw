@@ -20,7 +20,7 @@ module TLAW
         endpoints[name] = endpoint
 
         define_method(name) { |*arg, **param|
-          @endpoints[name].call(*arg, **{_namespace: self.class.path}.merge(param))
+          @endpoints[name].call(*arg, **@api.initial_param.merge(_namespace: self.class.path).merge(param))
         }
       end
 

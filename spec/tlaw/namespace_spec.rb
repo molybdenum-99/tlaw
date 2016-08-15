@@ -30,8 +30,9 @@ module TLAW
           c.add_endpoint endpoint_class
         }
       }
+      let(:initial_params) { {} }
 
-      let(:api) { instance_double('TLAW::API') }
+      let(:api) { instance_double('TLAW::API', initial_param: initial_params) }
 
       subject(:namespace) { namespace_class.new(api)  }
 
@@ -46,6 +47,16 @@ module TLAW
           expect(namespace.endpoints[:some_ep]).to receive(:call).with(foo: 'bar', _namespace: 'ns')
           namespace.some_ep(foo: 'bar')
         end
+
+        context 'initial params' do
+          let(:initial_params) { {apikey: 'foo'} }
+
+          it 'adds them to call' do
+            expect(namespace.endpoints[:some_ep]).to receive(:call).with(foo: 'bar', _namespace: 'ns', apikey: 'foo')
+            namespace.some_ep(foo: 'bar')
+          end
+        end
+
       end
     end
   end

@@ -1,10 +1,11 @@
 module TLAW
   class API
-    attr_reader :endpoints
+    attr_reader :endpoints, :namespaces, :initial_param
 
     def initialize(**param)
       @initial_param = param
       @endpoints = self.class.endpoints.map { |name, klass| [name, klass.new(self)] }.to_h
+      @namespaces = self.class.namespaces.map { |name, klass| [name, klass.new(self)] }.to_h
     end
 
     def call(path)
