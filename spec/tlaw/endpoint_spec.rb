@@ -3,44 +3,84 @@ module TLAW
     describe '.add_param' do
     end
 
+    let(:url_template) { 'https://api.example.com' }
+    let(:api) { instance_double('TLAW::API') }
+    let(:endpoint_class) { Class.new(Endpoint).tap { |c| c.url = url_template } }
+    let(:endpoint) { endpoint_class.new(api) }
+
+    describe '#construct_url' do
+      let(:params) { {} }
+
+      subject(:url) { endpoint.__send__(:construct_url, params) }
+
+      context 'no params' do
+        it { is_expected.to eq 'https://api.example.com' }
+      end
+
+      context 'only query params' do
+        before {
+          endpoint_class.add_param(:q)
+          endpoint_class.add_param(:pagesize, type: :to_i, format: ->(v) { v*10 })
+        }
+        let(:params) { {q: 'Kharkiv oblast', pagesize: 10, page: 5} }
+
+        it { is_expected.to eq 'https://api.example.com?q=Kharkiv%20oblast&pagesize=100' }
+      end
+
+      context 'path & query params' do
+        before {
+          endpoint_class.add_param(:q)
+          endpoint_class.add_param(:pagesize, type: :to_i, format: ->(v) { v*10 })
+        }
+        let(:params) { {q: 'Kharkiv', pagesize: 10, page: 5} }
+
+        let(:url_template) { 'https://api.example.com{/q}' }
+
+        it { is_expected.to eq 'https://api.example.com/Kharkiv?pagesize=100' }
+      end
+
+      context 'path with ?' do
+        before {
+          endpoint_class.add_param(:q)
+          endpoint_class.add_param(:pagesize, type: :to_i, format: ->(v) { v*10 })
+        }
+        let(:params) { {q: 'Kharkiv', pagesize: 10, page: 5} }
+
+        let(:url_template) { 'https://api.example.com?q={q}' }
+
+        it { is_expected.to eq 'https://api.example.com?q=Kharkiv&pagesize=100' }
+      end
+    end
+
     describe '#call' do
-      let(:api) { instance_double('TLAW::API') }
-      let(:path) { 'weather' }
-      let(:endpoint_class) { Class.new(Endpoint).tap { |c| c.path = path } }
-      subject(:endpoint) { endpoint_class.new(api) }
+      before {
+        endpoint_class.add_param(:q)
+      }
 
-      it 'validates & converts params'
-
-      it 'calls back API with constructed URL' do
-        expect(api).to receive(:call).with('/weather?q=Kharkiv')
-        endpoint.call(q: 'Kharkiv')
+      it 'calls web with params provided' do
+        expect { endpoint.call(q: 'Why') }
+          .to get_webmock('https://api.example.com?q=Why')
+          .and_return({test: 'me'}.to_json)
       end
 
-      context 'with namsepace' do
-        it 'calls back API with constructed URL' do
-          expect(api).to receive(:call).with('/boo/weather?q=Kharkiv')
-          endpoint.call(q: 'Kharkiv', _namespace: 'boo')
-        end
-      end
+      let(:deep_hash) {
+        {
+          response: {status: 200, message: 'OK'},
+          data: {field1: 'foo', field2: {bar: 1}}
+        }
+      }
 
-      context 'URL constructions' do
-        subject { endpoint.__send__(:construct_url, *args) }
+      it 'parses response & flatterns it' do
+        stub_request(:get, 'https://api.example.com?q=Why')
+          .to_return(body: deep_hash.to_json)
 
-        let(:params) { {} }
-        let(:args) { [params] }
-
-        context 'simple' do
-          let(:params) { {lat: 0, lng: 0} }
-
-          it { is_expected.to eq '/weather?lat=0&lng=0' }
-        end
-
-        context 'some param is part of path' do
-          let(:path) { 'weather?q=:q' }
-          let(:args) { ['Kharkiv'] }
-
-          it { is_expected.to eq '/weather?q=Kharkiv' }
-        end
+        expect(endpoint.call(q: 'Why'))
+          .to eq(
+            'response.status' => 200,
+            'response.message' => 'OK',
+            'data.field1' => 'foo',
+            'data.field2.bar' => 1
+          )
       end
     end
   end

@@ -7,11 +7,11 @@ module TLAW
     end
 
     module EndpointDefiner
-      def endpoint(path, **opts, &block)
+      def endpoint(name, path: nil, **opts, &block)
         Class.new(Endpoint).tap do |ep|
           ep.api = @object
-          ep.path = path
-          ep.endpoint_name = opts.delete(:as) || path
+          ep.path = path || "/#{name}"
+          ep.endpoint_name = name
           EndpointWrapper.new(ep).define(&block)
           @object.__send__(:add_endpoint, ep)
         end
@@ -36,11 +36,11 @@ module TLAW
       include ParamDefiner
       include EndpointDefiner
 
-      def namespace(path, **opts, &block)
+      def namespace(name, path: nil, **opts, &block)
         Class.new(Namespace).tap do |ns|
           ns.api = @object
-          ns.path = path
-          ns.namespace_name = opts.delete(:as) || path
+          ns.path = path || "/#{name}"
+          ns.namespace_name = name
           NamespaceWrapper.new(ns).define(&block)
           @object.__send__(:add_namespace, ns)
         end

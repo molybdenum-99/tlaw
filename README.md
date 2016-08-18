@@ -48,3 +48,12 @@ Helpers for defining hi-level API
 paging helpers
 
 There is no such thing as a "perfect orthogonal REST API" in real world.
+
+* Pragmatic: thorougly designed with tens of real world examples in mind,
+  not just your textbook's "perfect orthogonal REST API";
+* Opinionated;
+* Easy and readable;
+* Discoverable.
+
+* Metaprogramming creates resonable and explainable entities.
+  (demo)

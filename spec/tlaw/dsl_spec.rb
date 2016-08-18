@@ -38,7 +38,7 @@ module TLAW
             .with(Endpoint).and_return(endpoint)
 
           expect(endpoint).to receive(:api=).with(api)
-          expect(endpoint).to receive(:path=).with(:ep1)
+          expect(endpoint).to receive(:path=).with('/ep1')
           expect(endpoint).to receive(:endpoint_name=).with(:ep1)
 
           expect(DSL::EndpointWrapper).to receive(:new)
@@ -52,13 +52,13 @@ module TLAW
           wrapper.endpoint :ep1, &block
         end
 
-        context 'with :as' do
+        context 'explicit path' do
           it 'creates endpoint and adds it' do
             expect(Class).to receive(:new)
               .with(Endpoint).and_return(endpoint)
 
             expect(endpoint).to receive(:api=).with(api)
-            expect(endpoint).to receive(:path=).with('ns1/ns2/ep1')
+            expect(endpoint).to receive(:path=).with('/ns1/ns2/ep1')
             expect(endpoint).to receive(:endpoint_name=).with(:ep1)
 
             expect(DSL::EndpointWrapper).to receive(:new)
@@ -69,7 +69,7 @@ module TLAW
 
             expect(api).to receive(:add_endpoint).with(endpoint)
 
-            wrapper.endpoint 'ns1/ns2/ep1', as: :ep1, &block
+            wrapper.endpoint :ep1, path: '/ns1/ns2/ep1', &block
           end
         end
       end
@@ -84,7 +84,7 @@ module TLAW
             .with(Namespace).and_return(namespace)
 
           expect(namespace).to receive(:api=).with(api)
-          expect(namespace).to receive(:path=).with(:ns1)
+          expect(namespace).to receive(:path=).with('/ns1')
           expect(namespace).to receive(:namespace_name=).with(:ns1)
 
           expect(DSL::NamespaceWrapper).to receive(:new)
