@@ -1,9 +1,9 @@
 module TLAW
   describe Param do
-    describe :required? do
+    describe '#required?' do
     end
 
-    describe :convert do
+    describe '#convert' do
       subject { param.convert(value) }
 
       context 'default' do
@@ -46,7 +46,7 @@ module TLAW
       end
     end
 
-    describe :format do
+    describe '#format' do
       let(:param) { Param.new(:p) }
       subject { param.format(value) }
 
@@ -79,9 +79,43 @@ module TLAW
       context 'unformattable'
     end
 
-    describe :convert_and_format do
+    describe '#convert_and_format' do
       let(:param) { Param.new(:p, type: :to_i, format: ->(x) { x*2 }) }
       specify { expect(param.convert_and_format(3.3)).to eq '6' }
+    end
+
+    describe '#generate_definition' do
+      subject { param.generate_definition }
+
+      context 'keyword - required' do
+        let(:param) { Param.new(:p, required: true) }
+        it { is_expected.to eq 'p:' }
+      end
+
+      context 'keyword - optional' do
+        let(:param) { Param.new(:p) }
+        it { is_expected.to eq 'p: nil' }
+      end
+
+      context 'keyword - with default' do
+        let(:param) { Param.new(:p, default: 'foo') }
+        it { is_expected.to eq 'p: "foo"' }
+      end
+
+      context 'argument - required' do
+        let(:param) { Param.new(:p, keyword_argument: false, required: true) }
+        it { is_expected.to eq 'p' }
+      end
+
+      context 'argument - optional' do
+        let(:param) { Param.new(:p, keyword_argument: false) }
+        it { is_expected.to eq 'p=nil' }
+      end
+
+      context 'argument - with default' do
+        let(:param) { Param.new(:p, keyword_argument: false, default: "foo") }
+        it { is_expected.to eq 'p="foo"' }
+      end
     end
   end
 end

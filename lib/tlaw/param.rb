@@ -2,36 +2,68 @@ module TLAW
   class Param
     Nonconvertible = Class.new(ArgumentError)
 
-    def initialize(name, type: nil, format: nil, **opts)
+    DEFAULT_DEFINITION = {keyword_argument: true}.freeze
+
+    attr_reader :name, :definition
+
+    def initialize(name, **definition)
       @name = name
-      @type = type
-      @formatter = prepare_formatter(format)
+      @definition = DEFAULT_DEFINITION.merge(definition)
     end
 
     def convert(value)
-      case @type
+      case type
       when nil
         value
       when Symbol
-        value.respond_to?(@type) or nonconvertible!(value, "not responding to #{@type}")
-        value.send(@type)
+        value.respond_to?(type) or nonconvertible!(value, "not responding to #{type}")
+        value.send(type)
       when Class
-        value.kind_of?(@type) or nonconvertible!(value, "is not #{@type}")
+        value.kind_of?(type) or nonconvertible!(value, "is not #{type}")
         value
       else
-        nonconvertible!(value, "undefined type #{@type}")
+        nonconvertible!(value, "undefined type #{type}")
       end
     end
 
     def format(value)
-      to_url_part(@formatter.call(value))
+      to_url_part(formatter.call(value))
     end
 
     def convert_and_format(value)
       format(convert(value))
     end
 
+    alias_method :to_h, :definition
+
+    def generate_definition
+      default = definition[:default]
+
+      case
+      when keyword_argument? && required?
+        "#{name}:"
+      when keyword_argument?
+        "#{name}: #{default.inspect}"
+      when required?
+        "#{name}"
+      else
+        "#{name}=#{default.inspect}"
+      end
+    end
+
     private
+
+    def type
+      definition[:type]
+    end
+
+    def required?
+      definition[:required]
+    end
+
+    def keyword_argument?
+      definition[:keyword_argument]
+    end
 
     def to_url_part(value)
       case value
@@ -42,17 +74,18 @@ module TLAW
       end
     end
 
-    def prepare_formatter(formatter)
-      case formatter
-      when Proc
-        formatter
-      when ->(f) { f.respond_to?(:to_proc) }
-        formatter.to_proc
-      when nil
-        ->(v) { v }
-      else
-        fail ArgumentError, "#{self}: unsupporter formatter #{formatter}"
-      end
+    def formatter
+      @formatter ||=
+        case definition[:format]
+        when Proc
+          definition[:format]
+        when ->(f) { f.respond_to?(:to_proc) }
+          definition[:format].to_proc
+        when nil
+          ->(v) { v }
+        else
+          fail ArgumentError, "#{self}: unsupporter formatter #{definition[:format]}"
+        end
     end
 
     def nonconvertible!(value, reason)

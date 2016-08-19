@@ -1,8 +1,8 @@
 module TLAW
   module DSL
     module ParamDefiner
-      def param(name, type, **opts)
-        @object.__send__(:add_param, **opts.merge(name: name, type: type))
+      def param(name, type = nil, **opts)
+        @object.__send__(:add_param, name, **opts.merge(type: type))
       end
     end
 
@@ -10,9 +10,12 @@ module TLAW
       def endpoint(name, path: nil, **opts, &block)
         Class.new(Endpoint).tap do |ep|
           ep.api = @object
-          ep.path = path || "/#{name}"
+          ep.url = @object.base_url + (path || "/#{name}")
           ep.endpoint_name = name
           EndpointWrapper.new(ep).define(&block)
+          @object.params.each do |name, param|
+            ep.add_param name, **param.to_h
+          end
           @object.__send__(:add_endpoint, ep)
         end
       end
@@ -39,7 +42,7 @@ module TLAW
       def namespace(name, path: nil, **opts, &block)
         Class.new(Namespace).tap do |ns|
           ns.api = @object
-          ns.path = path || "/#{name}"
+          ns.base_url = @object.base_url + (path || "/#{name}")
           ns.namespace_name = name
           NamespaceWrapper.new(ns).define(&block)
           @object.__send__(:add_namespace, ns)
