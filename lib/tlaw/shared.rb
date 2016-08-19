@@ -34,9 +34,7 @@ module TLAW
         const_set(Util::camelize(name), endpoint)
         endpoints[name] = endpoint
 
-        define_method(name) { |*arg, **param|
-          @endpoints[name].call(*arg, **@initial_param.merge(param))
-        }
+        module_eval(endpoint.generate_definition)
       end
 
       def endpoints

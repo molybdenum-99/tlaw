@@ -1,6 +1,6 @@
 module TLAW
   class Namespace
-    attr_reader :endpoints
+    attr_reader :endpoints, :initial_param
 
     def initialize(api)
       @api = api

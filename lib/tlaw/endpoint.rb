@@ -11,6 +11,18 @@ module TLAW
       attr_accessor :api, :url, :endpoint_name
 
       include Shared::ParamHolder
+
+      def generate_definition
+        arg_def = params.values
+          .partition(&:keyword_argument?).reverse.map { |args|
+            args.partition(&:required?)
+          }.flatten.map(&:generate_definition).join(', ')
+
+        "def #{endpoint_name}(#{arg_def})\n" +
+        "  param = initial_param.merge(#{params.values.map(&:name).map { |n| "#{n}: #{n}" }.join(', ')})\n" +
+        "  endpoints[:#{endpoint_name}].call(**param)\n" +
+        "end"
+      end
     end
 
     def call(**params)

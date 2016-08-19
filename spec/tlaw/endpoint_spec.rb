@@ -83,5 +83,27 @@ module TLAW
           )
       end
     end
+
+    describe '#generated_definition' do
+      before {
+        endpoint_class.endpoint_name = :ep
+
+        endpoint_class.add_param :kv1
+        endpoint_class.add_param :kv2, required: true
+        endpoint_class.add_param :kv3, default: 14
+
+        endpoint_class.add_param :arg1, keyword_argument: false
+        endpoint_class.add_param :arg2, keyword_argument: false, default: 'foo'
+        endpoint_class.add_param :arg3, keyword_argument: false, required: true
+      }
+
+      subject { endpoint_class.generate_definition }
+
+      it { is_expected
+        .to  include('def ep(arg3, arg1=nil, arg2="foo", kv2:, kv1: nil, kv3: 14)')
+        .and include('param = initial_param.merge(kv1: kv1, kv2: kv2, kv3: kv3, arg1: arg1, arg2: arg2, arg3: arg3)')
+        .and include('endpoints[:ep].call(**param)')
+      }
+    end
   end
 end

@@ -11,6 +11,18 @@ module TLAW
       @definition = DEFAULT_DEFINITION.merge(definition)
     end
 
+    def type
+      definition[:type]
+    end
+
+    def required?
+      definition[:required]
+    end
+
+    def keyword_argument?
+      definition[:keyword_argument]
+    end
+
     def convert(value)
       case type
       when nil
@@ -52,18 +64,6 @@ module TLAW
     end
 
     private
-
-    def type
-      definition[:type]
-    end
-
-    def required?
-      definition[:required]
-    end
-
-    def keyword_argument?
-      definition[:keyword_argument]
-    end
 
     def to_url_part(value)
       case value
