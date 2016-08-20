@@ -41,6 +41,7 @@ module TLAW
             base 'http://api.example.com'
 
             endpoint :some_ep do
+              param :foo
             end
 
             namespace :some_ns do
@@ -62,34 +63,6 @@ module TLAW
         end
 
         it 'parses and validates initial params'
-      end
-
-      describe '#call' do
-        it 'joins path with base URL and calls web' do
-          expect { api.call('wtf?q=Why') }
-            .to get_webmock('http://api.example.com/wtf?q=Why')
-            .and_return({test: 'me'}.to_json)
-        end
-
-        let(:deep_hash) {
-          {
-            response: {status: 200, message: 'OK'},
-            data: {field1: 'foo', field2: {bar: 1}}
-          }
-        }
-
-        it 'parses response & flatterns it' do
-          stub_request(:get, 'http://api.example.com/wtf?q=Why')
-            .to_return(body: deep_hash.to_json)
-
-          expect(api.call('wtf?q=Why'))
-            .to eq(
-              'response.status' => 200,
-              'response.message' => 'OK',
-              'data.field1' => 'foo',
-              'data.field2.bar' => 1
-            )
-        end
       end
 
       describe '#<endpoint>' do

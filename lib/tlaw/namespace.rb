@@ -4,7 +4,7 @@ module TLAW
 
     def initialize(api)
       @api = api
-      @initial_param = api.initial_param # TODO: could add param at namespace definition
+      @initial_param = api.initial_param # TODO: could add param at namespace call?..
 
       # TODO: responsibility of endpoints_holder?
       @endpoints = self.class.endpoints.map { |name, klass| [name, klass.new(api)] }.to_h

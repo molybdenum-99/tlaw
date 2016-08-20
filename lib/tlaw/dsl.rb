@@ -14,7 +14,7 @@ module TLAW
           ep.endpoint_name = name
           EndpointWrapper.new(ep).define(&block)
           @object.params.each do |name, param|
-            ep.add_param name, **param.to_h
+            ep.add_param name, **param.to_h.merge(common: true)
           end
           @object.__send__(:add_endpoint, ep)
         end
@@ -44,6 +44,9 @@ module TLAW
           ns.api = @object
           ns.base_url = @object.base_url + (path || "/#{name}")
           ns.namespace_name = name
+          @object.params.each do |name, param|
+            ns.add_param name, **param.to_h.merge(common: true)
+          end
           NamespaceWrapper.new(ns).define(&block)
           @object.__send__(:add_namespace, ns)
         end

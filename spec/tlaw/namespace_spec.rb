@@ -22,11 +22,17 @@ module TLAW
     end
 
     context 'instance' do
-      let(:endpoint_class) { Class.new(Endpoint) { self.endpoint_name = :some_ep } }
+      let(:endpoint_class) {
+        Class.new(Endpoint) {
+          self.endpoint_name = :some_ep
+          self.url = 'https://api.example.com/ns/some_ep'
+          self.add_param :foo
+        }
+      }
 
       let!(:namespace_class) {
         Class.new(Namespace).tap { |c|
-          c.path = 'ns'
+          c.base_url = 'https://api.example.com/ns'
           c.add_endpoint endpoint_class
         }
       }
@@ -44,7 +50,7 @@ module TLAW
 
       describe '#<endpoint>' do
         it 'calls proper endpoint' do
-          expect(namespace.endpoints[:some_ep]).to receive(:call).with(foo: 'bar', _namespace: 'ns')
+          expect(namespace.endpoints[:some_ep]).to receive(:call).with(foo: 'bar')
           namespace.some_ep(foo: 'bar')
         end
 
@@ -52,7 +58,7 @@ module TLAW
           let(:initial_params) { {apikey: 'foo'} }
 
           it 'adds them to call' do
-            expect(namespace.endpoints[:some_ep]).to receive(:call).with(foo: 'bar', _namespace: 'ns', apikey: 'foo')
+            expect(namespace.endpoints[:some_ep]).to receive(:call).with(foo: 'bar', apikey: 'foo')
             namespace.some_ep(foo: 'bar')
           end
         end

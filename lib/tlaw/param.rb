@@ -23,6 +23,10 @@ module TLAW
       definition[:keyword_argument]
     end
 
+    def common?
+      definition[:common]
+    end
+
     def convert(value)
       case type
       when nil

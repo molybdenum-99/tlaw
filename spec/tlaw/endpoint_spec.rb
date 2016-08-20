@@ -95,6 +95,8 @@ module TLAW
         endpoint_class.add_param :arg1, keyword_argument: false
         endpoint_class.add_param :arg2, keyword_argument: false, default: 'foo'
         endpoint_class.add_param :arg3, keyword_argument: false, required: true
+
+        endpoint_class.add_param :cm1, common: true
       }
 
       subject { endpoint_class.generate_definition }

@@ -23,7 +23,8 @@ module TLAW
 
       describe '#param' do
         it 'adds global parameter' do
-          expect(api).to receive(:add_param).with(name: :param1, type: String, required: true)
+          expect(api).to receive(:add_param)
+            .with(:param1, type: String, required: true)
           wrapper.param :param1, String, required: true
         end
       end
@@ -52,7 +53,8 @@ module TLAW
 
           expect(endpoint_wrapper).to receive(:define){|&b| expect(b).to eq block }
 
-          expect(endpoint).to receive(:add_param).with(:base_param1, type: Integer)
+          expect(endpoint).to receive(:add_param)
+            .with(:base_param1, type: Integer, keyword_argument: true, common: true)
 
           expect(api).to receive(:add_endpoint).with(endpoint)
 
@@ -74,6 +76,9 @@ module TLAW
 
             expect(endpoint_wrapper).to receive(:define){|&b| expect(b).to eq block }
 
+            expect(endpoint).to receive(:add_param)
+              .with(:base_param1, type: Integer, keyword_argument: true, common: true)
+
             expect(api).to receive(:add_endpoint).with(endpoint)
 
             wrapper.endpoint :ep1, path: '/ns1/ns2/ep1', &block
@@ -86,7 +91,10 @@ module TLAW
         let(:namespace_wrapper) { instance_double('TLAW::DSL::NamespaceWrapper') }
         let(:block) { ->{} }
 
-        before { api.base_url = 'https://api.example.com' }
+        before {
+          api.base_url = 'https://api.example.com'
+          api.add_param :base_param1, type: Integer
+        }
 
         it 'creates namespace and adds it' do
           expect(Class).to receive(:new)
@@ -101,6 +109,9 @@ module TLAW
             .and_return(namespace_wrapper)
 
           expect(namespace_wrapper).to receive(:define){|&b| expect(b).to eq block }
+
+          expect(namespace).to receive(:add_param)
+            .with(:base_param1, type: Integer, keyword_argument: true, common: true)
 
           expect(api).to receive(:add_namespace).with(namespace)
 
