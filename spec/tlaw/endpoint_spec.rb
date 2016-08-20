@@ -82,6 +82,23 @@ module TLAW
             'data.field2.bar' => 1
           )
       end
+
+      context 'errors' do
+        context 'just code' do
+          before {
+            stub_request(:get, 'https://api.example.com?q=Why')
+              .to_return(status: 404)
+          }
+
+          specify {
+            expect { endpoint.call(q: 'Why') }
+              .to raise_error(API::Error, 'HTTP 404 at https://api.example.com?q=Why')
+          }
+        end
+        context 'code + json message'
+        context 'code + unparseable json'
+        context 'just unparseable json'
+      end
     end
 
     describe '#generated_definition' do

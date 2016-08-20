@@ -1,5 +1,8 @@
 module TLAW
   class API
+    class Error < RuntimeError
+    end
+
     attr_reader :endpoints, :namespaces, :initial_param
 
     def initialize(**param)

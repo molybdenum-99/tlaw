@@ -1,9 +1,11 @@
+require 'faraday'
 require 'addressable/template'
 
 module TLAW
   class Endpoint
     def initialize(api)
       @api = api
+      @client = Faraday.new
       @template = construct_template
     end
 
@@ -32,12 +34,19 @@ module TLAW
     end
 
     def call(**params)
-      open(construct_url(**params)).read
-        .derp { |response| JSON.parse(response) }
+      @client.get(construct_url(**params))
+        .tap { |response| guard_errors!(response) }
+        .derp { |response| JSON.parse(response.body) }
         .derp(&Util.method(:flatten_hash))
     end
 
     private
+
+    def guard_errors!(response)
+      return response if (200...400).include?(response.status)
+
+      fail API::Error, "HTTP #{response.status} at #{response.env[:url]}"
+    end
 
     def construct_template
       t = Addressable::Template.new(self.class.url)
