@@ -25,8 +25,21 @@ module TLAW
       end
     end
 
+    def columns(*names)
+      names.map!(&:to_s)
+      DataTable.new(map { |h| names.map { |n| [n, h[n]] }.to_h })
+    end
+
     def to_h
       keys.map { |k| [k, map { |h| h[k] }] }.to_h
+    end
+
+    def inspect
+      "#<#{self.class.name}[#{keys.join(', ')}] x #{size}>"
+    end
+
+    def pretty_print(pp)
+      pp.text("#<#{self.class.name}[#{keys.join(', ')}] x #{size}>")
     end
   end
 end

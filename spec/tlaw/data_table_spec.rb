@@ -8,10 +8,14 @@ module TLAW
       ]
     }
 
-    subject { described_class.new(data) }
+    subject(:table) { described_class.new(data) }
 
     context '#initialize' do
       it 'is initialized by array of hashes'
+    end
+
+    context '#==' do
+      it { is_expected.to eq described_class.new(data) }
     end
 
     context 'Array-ish behavior' do
@@ -38,11 +42,20 @@ module TLAW
         'd' => [nil, 'dummy', nil]
       )}
 
-      context '#columns(a, b)'
+      context '#columns(a, b)' do
+        subject { table.columns(:a, :b) }
+        it { is_expected.to eq DataTable.new(
+          [
+            {a: 1, b: 'a'},
+            {a: 2, b: 'b'},
+            {a: 3, b: 'c'},
+          ]
+        )}
+      end
     end
 
     context '#inspect' do
-      it { is_expected.to eq '#<TLAW::DataTable[a, b, c, d] x 6>' }
+      its(:inspect) { is_expected.to eq '#<TLAW::DataTable[a, b, c, d] x 3>' }
     end
   end
 end
