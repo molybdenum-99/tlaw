@@ -21,8 +21,15 @@ module TLAW
 
     def flatten_hash(hash)
       hash.map { |k, v|
-        if v.is_a?(Hash)
+        case v
+        when Hash
           flatten_hash(v).map { |k1, v1| ["#{k}.#{k1}", v1] }
+        when Array
+          if v.all? {|v1| v1.is_a?(Hash) }
+            [[k, DataTable.new(flatten_hashes(v))]]
+          else
+            [[k, flatten_hashes(v)]]
+          end
         else
           [[k, flatten_hashes(v)]]
         end

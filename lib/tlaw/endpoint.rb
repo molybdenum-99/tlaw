@@ -34,7 +34,7 @@ module TLAW
     def call(**params)
       open(construct_url(**params)).read
         .derp { |response| JSON.parse(response) }
-        .derp(&Util.method(:flatten_hashes))
+        .derp(&Util.method(:flatten_hash))
     end
 
     private
