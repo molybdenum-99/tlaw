@@ -61,28 +61,49 @@ module TLAW
           wrapper.endpoint :ep1, &block
         end
 
-        context 'explicit path' do
-          it 'creates endpoint and adds it' do
-            expect(Class).to receive(:new)
-              .with(Endpoint).and_return(endpoint)
+        it 'allows explicit url' do
+          expect(Class).to receive(:new)
+            .with(Endpoint).and_return(endpoint)
 
-            expect(endpoint).to receive(:api=).with(api)
-            expect(endpoint).to receive(:url=).with('https://api.example.com/ns1/ns2/ep1')
-            expect(endpoint).to receive(:endpoint_name=).with(:ep1)
+          expect(endpoint).to receive(:api=).with(api)
+          expect(endpoint).to receive(:url=).with('https://api.example.com/ns1/ns2/ep1')
+          expect(endpoint).to receive(:endpoint_name=).with(:ep1)
 
-            expect(DSL::EndpointWrapper).to receive(:new)
-              .with(endpoint)
-              .and_return(endpoint_wrapper)
+          expect(DSL::EndpointWrapper).to receive(:new)
+            .with(endpoint)
+            .and_return(endpoint_wrapper)
 
-            expect(endpoint_wrapper).to receive(:define){|&b| expect(b).to eq block }
+          expect(endpoint_wrapper).to receive(:define){|&b| expect(b).to eq block }
 
-            expect(endpoint).to receive(:add_param)
-              .with(:base_param1, type: Integer, keyword_argument: true, common: true)
+          expect(endpoint).to receive(:add_param)
+            .with(:base_param1, type: Integer, keyword_argument: true, common: true)
 
-            expect(api).to receive(:add_endpoint).with(endpoint)
+          expect(api).to receive(:add_endpoint).with(endpoint)
 
-            wrapper.endpoint :ep1, path: '/ns1/ns2/ep1', &block
-          end
+          wrapper.endpoint :ep1, path: '/ns1/ns2/ep1', &block
+        end
+
+        it 'guesses params from url' do
+          expect(Class).to receive(:new)
+            .with(Endpoint).and_return(endpoint)
+
+          expect(endpoint).to receive(:api=).with(api)
+          expect(endpoint).to receive(:url=).with('https://api.example.com/ns1/ns2/{city}')
+          expect(endpoint).to receive(:endpoint_name=).with(:ep1)
+          expect(endpoint).to receive(:add_param).with(:city, keyword_argument: false)
+
+          expect(DSL::EndpointWrapper).to receive(:new)
+            .with(endpoint)
+            .and_return(endpoint_wrapper)
+
+          expect(endpoint_wrapper).to receive(:define){|&b| expect(b).to eq block }
+
+          expect(endpoint).to receive(:add_param)
+            .with(:base_param1, type: Integer, keyword_argument: true, common: true)
+
+          expect(api).to receive(:add_endpoint).with(endpoint)
+
+          wrapper.endpoint :ep1, path: '/ns1/ns2/{city}', &block
         end
       end
 

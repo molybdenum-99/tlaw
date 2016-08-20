@@ -2,7 +2,11 @@ module TLAW
   module Shared
     module ParamHolder
       def add_param(name, **opts)
-        params[name] = Param.new(name, **opts)
+        if params[name]
+          params[name].update(**opts)
+        else
+          params[name] = Param.new(name, **opts)
+        end
       end
 
       def params

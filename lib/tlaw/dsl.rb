@@ -10,9 +10,15 @@ module TLAW
       def endpoint(name, path: nil, **opts, &block)
         Class.new(Endpoint).tap do |ep|
           ep.api = @object
-          ep.url = @object.base_url + (path || "/#{name}")
+          url = @object.base_url + (path || "/#{name}")
+          ep.url = url
           ep.endpoint_name = name
-          EndpointWrapper.new(ep).define(&block)
+          Addressable::Template.new(url).keys.each do |key|
+            ep.add_param key.to_sym, keyword_argument: false
+          end
+
+          EndpointWrapper.new(ep).define(&block) if block
+
           @object.params.each do |name, param|
             ep.add_param name, **param.to_h.merge(common: true)
           end

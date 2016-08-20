@@ -27,6 +27,10 @@ module TLAW
       definition[:common]
     end
 
+    def update(**new_definition)
+      @definition.update(new_definition)
+    end
+
     def convert(value)
       case type
       when nil
