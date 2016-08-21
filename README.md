@@ -57,3 +57,9 @@ There is no such thing as a "perfect orthogonal REST API" in real world.
 
 * Metaprogramming creates resonable and explainable entities.
   (demo)
+
+What is information API
+
+GET-only (logical)
+Simple authorization
+JSON

@@ -96,8 +96,20 @@ module TLAW
           }
         end
         context 'code + json message'
-        context 'code + unparseable json'
-        context 'just unparseable json'
+        context 'code + text'
+        context 'code + html'
+
+        context 'exception while processing' do
+          before {
+            stub_request(:get, 'https://api.example.com?q=Why')
+              .to_return { raise JSON::ParserError, 'Unparseable!' }
+          }
+
+          specify {
+            expect { endpoint.call(q: 'Why') }
+              .to raise_error(API::Error, 'JSON::ParserError at https://api.example.com?q=Why: Unparseable!')
+          }
+        end
       end
     end
 

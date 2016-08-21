@@ -34,10 +34,16 @@ module TLAW
     end
 
     def call(**params)
+      url = construct_url(**params)
+
       @client.get(construct_url(**params))
         .tap { |response| guard_errors!(response) }
         .derp { |response| JSON.parse(response.body) }
         .derp(&Util.method(:flatten_hash))
+    rescue API::Error
+      raise
+    rescue => e
+      fail API::Error, "#{e.class} at #{url}: #{e.message}"
     end
 
     private
@@ -45,7 +51,15 @@ module TLAW
     def guard_errors!(response)
       return response if (200...400).include?(response.status)
 
-      fail API::Error, "HTTP #{response.status} at #{response.env[:url]}"
+      p response.body
+      body = JSON.parse(response.body) rescue nil
+      message = body && (body['message'] || body['error'])
+
+      if message
+        fail API::Error, "HTTP #{response.status} at #{response.env[:url]}: #{message}"
+      else
+        fail API::Error, "HTTP #{response.status} at #{response.env[:url]}"
+      end
     end
 
     def construct_template
