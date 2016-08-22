@@ -35,5 +35,9 @@ module TLAW
         end
       }.flatten(1).to_h
     end
+
+    class Description < String
+      alias_method :inspect, :to_s
+    end
   end
 end

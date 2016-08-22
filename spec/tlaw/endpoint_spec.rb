@@ -141,12 +141,13 @@ module TLAW
     context 'documentation' do
       before {
         endpoint_class.endpoint_name = :ep
+        endpoint_class.description = "This is cool endpoint!\nIt works."
 
-        endpoint_class.add_param :kv1
-        endpoint_class.add_param :kv2, required: true
+        endpoint_class.add_param :kv1, type: Time
+        endpoint_class.add_param :kv2, type: :to_i, required: true
 
         endpoint_class.add_param :arg1, keyword_argument: false
-        endpoint_class.add_param :arg3, keyword_argument: false, required: true
+        endpoint_class.add_param :arg3, type: :to_time, keyword_argument: false, required: true
 
         allow(endpoint_class).to receive(:name).and_return('SomeEndpoint')
       }
@@ -155,6 +156,21 @@ module TLAW
         subject { endpoint.inspect }
 
         it { is_expected.to eq '#<SomeEndpoint: call-sequence (arg3, arg1=nil, kv2:, kv1: nil); docs: .describe>' }
+      end
+
+      describe '#describe' do
+        subject { endpoint.describe }
+
+        it { is_expected.to eq(%Q{
+          |Synopsys: ep(arg3, arg1=nil, kv2:, kv1: nil)
+          |  This is cool endpoint!
+          |  It works.
+          |
+          |  @param arg3 [#to_time]
+          |  @param arg1 [#to_s]
+          |  @param kv2 [#to_i]
+          |  @param kv1 [Time]
+        }.unindent)}
       end
     end
   end

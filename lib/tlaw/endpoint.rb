@@ -10,7 +10,7 @@ module TLAW
     end
 
     class << self
-      attr_accessor :api, :url, :endpoint_name
+      attr_accessor :api, :url, :endpoint_name, :description
 
       include Shared::ParamHolder
 
@@ -56,7 +56,22 @@ module TLAW
           args.partition(&:required?)
         }.flatten.map(&:generate_definition).join(', ')
 
-      "#<#{self.class.name}: call-sequence (#{arg_def}); docs: .describe>"
+      "#<#{self.class.name}: call-sequence: #{self.class.endpoint_name}(#{arg_def}); docs: .describe>"
+    end
+
+    def describe
+      args = self.class.send(:own_params)
+        .partition(&:keyword_argument?).reverse.map { |args|
+          args.partition(&:required?)
+        }.flatten
+
+      arg_def = args.map(&:generate_definition).join(', ')
+
+      Util::Description.new(
+        "Synopsys: #{self.class.endpoint_name}(#{arg_def})\n" +
+          self.class.description.to_s.gsub(/(\A|\n)/, '\1  ') + "\n" +
+          args.map { |a| "  @param #{a.name} [#{a.doc_type}]" }.join("\n")
+      )
     end
 
     private

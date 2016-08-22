@@ -46,6 +46,17 @@ module TLAW
       end
     end
 
+    def doc_type
+      case type
+      when nil
+        '#to_s'
+      when Symbol
+        "##{type}"
+      when Class
+        type.name
+      end
+    end
+
     def format(value)
       to_url_part(formatter.call(value))
     end
