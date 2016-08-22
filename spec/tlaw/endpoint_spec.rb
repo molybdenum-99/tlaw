@@ -137,5 +137,25 @@ module TLAW
         .and include('endpoints[:ep].call(**param)')
       }
     end
+
+    context 'documentation' do
+      before {
+        endpoint_class.endpoint_name = :ep
+
+        endpoint_class.add_param :kv1
+        endpoint_class.add_param :kv2, required: true
+
+        endpoint_class.add_param :arg1, keyword_argument: false
+        endpoint_class.add_param :arg3, keyword_argument: false, required: true
+
+        allow(endpoint_class).to receive(:name).and_return('SomeEndpoint')
+      }
+
+      describe '#inspect' do
+        subject { endpoint.inspect }
+
+        it { is_expected.to eq '#<SomeEndpoint: call-sequence (arg3, arg1=nil, kv2:, kv1: nil); docs: .describe>' }
+      end
+    end
   end
 end

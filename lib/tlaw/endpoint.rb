@@ -50,6 +50,15 @@ module TLAW
       fail API::Error, "#{e.class} at #{url}: #{e.message}"
     end
 
+    def inspect
+      arg_def = self.class.send(:own_params)
+        .partition(&:keyword_argument?).reverse.map { |args|
+          args.partition(&:required?)
+        }.flatten.map(&:generate_definition).join(', ')
+
+      "#<#{self.class.name}: call-sequence (#{arg_def}); docs: .describe>"
+    end
+
     private
 
     def guard_errors!(response)

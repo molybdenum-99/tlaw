@@ -81,5 +81,40 @@ module TLAW
         end
       end
     end
+
+    context 'documentation' do
+      let(:api_class) {
+        Class.new(API) do
+          define do
+            base 'http://api.example.com'
+
+            param :api_key, required: true
+
+            endpoint :some_ep do
+              param :foo
+            end
+
+            namespace :some_ns do
+            end
+          end
+        end
+      }
+      let(:api) { api_class.new(api_key: '123') }
+
+      before { allow(api_class).to receive(:name).and_return('Dummy') }
+
+      context '.inspect' do
+        subject { api_class.inspect }
+
+        it { is_expected.to eq '#<Dummy | create: Dummy.new(api_key:), docs: Dummy.describe>' }
+      end
+
+      context '#inspect' do
+        subject { api.inspect }
+
+        it { is_expected.to eq '#<Dummy(api_key: "123") namespaces: some_ns; endpoints: some_ep; docs: .describe>' }
+      end
+
+    end
   end
 end

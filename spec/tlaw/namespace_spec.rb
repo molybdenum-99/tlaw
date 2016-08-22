@@ -64,6 +64,15 @@ module TLAW
         end
 
       end
+
+      context 'documentation' do
+        before { allow(namespace_class).to receive(:name).and_return('SomeNamespace') }
+        describe '#inspect' do
+          subject { namespace.inspect }
+
+          it { is_expected.to eq '#<SomeNamespace endpoints: some_ep; docs: .describe>' }
+        end
+      end
     end
   end
 end

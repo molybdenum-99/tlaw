@@ -11,6 +11,14 @@ module TLAW
       @namespaces = self.class.namespaces.map { |name, klass| [name, klass.new(self)] }.to_h
     end
 
+    def inspect
+      param = initial_param.reject { |k, v| v.nil? }.map { |k,v| "#{k}: #{v.inspect}" }.join(', ')
+      "#<#{self.class.name}(#{param})" +
+        (namespaces.empty? ? '' : " namespaces: #{namespaces.keys.join(', ')};") +
+        (endpoints.empty? ? '' : " endpoints: #{endpoints.keys.join(', ')};") +
+        ' docs: .describe>'
+    end
+
     private
 
     class << self
@@ -23,6 +31,15 @@ module TLAW
       include Shared::ParamHolder
       include Shared::EndpointHolder
       include Shared::NamespaceHolder
+
+      def inspect
+        param_def = params.values
+          .partition(&:keyword_argument?).reverse.map { |args|
+            args.partition(&:required?)
+          }.flatten.map(&:generate_definition).join(', ')
+
+        "#<#{self.name} | create: #{self.name}.new(#{param_def}), docs: #{self.name}.describe>"
+      end
     end
   end
 end

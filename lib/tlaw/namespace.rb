@@ -10,6 +10,13 @@ module TLAW
       @endpoints = self.class.endpoints.map { |name, klass| [name, klass.new(api)] }.to_h
     end
 
+    def inspect
+      "#<#{self.class.name}" +
+        # (namespaces.empty? ? '' : " namespaces: #{namespaces.keys.join(', ')};") +
+        (endpoints.empty? ? '' : " endpoints: #{endpoints.keys.join(', ')};") +
+        ' docs: .describe>'
+    end
+
     class << self
       attr_accessor :api
       attr_accessor :base_url
