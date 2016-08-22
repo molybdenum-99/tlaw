@@ -159,6 +159,30 @@ module TLAW
           wrapper.param :param1, String, required: true
         end
       end
+
+      describe '#post_process' do
+        it 'adds post processor without key' do
+          expect(endpoint.response_processor).to receive(:add_post_processor).with(nil)
+          wrapper.post_process { |h| }
+        end
+
+        it 'adds post processor with key' do
+          expect(endpoint.response_processor).to receive(:add_post_processor).with('count')
+          wrapper.post_process('count') { |h| }
+        end
+      end
+
+      describe '#post_process_each' do
+        it 'adds post processor without key' do
+          expect(endpoint.response_processor).to receive(:add_item_post_processor).with('list', nil)
+          wrapper.post_process_each('list') { |h| }
+        end
+
+        it 'adds post processor with key' do
+          expect(endpoint.response_processor).to receive(:add_item_post_processor).with('list', 'dt')
+          wrapper.post_process_each('list', 'dt') { |h| }
+        end
+      end
     end
   end
 end

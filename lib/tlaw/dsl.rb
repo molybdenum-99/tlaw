@@ -61,6 +61,14 @@ module TLAW
 
     class EndpointWrapper < BaseWrapper
       include ParamDefiner
+
+      def post_process(key = nil, &block)
+        @object.response_processor.add_post_processor(key, &block)
+      end
+
+      def post_process_each(key, subkey = nil, &block)
+        @object.response_processor.add_item_post_processor(key, subkey, &block)
+      end
     end
 
     class NamespaceWrapper < BaseWrapper

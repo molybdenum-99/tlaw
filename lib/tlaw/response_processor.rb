@@ -1,4 +1,5 @@
 module TLAW
+  # FIXME: everything is awfully dirty here
   class ResponseProcessor
     def initialize
       @post_processors = []
