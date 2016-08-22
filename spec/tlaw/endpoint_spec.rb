@@ -55,6 +55,7 @@ module TLAW
     describe '#call' do
       before {
         endpoint_class.add_param(:q)
+        endpoint_class.response_processor.add_post_processor('response.message', &:downcase)
       }
 
       it 'calls web with params provided' do
@@ -77,7 +78,7 @@ module TLAW
         expect(endpoint.call(q: 'Why'))
           .to eq(
             'response.status' => 200,
-            'response.message' => 'OK',
+            'response.message' => 'ok',
             'data.field1' => 'foo',
             'data.field2.bar' => 1
           )

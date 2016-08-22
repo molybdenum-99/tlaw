@@ -1,31 +1,29 @@
 module TLAW
   class ResponseProcessor
-    class << self
-      def post_process(key = nil, &block)
-        post_processors << [key, block]
-      end
+    def initialize
+      @post_processors = []
+    end
 
-      def post_process_each(key, subkey = nil, &block)
-        post_processors << [key, ->(array) {
-          next array unless array.is_a?(Array)
-          array.map { |h|
-            if subkey
+    def add_post_processor(key = nil, &block)
+      @post_processors << [key, block]
+    end
+
+    def add_item_post_processor(key, subkey = nil, &block)
+      @post_processors << [key, ->(array) {
+        next array unless array.is_a?(Array)
+        array.map { |h|
+          if subkey
+            if h[subkey]
               h.merge(subkey => block.call(h[subkey]))
             else
-              block.call(h)
               h
-            end.reject { |k, v| v.nil? }
-          }
-        }]
-      end
-
-      def post_processors
-        @post_processors ||= []
-      end
-
-      def list_post_processors
-        @list_post_processors ||= {}
-      end
+            end
+          else
+            block.call(h)
+            h
+          end.reject { |k, v| v.nil? }
+        }
+      }]
     end
 
     def flatten(hash)
@@ -46,14 +44,18 @@ module TLAW
     end
 
     def post_process(hash)
-      self.class.post_processors.inject(hash) { |res, (key, block)|
+      @post_processors.inject(hash) { |res, (key, block)|
         if key
-          res.merge(key => block.call(res[key]))
+          if res.has_key?(key)
+            res.merge(key => block.call(res[key]))
+          else
+            res
+          end
         else
           block.call(res)
           res
         end
-      }.reject { |k, v| v.nil? }
+      }.reject { |k, v| v.nil? }.derp(&method(:flatten))
     end
 
     def datablize(hash)
@@ -64,6 +66,10 @@ module TLAW
           [k, v]
         end
       }.to_h
+    end
+
+    def process(hash)
+      flatten(hash).derp(&method(:post_process)).derp(&method(:datablize))
     end
   end
 end

@@ -1,7 +1,6 @@
 module TLAW
   describe ResponseProcessor do
-    let(:processor) { Class.new(described_class) }
-    let(:processor_instance) { processor.new }
+    let(:processor) { described_class.new }
 
     describe 'initial flattening' do
       let(:source) {
@@ -16,7 +15,7 @@ module TLAW
         }
       }
 
-      subject { processor_instance.flatten(source) }
+      subject { processor.flatten(source) }
 
       it { is_expected.to eq(
           'response.count' => 10,
@@ -43,11 +42,11 @@ module TLAW
         }
       }
 
-      subject { processor_instance.post_process(source) }
+      subject { processor.post_process(source) }
 
       context 'global' do
         before {
-          processor.post_process { |h|
+          processor.add_post_processor { |h|
             h['count'] = h['count'].to_i
           }
         }
@@ -57,15 +56,21 @@ module TLAW
 
       context 'one key' do
         before {
-          processor.post_process('count', &:to_i)
+          processor.add_post_processor('count', &:to_i)
         }
 
         its(['count']) { is_expected.to eq 10 }
+
+        context 'key is absent' do
+          let(:source) { {} }
+
+          it { is_expected.not_to include('count') }
+        end
       end
 
       context 'each element of array by key' do
         before {
-          processor.post_process_each('list') { |h| h['t'] = Time.at(h['t']) }
+          processor.add_item_post_processor('list') { |h| h['t'] = Time.at(h['t']) }
         }
 
         it { expect(subject['list'].map{|h| h['t']}).to all be_a(Time) }
@@ -73,18 +78,33 @@ module TLAW
 
       context 'each element -> key' do
         before {
-          processor.post_process_each('list', 't') { |v| Time.at(v) }
+          processor.add_item_post_processor('list', 't') { |v| Time.at(v) }
         }
 
         it { expect(subject['list'].map{|h| h['t']}).to all be_a(Time) }
+
+        context 'key is absent' do
+          let(:source) { {'list' => [{'i' => 1}, {'i' => 2}]} }
+
+          it { expect(subject['list'].map{|h| h.has_key?('t')}).to all be_falsey  }
+        end
       end
 
       context 'removing unnecessary' do
         before {
-          processor.post_process('dummy') { nil }
+          processor.add_post_processor('dummy') { nil }
         }
 
         it { is_expected.not_to include('dummy') }
+      end
+
+      context 'reflattening' do
+        before {
+          processor.add_post_processor('count') { {'total' => 100, 'current' => 10} }
+        }
+
+        it { is_expected.not_to include('count') }
+        it { is_expected.to include('count.total' => 100, 'count.current' => 10) }
       end
     end
 
@@ -99,7 +119,7 @@ module TLAW
         }
       }
 
-      subject { processor_instance.datablize(source)['list'] }
+      subject { processor.datablize(source)['list'] }
 
       it { is_expected.to be_a DataTable }
       its(:keys) { is_expected.to eq %w[i val] }

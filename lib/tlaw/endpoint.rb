@@ -26,6 +26,10 @@ module TLAW
         "end"
       end
 
+      def response_processor
+        @response_processor ||= ResponseProcessor.new
+      end
+
       private
 
       def own_params
@@ -39,7 +43,7 @@ module TLAW
       @client.get(construct_url(**params))
         .tap { |response| guard_errors!(response) }
         .derp { |response| JSON.parse(response.body) }
-        .derp(&Util.method(:flatten_hash))
+        .derp { |response| self.class.response_processor.process(response) }
     rescue API::Error
       raise
     rescue => e
@@ -51,7 +55,6 @@ module TLAW
     def guard_errors!(response)
       return response if (200...400).include?(response.status)
 
-      p response.body
       body = JSON.parse(response.body) rescue nil
       message = body && (body['message'] || body['error'])
 
