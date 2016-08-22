@@ -21,7 +21,7 @@ module TLAW
           }.flatten.map(&:generate_definition).join(', ')
 
         "def #{endpoint_name}(#{arg_def})\n" +
-        "  param = initial_param.merge(#{own_params.map(&:name).map { |n| "#{n}: #{n}" }.join(', ')})\n" +
+        "  param = initial_param.merge({#{own_params.map(&:name).map { |n| "#{n}: #{n}" }.join(', ')}})\n" +
         "  endpoints[:#{endpoint_name}].call(**param)\n" +
         "end"
       end
