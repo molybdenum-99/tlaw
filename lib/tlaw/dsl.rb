@@ -57,6 +57,18 @@ module TLAW
           @object.__send__(:add_namespace, ns)
         end
       end
+
+      def post_process(key = nil, &block)
+        @object.endpoints.values.each do |e|
+          e.response_processor.add_post_processor(key, &block)
+        end
+      end
+
+      def post_process_each(key, subkey = nil, &block)
+        @object.endpoints.values.each do |e|
+          e.response_processor.add_item_post_processor(key, subkey, &block)
+        end
+      end
     end
 
     class EndpointWrapper < BaseWrapper
@@ -74,6 +86,18 @@ module TLAW
     class NamespaceWrapper < BaseWrapper
       include ParamDefiner
       include EndpointDefiner
+
+      def post_process(key = nil, &block)
+        @object.endpoints.values.each do |e|
+          e.response_processor.add_post_processor(key, &block)
+        end
+      end
+
+      def post_process_each(key, subkey = nil, &block)
+        @object.endpoints.values.each do |e|
+          e.response_processor.add_item_post_processor(key, subkey, &block)
+        end
+      end
     end
   end
 end
