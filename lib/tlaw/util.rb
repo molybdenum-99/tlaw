@@ -38,6 +38,10 @@ module TLAW
 
     class Description < String
       alias_method :inspect, :to_s
+
+      def indent(indentation = '  ')
+        gsub(/(\A|\n)/, '\1' + indentation)
+      end
     end
   end
 end

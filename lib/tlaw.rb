@@ -15,6 +15,7 @@ require_relative 'tlaw/util'
 require_relative 'tlaw/data_table'
 
 require_relative 'tlaw/param'
+require_relative 'tlaw/param_set'
 
 require_relative 'tlaw/shared'
 

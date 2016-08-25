@@ -1,6 +1,6 @@
 module TLAW
   describe Endpoint do
-    describe '.add_param' do
+    describe '.param_set' do
     end
 
     let(:url_template) { 'https://api.example.com' }
@@ -19,8 +19,8 @@ module TLAW
 
       context 'only query params' do
         before {
-          endpoint_class.add_param(:q)
-          endpoint_class.add_param(:pagesize, type: :to_i, format: ->(v) { v*10 })
+          endpoint_class.param_set.add(:q)
+          endpoint_class.param_set.add(:pagesize, type: :to_i, format: ->(v) { v*10 })
         }
         let(:params) { {q: 'Kharkiv oblast', pagesize: 10, page: 5} }
 
@@ -29,8 +29,8 @@ module TLAW
 
       context 'path & query params' do
         before {
-          endpoint_class.add_param(:q)
-          endpoint_class.add_param(:pagesize, type: :to_i, format: ->(v) { v*10 })
+          endpoint_class.param_set.add(:q)
+          endpoint_class.param_set.add(:pagesize, type: :to_i, format: ->(v) { v*10 })
         }
         let(:params) { {q: 'Kharkiv', pagesize: 10, page: 5} }
 
@@ -41,8 +41,8 @@ module TLAW
 
       context 'path with ?' do
         before {
-          endpoint_class.add_param(:q)
-          endpoint_class.add_param(:pagesize, type: :to_i, format: ->(v) { v*10 })
+          endpoint_class.param_set.add(:q)
+          endpoint_class.param_set.add(:pagesize, type: :to_i, format: ->(v) { v*10 })
         }
         let(:params) { {q: 'Kharkiv', pagesize: 10, page: 5} }
 
@@ -54,7 +54,7 @@ module TLAW
 
     describe '#call' do
       before {
-        endpoint_class.add_param(:q)
+        endpoint_class.param_set.add(:q)
         endpoint_class.response_processor.add_post_processor('response.message', &:downcase)
       }
 
@@ -118,22 +118,22 @@ module TLAW
       before {
         endpoint_class.endpoint_name = :ep
 
-        endpoint_class.add_param :kv1
-        endpoint_class.add_param :kv2, required: true
-        endpoint_class.add_param :kv3, default: 14
+        endpoint_class.param_set.add :kv1
+        endpoint_class.param_set.add :kv2, required: true
+        endpoint_class.param_set.add :kv3, default: 14
 
-        endpoint_class.add_param :arg1, keyword_argument: false
-        endpoint_class.add_param :arg2, keyword_argument: false, default: 'foo'
-        endpoint_class.add_param :arg3, keyword_argument: false, required: true
+        endpoint_class.param_set.add :arg1, keyword_argument: false
+        endpoint_class.param_set.add :arg2, keyword_argument: false, default: 'foo'
+        endpoint_class.param_set.add :arg3, keyword_argument: false, required: true
 
-        endpoint_class.add_param :cm1, common: true
+        endpoint_class.param_set.add :cm1, common: true
       }
 
-      subject { endpoint_class.generate_definition }
+      subject { endpoint_class.to_code }
 
       it { is_expected
         .to  include('def ep(arg3, arg1=nil, arg2="foo", kv2:, kv1: nil, kv3: 14)')
-        .and include('param = initial_param.merge(kv1: kv1, kv2: kv2, kv3: kv3, arg1: arg1, arg2: arg2, arg3: arg3)')
+        .and include('param = initial_param.merge({kv1: kv1, kv2: kv2, kv3: kv3, arg1: arg1, arg2: arg2, arg3: arg3})')
         .and include('endpoints[:ep].call(**param)')
       }
     end
@@ -143,11 +143,11 @@ module TLAW
         endpoint_class.endpoint_name = :ep
         endpoint_class.description = "This is cool endpoint!\nIt works."
 
-        endpoint_class.add_param :kv1, type: Time
-        endpoint_class.add_param :kv2, type: :to_i, required: true
+        endpoint_class.param_set.add :kv1, type: Time
+        endpoint_class.param_set.add :kv2, type: :to_i, required: true
 
-        endpoint_class.add_param :arg1, keyword_argument: false
-        endpoint_class.add_param :arg3, type: :to_time, keyword_argument: false, required: true
+        endpoint_class.param_set.add :arg1, keyword_argument: false
+        endpoint_class.param_set.add :arg3, type: :to_time, keyword_argument: false, required: true
 
         allow(endpoint_class).to receive(:name).and_return('SomeEndpoint')
       }
@@ -155,7 +155,7 @@ module TLAW
       describe '#inspect' do
         subject { endpoint.inspect }
 
-        it { is_expected.to eq '#<SomeEndpoint: call-sequence (arg3, arg1=nil, kv2:, kv1: nil); docs: .describe>' }
+        it { is_expected.to eq '#<SomeEndpoint: call-sequence: ep(arg3, arg1=nil, kv2:, kv1: nil); docs: .describe>' }
       end
 
       describe '#describe' do

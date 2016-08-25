@@ -2,33 +2,33 @@ module TLAW
   class Param
     Nonconvertible = Class.new(ArgumentError)
 
-    DEFAULT_DEFINITION = {keyword_argument: true}.freeze
+    DEFAULT_OPTIONS = {keyword_argument: true}.freeze
 
-    attr_reader :name, :definition
+    attr_reader :name, :options
 
-    def initialize(name, **definition)
+    def initialize(name, **options)
       @name = name
-      @definition = DEFAULT_DEFINITION.merge(definition)
+      @options = DEFAULT_OPTIONS.merge(options)
     end
 
     def type
-      definition[:type]
+      options[:type]
     end
 
     def required?
-      definition[:required]
+      options[:required]
     end
 
     def keyword_argument?
-      definition[:keyword_argument]
+      options[:keyword_argument]
     end
 
     def common?
-      definition[:common]
+      options[:common]
     end
 
-    def update(**new_definition)
-      @definition.update(new_definition)
+    def update(**new_options)
+      @options.update(new_options)
     end
 
     def convert(value)
@@ -46,17 +46,6 @@ module TLAW
       end
     end
 
-    def doc_type
-      case type
-      when nil
-        '#to_s'
-      when Symbol
-        "##{type}"
-      when Class
-        type.name
-      end
-    end
-
     def format(value)
       to_url_part(formatter.call(value))
     end
@@ -65,10 +54,10 @@ module TLAW
       format(convert(value))
     end
 
-    alias_method :to_h, :definition
+    alias_method :to_h, :options
 
-    def generate_definition
-      default = definition[:default]
+    def to_code
+      default = options[:default]
 
       case
       when keyword_argument? && required?
@@ -82,8 +71,22 @@ module TLAW
       end
     end
 
+    def describe
+      Util::Description.new("@param #{name} [#{doc_type}]")
+    end
+
     private
 
+    def doc_type
+      case type
+      when nil
+        '#to_s'
+      when Symbol
+        "##{type}"
+      when Class
+        type.name
+      end
+    end
     def to_url_part(value)
       case value
       when Array
@@ -95,15 +98,15 @@ module TLAW
 
     def formatter
       @formatter ||=
-        case definition[:format]
+        case options[:format]
         when Proc
-          definition[:format]
+          options[:format]
         when ->(f) { f.respond_to?(:to_proc) }
-          definition[:format].to_proc
+          options[:format].to_proc
         when nil
           ->(v) { v }
         else
-          fail ArgumentError, "#{self}: unsupporter formatter #{definition[:format]}"
+          fail ArgumentError, "#{self}: unsupporter formatter #{options[:format]}"
         end
     end
 

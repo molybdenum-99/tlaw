@@ -1,5 +1,6 @@
 require 'faraday'
 require 'addressable/template'
+require 'forwardable'
 
 module TLAW
   class Endpoint
@@ -12,16 +13,13 @@ module TLAW
     class << self
       attr_accessor :api, :url, :endpoint_name, :description
 
-      include Shared::ParamHolder
+      def param_set
+        @param_set ||= ParamSet.new
+      end
 
-      def generate_definition
-        arg_def = own_params
-          .partition(&:keyword_argument?).reverse.map { |args|
-            args.partition(&:required?)
-          }.flatten.map(&:generate_definition).join(', ')
-
-        "def #{endpoint_name}(#{arg_def})\n" +
-        "  param = initial_param.merge({#{own_params.map(&:name).map { |n| "#{n}: #{n}" }.join(', ')}})\n" +
+      def to_code
+        "def #{endpoint_name}(#{param_set.to_code})\n" +
+        "  param = initial_param.merge({#{param_set.names.map { |n| "#{n}: #{n}" }.join(', ')}})\n" +
         "  endpoints[:#{endpoint_name}].call(**param)\n" +
         "end"
       end
@@ -30,10 +28,16 @@ module TLAW
         @response_processor ||= ResponseProcessor.new
       end
 
-      private
+      def inspect
+        "#<#{name}: call-sequence: #{endpoint_name}(#{param_set.to_code}); docs: .describe>"
+      end
 
-      def own_params
-        params.values.reject(&:common?)
+      def describe
+        Util::Description.new(
+          "Synopsys: #{endpoint_name}(#{param_set.to_code})\n" +
+            description.to_s.gsub(/(\A|\n)/, '\1  ') + "\n" +
+            param_set.describe.indent('  ')
+        )
       end
     end
 
@@ -50,31 +54,15 @@ module TLAW
       fail API::Error, "#{e.class} at #{url}: #{e.message}"
     end
 
-    def inspect
-      arg_def = self.class.send(:own_params)
-        .partition(&:keyword_argument?).reverse.map { |args|
-          args.partition(&:required?)
-        }.flatten.map(&:generate_definition).join(', ')
+    extend Forwardable
 
-      "#<#{self.class.name}: call-sequence: #{self.class.endpoint_name}(#{arg_def}); docs: .describe>"
-    end
-
-    def describe
-      args = self.class.send(:own_params)
-        .partition(&:keyword_argument?).reverse.map { |args|
-          args.partition(&:required?)
-        }.flatten
-
-      arg_def = args.map(&:generate_definition).join(', ')
-
-      Util::Description.new(
-        "Synopsys: #{self.class.endpoint_name}(#{arg_def})\n" +
-          self.class.description.to_s.gsub(/(\A|\n)/, '\1  ') + "\n" +
-          args.map { |a| "  @param #{a.name} [#{a.doc_type}]" }.join("\n")
-      )
-    end
+    def_delegators :self_class, :inspect, :describe
 
     private
+
+    def self_class
+      self.class
+    end
 
     def guard_errors!(response)
       return response if (200...400).include?(response.status)
@@ -91,7 +79,7 @@ module TLAW
 
     def construct_template
       t = Addressable::Template.new(self.class.url)
-      query_params = self.class.params.reject { |k, v| t.keys.include?(k.to_s) }
+      query_params = self.class.param_set.to_h.reject { |k, v| t.keys.include?(k.to_s) }
 
       tpl = if query_params.empty?
           self.class.url
@@ -104,11 +92,7 @@ module TLAW
     end
 
     def construct_url(**params)
-      url_params = self.class.params
-        .map { |name, dfn| [name, dfn, params[name]] }
-        .reject { |*, val| val.nil? }
-        .map { |name, dfn, val| [name, dfn.convert_and_format(val)] }
-        .to_h
+      url_params = self.class.param_set.process(**params)
       @template.expand(url_params).to_s
     end
   end
