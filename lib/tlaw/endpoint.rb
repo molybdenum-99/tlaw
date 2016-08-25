@@ -4,8 +4,7 @@ require 'forwardable'
 
 module TLAW
   class Endpoint
-    def initialize(api)
-      @api = api
+    def initialize
       @client = Faraday.new
       @template = construct_template
     end

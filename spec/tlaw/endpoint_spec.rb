@@ -4,9 +4,8 @@ module TLAW
     end
 
     let(:url_template) { 'https://api.example.com' }
-    let(:api) { instance_double('TLAW::API') }
     let(:endpoint_class) { Class.new(Endpoint).tap { |c| c.url = url_template } }
-    let(:endpoint) { endpoint_class.new(api) }
+    let(:endpoint) { endpoint_class.new }
 
     describe '#construct_url' do
       let(:params) { {} }

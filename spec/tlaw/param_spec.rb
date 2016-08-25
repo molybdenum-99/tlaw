@@ -85,7 +85,7 @@ module TLAW
     end
 
     describe '#generate_definition' do
-      subject { param.generate_definition }
+      subject { param.to_code }
 
       context 'keyword - required' do
         let(:param) { Param.new(:p, required: true) }

@@ -44,13 +44,13 @@ module TLAW
       }
 
       describe '#definition' do
-        subject { set.definition }
+        subject { set.to_code }
 
         it { is_expected.to  eq 'arg3, arg1=nil, arg2="foo", kv2:, kv1: nil, kv3: 14' }
       end
 
       describe '#description' do
-        subject { set.description }
+        subject { set.describe }
 
         it { is_expected.to be_a Util::Description }
         it { is_expected.to eq %Q{
