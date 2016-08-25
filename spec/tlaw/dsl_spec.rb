@@ -147,6 +147,7 @@ module TLAW
 
       describe '#define' do
         let(:block) { ->{} }
+
         it 'calls definition API' do
           expect(wrapper).to receive(:instance_eval){|&b| expect(b).to eq block }
           wrapper.define(&block)
@@ -155,7 +156,7 @@ module TLAW
 
       describe '#param' do
         it 'creates params' do
-          expect(endpoint).to receive(:add_param).with(:param1, type: String, required: true)
+          expect(endpoint.param_set).to receive(:add).with(:param1, type: String, required: true)
           wrapper.param :param1, String, required: true
         end
       end

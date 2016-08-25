@@ -10,7 +10,7 @@ module TLAW
     end
 
     class << self
-      attr_accessor :api, :url, :endpoint_name, :description
+      attr_accessor :url, :endpoint_name, :description
 
       def param_set
         @param_set ||= ParamSet.new

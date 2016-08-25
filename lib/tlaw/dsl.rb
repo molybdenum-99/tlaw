@@ -2,7 +2,7 @@ module TLAW
   module DSL
     module ParamDefiner
       def param(name, type = nil, **opts)
-        @object.__send__(:add_param, name, **opts.merge(type: type))
+        @object.param_set.add(name, **opts.merge(type: type))
       end
     end
 
