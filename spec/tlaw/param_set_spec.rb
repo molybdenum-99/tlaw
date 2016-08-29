@@ -55,7 +55,18 @@ module TLAW
       it 'fails on unknown params' do
         expect { set.process(param3: 'foo') }.to raise_error(ArgumentError, "Unknown parameters: param3")
       end
-      it 'allows params from parent scope'
+
+      context 'parent scope' do
+        let(:parent) { described_class.new }
+        before {
+          parent.add :param3
+          set.parent = parent
+        }
+        it 'allows params from parent scope' do
+          expect(set.process(param2: 1, param3: 'foo'))
+            .to eq(param2: '1', param3: 'foo')
+        end
+      end
     end
 
     context 'docs' do
