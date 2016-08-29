@@ -28,7 +28,35 @@ module TLAW
       end
     end
 
-    describe '#process'
+    describe '#process' do
+      before {
+        set.add(:param1, type: Integer)
+        set.add(:param2, required: true)
+      }
+
+      it 'convert & format all the params' do
+        expect(set[:param1]).to receive(:convert_and_format).with(:val1).and_return('val2')
+        expect(set[:param2]).to receive(:convert_and_format).with(:val3).and_return('val4')
+        expect(set.process(param1: :val1, param2: :val3)).to \
+          eq(param1: 'val2', param2: 'val4')
+      end
+
+      it 'drops empty params' do
+        expect(set[:param1]).not_to receive(:convert_and_format)
+        expect(set[:param2]).to receive(:convert_and_format).with(:val3).and_return('val4')
+        expect(set.process(param1: nil, param2: :val3)).to \
+          eq(param2: 'val4')
+      end
+
+      it 'checks required params existance' do
+        expect { set.process(param2: nil) }.to raise_error(ArgumentError, "Required parameter param2 is missing")
+      end
+
+      it 'fails on unknown params' do
+        expect { set.process(param3: 'foo') }.to raise_error(ArgumentError, "Unknown parameters: param3")
+      end
+      it 'allows params from parent scope'
+    end
 
     context 'docs' do
       before {

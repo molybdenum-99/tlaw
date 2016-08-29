@@ -4,11 +4,6 @@ require 'forwardable'
 
 module TLAW
   class Endpoint
-    def initialize
-      @client = Faraday.new
-      @template = construct_template
-    end
-
     class << self
       attr_accessor :url, :endpoint_name, :description
 
@@ -38,6 +33,11 @@ module TLAW
             param_set.describe.indent('  ')
         )
       end
+    end
+
+    def initialize
+      @client = Faraday.new
+      @template = construct_template
     end
 
     def call(**params)

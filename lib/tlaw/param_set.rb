@@ -37,8 +37,12 @@ module TLAW
     end
 
     def process(**input)
+      (input.keys - @params.keys).tap { |unknown|
+        unknown.empty? or raise(ArgumentError, "Unknown parameters: #{unknown.join(', ')}")
+      }
       @params
         .map { |name, dfn| [name, dfn, input[name]] }
+        .each { |name, dfn, val| dfn.required? && val.nil? and raise(ArgumentError, "Required parameter #{name} is missing") }
         .reject { |*, val| val.nil? }
         .map { |name, dfn, val| [name, dfn.convert_and_format(val)] }
         .to_h
