@@ -27,7 +27,7 @@ module TLAW
     end
 
     def names
-      @params.values.reject(&:common?).map(&:name)
+      @params.keys
     end
 
     def to_code
@@ -58,7 +58,6 @@ module TLAW
 
     def ordered
       @params.values
-        .reject(&:common?)
         .partition(&:keyword_argument?).reverse.map { |args|
           args.partition(&:required?)
         }.flatten

@@ -1,50 +1,103 @@
 module TLAW
-  describe API do
+  describe Namespace do
     context 'definition' do
+      subject(:namespace) {
+        Class.new(described_class).tap { |c|
+          c.base_url = 'https://example.com/ns'
+        }
+      }
+
       describe '.define' do
       end
 
-      describe '.add_param' do
-      end
+      its(:param_set) { is_expected.to be_a ParamSet }
 
       describe '.add_endpoint' do
-        let(:endpoint) { Class.new(Endpoint) }
-        subject(:namespace) { Class.new(Namespace) }
+        let(:endpoint) {
+          Class.new(Endpoint).tap { |c|
+            c.symbol = :some_endpoint
+            c.path = '/ep'
+          }
+        }
+
         before {
-          endpoint.endpoint_name = :some_endpoint
-          namespace.__send__(:add_endpoint, endpoint)
+          namespace.add_endpoint(endpoint)
         }
 
         its(:constants) { is_expected.to include(:SomeEndpoint) }
         its(:instance_methods) { is_expected.to include(:some_endpoint) }
         its(:endpoints) { is_expected.to include(some_endpoint: endpoint) }
+
+        context 'updates endpoint' do
+          subject { endpoint }
+
+          its(:'param_set.parent') { is_expected.to eq namespace.param_set }
+          its(:base_url) { is_expected.to eq 'https://example.com/ns/ep' }
+        end
+      end
+
+      describe '.add_namespace' do
+        let(:child) {
+          Class.new(Namespace).tap { |c|
+            c.symbol = :some_namespace
+            c.path = '/ns2'
+          }
+        }
+        before {
+          namespace.add_namespace(child)
+        }
+
+        its(:constants) { is_expected.to include(:SomeNamespace) }
+        its(:instance_methods) { is_expected.to include(:some_namespace) }
+        its(:namespaces) { is_expected.to include(some_namespace: child) }
+
+        context 'updates child' do
+          subject { child }
+
+          its(:'param_set.parent') { is_expected.to eq namespace.param_set }
+          its(:base_url) { is_expected.to eq 'https://example.com/ns/ns2' }
+        end
       end
     end
 
     context 'instance' do
       let(:endpoint_class) {
-        Class.new(Endpoint) {
-          self.endpoint_name = :some_ep
-          self.url = 'https://api.example.com/ns/some_ep'
-          self.add_param :foo
+        Class.new(Endpoint).tap { |c|
+          c.symbol = :some_ep
+          c.path = '/some_ep'
+          c.param_set.add :foo
+        }
+      }
+
+      let(:child_class) {
+        Class.new(described_class).tap { |c|
+          c.symbol = :child_ns
+          c.path = '/ns2'
         }
       }
 
       let!(:namespace_class) {
-        Class.new(Namespace).tap { |c|
+        Class.new(described_class).tap { |c|
           c.base_url = 'https://api.example.com/ns'
           c.add_endpoint endpoint_class
+          c.add_namespace child_class
+          c.param_set.add :apikey
         }
       }
       let(:initial_params) { {} }
 
-      let(:api) { instance_double('TLAW::API', initial_param: initial_params) }
-
-      subject(:namespace) { namespace_class.new(api)  }
+      subject(:namespace) { namespace_class.new(initial_params)  }
 
       describe '#initialize' do
         it 'instantiates endpoints' do
           expect(namespace.endpoints[:some_ep]).to be_an Endpoint
+        end
+
+        let(:initial_params) { {apikey: '111'} }
+
+        it 'instantiates children' do
+          expect(namespace.namespaces[:child_ns]).to be_a Namespace
+          expect(namespace.namespaces[:child_ns].initial_params).to eq initial_params
         end
       end
 

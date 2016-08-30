@@ -5,16 +5,16 @@ require 'forwardable'
 module TLAW
   class Endpoint
     class << self
-      attr_accessor :url, :endpoint_name, :description
+      attr_accessor :base_url, :path, :symbol, :description
 
       def param_set
         @param_set ||= ParamSet.new
       end
 
       def to_code
-        "def #{endpoint_name}(#{param_set.to_code})\n" +
-        "  param = initial_param.merge({#{param_set.names.map { |n| "#{n}: #{n}" }.join(', ')}})\n" +
-        "  endpoints[:#{endpoint_name}].call(**param)\n" +
+        "def #{symbol}(#{param_set.to_code})\n" +
+        "  param = initial_params.merge({#{param_set.names.map { |n| "#{n}: #{n}" }.join(', ')}})\n" +
+        "  endpoints[:#{symbol}].call(**param)\n" +
         "end"
       end
 
@@ -23,12 +23,12 @@ module TLAW
       end
 
       def inspect
-        "#<#{name}: call-sequence: #{endpoint_name}(#{param_set.to_code}); docs: .describe>"
+        "#<#{name || '(unnamed endpoint class)'}: call-sequence: #{symbol}(#{param_set.to_code}); docs: .describe>"
       end
 
       def describe
         Util::Description.new(
-          "Synopsys: #{endpoint_name}(#{param_set.to_code})\n" +
+          "Synopsys: #{symbol}(#{param_set.to_code})\n" +
             description.to_s.gsub(/(\A|\n)/, '\1  ') + "\n" +
             param_set.describe.indent('  ')
         )
@@ -77,15 +77,15 @@ module TLAW
     end
 
     def construct_template
-      t = Addressable::Template.new(self.class.url)
-      query_params = self.class.param_set.to_h.reject { |k, v| t.keys.include?(k.to_s) }
+      t = Addressable::Template.new(self.class.base_url)
+      query_params = self.class.param_set.all_params.reject { |k, v| t.keys.include?(k.to_s) }
 
       tpl = if query_params.empty?
-          self.class.url
+          self.class.base_url
         else
-          joiner = self.class.url.include?('?') ? '&' : '?'
+          joiner = self.class.base_url.include?('?') ? '&' : '?'
 
-          self.class.url + '{' + joiner + query_params.keys.join(',') + '}'
+          self.class.base_url + '{' + joiner + query_params.keys.join(',') + '}'
         end
       Addressable::Template.new(tpl)
     end

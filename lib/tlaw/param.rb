@@ -23,10 +23,6 @@ module TLAW
       options[:keyword_argument]
     end
 
-    def common?
-      options[:common]
-    end
-
     def update(**new_options)
       @options.update(new_options)
     end

@@ -78,8 +78,6 @@ module TLAW
         set.add :arg1, keyword_argument: false
         set.add :arg2, keyword_argument: false, default: 'foo'
         set.add :arg3, type: :to_time, keyword_argument: false, required: true
-
-        set.add :cm1, common: true
       }
 
       describe '#definition' do

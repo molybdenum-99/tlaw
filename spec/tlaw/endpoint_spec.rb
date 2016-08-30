@@ -1,11 +1,13 @@
 module TLAW
   describe Endpoint do
-    describe '.param_set' do
-    end
-
     let(:url_template) { 'https://api.example.com' }
-    let(:endpoint_class) { Class.new(Endpoint).tap { |c| c.url = url_template } }
+    let(:endpoint_class) { Class.new(Endpoint).tap { |c| c.base_url = url_template } }
     let(:endpoint) { endpoint_class.new }
+
+    context '.param_set' do
+      subject { endpoint_class }
+      its(:param_set) { is_expected.to be_a ParamSet }
+    end
 
     describe '#construct_url' do
       let(:params) { {} }
@@ -21,7 +23,7 @@ module TLAW
           endpoint_class.param_set.add(:q)
           endpoint_class.param_set.add(:pagesize, type: :to_i, format: ->(v) { v*10 })
         }
-        let(:params) { {q: 'Kharkiv oblast', pagesize: 10, page: 5} }
+        let(:params) { {q: 'Kharkiv oblast', pagesize: 10} }
 
         it { is_expected.to eq 'https://api.example.com?q=Kharkiv%20oblast&pagesize=100' }
       end
@@ -31,7 +33,7 @@ module TLAW
           endpoint_class.param_set.add(:q)
           endpoint_class.param_set.add(:pagesize, type: :to_i, format: ->(v) { v*10 })
         }
-        let(:params) { {q: 'Kharkiv', pagesize: 10, page: 5} }
+        let(:params) { {q: 'Kharkiv', pagesize: 10} }
 
         let(:url_template) { 'https://api.example.com{/q}' }
 
@@ -43,12 +45,14 @@ module TLAW
           endpoint_class.param_set.add(:q)
           endpoint_class.param_set.add(:pagesize, type: :to_i, format: ->(v) { v*10 })
         }
-        let(:params) { {q: 'Kharkiv', pagesize: 10, page: 5} }
+        let(:params) { {q: 'Kharkiv', pagesize: 10} }
 
         let(:url_template) { 'https://api.example.com?q={q}' }
 
         it { is_expected.to eq 'https://api.example.com?q=Kharkiv&pagesize=100' }
       end
+
+      context 'parent-defined params'
     end
 
     describe '#call' do
@@ -115,7 +119,7 @@ module TLAW
 
     describe '#generated_definition' do
       before {
-        endpoint_class.endpoint_name = :ep
+        endpoint_class.symbol = :ep
 
         endpoint_class.param_set.add :kv1
         endpoint_class.param_set.add :kv2, required: true
@@ -124,22 +128,20 @@ module TLAW
         endpoint_class.param_set.add :arg1, keyword_argument: false
         endpoint_class.param_set.add :arg2, keyword_argument: false, default: 'foo'
         endpoint_class.param_set.add :arg3, keyword_argument: false, required: true
-
-        endpoint_class.param_set.add :cm1, common: true
       }
 
       subject { endpoint_class.to_code }
 
       it { is_expected
         .to  include('def ep(arg3, arg1=nil, arg2="foo", kv2:, kv1: nil, kv3: 14)')
-        .and include('param = initial_param.merge({kv1: kv1, kv2: kv2, kv3: kv3, arg1: arg1, arg2: arg2, arg3: arg3})')
+        .and include('param = initial_params.merge({kv1: kv1, kv2: kv2, kv3: kv3, arg1: arg1, arg2: arg2, arg3: arg3})')
         .and include('endpoints[:ep].call(**param)')
       }
     end
 
     context 'documentation' do
       before {
-        endpoint_class.endpoint_name = :ep
+        endpoint_class.symbol = :ep
         endpoint_class.description = "This is cool endpoint!\nIt works."
 
         endpoint_class.param_set.add :kv1, type: Time

@@ -1,30 +1,65 @@
 module TLAW
   class Namespace
-    attr_reader :endpoints, :initial_param
+    attr_reader :endpoints, :namespaces, :initial_params
 
-    def initialize(api)
-      @api = api
-      @initial_param = api.initial_param # TODO: could add param at namespace call?..
+    def initialize(**initial_params)
+      @initial_params = initial_params # TODO: parent namespace here too
 
-      # TODO: responsibility of endpoints_holder?
-      @endpoints = self.class.endpoints.map { |name, klass| [name, klass.new(api)] }.to_h
+      @namespaces = self.class.namespaces.map { |name, klass| [name, klass.new(initial_params)] }.to_h
+      @endpoints = self.class.endpoints.map { |name, klass| [name, klass.new] }.to_h
     end
 
     def inspect
-      "#<#{self.class.name}" +
-        # (namespaces.empty? ? '' : " namespaces: #{namespaces.keys.join(', ')};") +
+      "#<#{self.class.name || '(unnamed namespace class)'}" +
+        (namespaces.empty? ? '' : " namespaces: #{namespaces.keys.join(', ')};") +
         (endpoints.empty? ? '' : " endpoints: #{endpoints.keys.join(', ')};") +
         ' docs: .describe>'
     end
 
     class << self
-      attr_accessor :api
-      attr_accessor :base_url
-      attr_accessor :namespace_name
+      attr_accessor :base_url, :path, :symbol
 
-      include Shared::ParamHolder
-      include Shared::EndpointHolder
-      include Shared::NamespaceHolder
+      def param_set
+        @param_set ||= ParamSet.new
+      end
+
+      def add_endpoint(endpoint)
+        name = endpoint.symbol
+
+        # TODO: validate if it is classifiable
+        const_set(Util::camelize(name), endpoint)
+        endpoints[name] = endpoint
+        endpoint.param_set.parent = param_set
+        if endpoint.path && !endpoint.base_url
+          base_url or fail(ArgumentError, "Current namespace does not define base url, not know what to do with #{endpoint.path}")
+          endpoint.base_url = base_url + endpoint.path
+        end
+
+        module_eval(endpoint.to_code)
+      end
+
+      def endpoints
+        @endpoints ||= {}
+      end
+
+      def add_namespace(child)
+        name = child.symbol
+
+        # TODO: validate if it is classifiable
+        const_set(Util::camelize(name), child)
+        namespaces[name] = child
+        child.param_set.parent = param_set
+        if child.path && !child.base_url
+          base_url or fail(NameError, 'Current namespace does not define base url')
+          child.base_url = base_url + child.path
+        end
+
+        define_method(name) { @namespaces[name] }
+      end
+
+      def namespaces
+        @namespaces ||= {}
+      end
     end
   end
 end
