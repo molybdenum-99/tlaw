@@ -17,7 +17,17 @@ module TLAW
     end
 
     class << self
-      attr_accessor :base_url, :path, :symbol
+      attr_accessor :path, :symbol
+      attr_reader :base_url
+
+      def base_url=(url)
+        @base_url = url
+        endpoints.values.each do |endpoint|
+          if endpoint.path && !endpoint.base_url
+            endpoint.base_url = base_url + endpoint.path
+          end
+        end
+      end
 
       def param_set
         @param_set ||= ParamSet.new
@@ -30,8 +40,7 @@ module TLAW
         const_set(Util::camelize(name), endpoint)
         endpoints[name] = endpoint
         endpoint.param_set.parent = param_set
-        if endpoint.path && !endpoint.base_url
-          base_url or fail(ArgumentError, "Current namespace does not define base url, not know what to do with #{endpoint.path}")
+        if endpoint.path && !endpoint.base_url && base_url
           endpoint.base_url = base_url + endpoint.path
         end
 

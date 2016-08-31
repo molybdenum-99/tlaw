@@ -186,4 +186,28 @@ module TLAW
       end
     end
   end
+
+  describe 'all at once' do
+    let(:api_class) {
+      Class.new(API) {
+        define {
+          base 'http://api.example.com'
+          namespace :some_ns do
+            endpoint :some_ep do
+              param :foo
+            end
+          end
+        }
+      }
+    }
+
+    let(:api) { api_class.new }
+
+    it 'produces reasonable outcome' do
+      expect(api.some_ns.endpoints[:some_ep].class.base_url)
+        .to eq 'http://api.example.com/some_ns/some_ep'
+
+      expect(api.some_ns.method(:some_ep).parameters).to eq [[:key, :foo]]
+    end
+  end
 end

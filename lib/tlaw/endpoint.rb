@@ -35,9 +35,11 @@ module TLAW
       end
     end
 
+    attr_reader :url_template
+
     def initialize
       @client = Faraday.new
-      @template = construct_template
+      @url_template = construct_template
     end
 
     def call(**params)
@@ -50,6 +52,7 @@ module TLAW
     rescue API::Error
       raise
     rescue => e
+      raise unless url
       fail API::Error, "#{e.class} at #{url}: #{e.message}"
     end
 
@@ -92,7 +95,7 @@ module TLAW
 
     def construct_url(**params)
       url_params = self.class.param_set.process(**params)
-      @template.expand(url_params).to_s
+      @url_template.expand(url_params).to_s
     end
   end
 end

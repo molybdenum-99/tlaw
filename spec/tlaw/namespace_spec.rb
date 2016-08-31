@@ -123,7 +123,7 @@ module TLAW
         describe '#inspect' do
           subject { namespace.inspect }
 
-          it { is_expected.to eq '#<SomeNamespace endpoints: some_ep; docs: .describe>' }
+          it { is_expected.to eq '#<SomeNamespace namespaces: child_ns; endpoints: some_ep; docs: .describe>' }
         end
       end
     end
