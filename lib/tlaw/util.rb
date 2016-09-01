@@ -3,6 +3,9 @@ module TLAW
     module_function
 
     def camelize(string)
+      # TODO: coool things
+      # return 'Brackets' if string == :[]
+
       string.to_s
         .sub(/^[a-z\d]*/) { |l| l.capitalize }
         .gsub(/(?:_|(\/))([a-z\d]*)/i) { "#{$1}#{$2.capitalize}" }
@@ -38,6 +41,10 @@ module TLAW
 
     class Description < String
       alias_method :inspect, :to_s
+
+      def initialize(str)
+        super(str.to_s.gsub(/\n +\n/, "\n\n"))
+      end
 
       def indent(indentation = '  ')
         gsub(/(\A|\n)/, '\1' + indentation)

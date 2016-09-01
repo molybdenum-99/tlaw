@@ -160,10 +160,10 @@ module TLAW
       end
 
       describe '#describe' do
-        subject { endpoint.describe }
+        subject { endpoint.describe.to_s }
 
         it { is_expected.to eq(%Q{
-          |Synopsys: ep(arg3, arg1=nil, kv2:, kv1: nil)
+          |ep(arg3, arg1=nil, kv2:, kv1: nil)
           |  This is cool endpoint!
           |  It works.
           |

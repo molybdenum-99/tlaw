@@ -1,27 +1,9 @@
 module TLAW
-  class Namespace
-    attr_reader :endpoints, :namespaces, :initial_params
-
-    def initialize(**initial_params)
-      @initial_params = initial_params # TODO: parent namespace here too
-
-      @namespaces = self.class.namespaces.map { |name, klass| [name, klass.new(initial_params)] }.to_h
-      @endpoints = self.class.endpoints.map { |name, klass| [name, klass.new] }.to_h
-    end
-
-    def inspect
-      "#<#{self.class.name || '(unnamed namespace class)'}" +
-        (namespaces.empty? ? '' : " namespaces: #{namespaces.keys.join(', ')};") +
-        (endpoints.empty? ? '' : " endpoints: #{endpoints.keys.join(', ')};") +
-        ' docs: .describe>'
-    end
-
+  class Namespace < APIObject
     class << self
-      attr_accessor :path, :symbol
-      attr_reader :base_url
-
       def base_url=(url)
         @base_url = url
+
         endpoints.values.each do |endpoint|
           if endpoint.path && !endpoint.base_url
             endpoint.base_url = base_url + endpoint.path
@@ -29,14 +11,13 @@ module TLAW
         end
       end
 
-      def param_set
-        @param_set ||= ParamSet.new
-      end
-
       def add_endpoint(endpoint)
         name = endpoint.symbol
 
-        # TODO: validate if it is classifiable
+        # TODO:
+        # * validate if it is classifiable
+        # * provide reasonable defaults for non-classifiable (like :[])
+        # * provide additional option for non-default class name
         const_set(Util::camelize(name), endpoint)
         endpoints[name] = endpoint
         endpoint.param_set.parent = param_set
@@ -69,6 +50,33 @@ module TLAW
       def namespaces
         @namespaces ||= {}
       end
+    end
+
+    attr_reader :endpoints, :namespaces, :initial_params
+
+    def initialize(**initial_params)
+      @initial_params = initial_params # TODO: parent namespace here too
+
+      @namespaces = self.class.namespaces.map { |name, klass| [name, klass.new(initial_params)] }.to_h
+      @endpoints = self.class.endpoints.map { |name, klass| [name, klass.new] }.to_h
+    end
+
+    def inspect
+      "#<#{self.class.name || '(unnamed namespace class)'}" +
+        (namespaces.empty? ? '' : " namespaces: #{namespaces.keys.join(', ')};") +
+        (endpoints.empty? ? '' : " endpoints: #{endpoints.keys.join(', ')};") +
+        ' docs: .describe>'
+    end
+
+    def describe
+      Util::Description.new(
+        #"#{self.class.symbol}\n" +
+        #Util::Description.new(self.class.description.to_s).indent('  ') +
+        self.class.describe +
+        "Endpoints:\n\n" +
+        endpoints.values.map(&:describe)
+          .map { |ed| ed.indent('  ') }.join("\n\n")
+      )
     end
   end
 end

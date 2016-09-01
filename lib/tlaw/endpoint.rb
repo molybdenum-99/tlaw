@@ -3,16 +3,10 @@ require 'addressable/template'
 require 'forwardable'
 
 module TLAW
-  class Endpoint
+  class Endpoint < APIObject
     class << self
-      attr_accessor :base_url, :path, :symbol, :description
-
-      def param_set
-        @param_set ||= ParamSet.new
-      end
-
       def to_code
-        "def #{symbol}(#{param_set.to_code})\n" +
+        "def #{to_method_definition}" +
         "  param = initial_params.merge({#{param_set.names.map { |n| "#{n}: #{n}" }.join(', ')}})\n" +
         "  endpoints[:#{symbol}].call(**param)\n" +
         "end"
@@ -24,14 +18,6 @@ module TLAW
 
       def inspect
         "#<#{name || '(unnamed endpoint class)'}: call-sequence: #{symbol}(#{param_set.to_code}); docs: .describe>"
-      end
-
-      def describe
-        Util::Description.new(
-          "Synopsys: #{symbol}(#{param_set.to_code})\n" +
-            description.to_s.gsub(/(\A|\n)/, '\1  ') + "\n" +
-            param_set.describe.indent('  ')
-        )
       end
     end
 

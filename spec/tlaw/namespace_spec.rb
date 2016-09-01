@@ -78,6 +78,7 @@ module TLAW
 
       let!(:namespace_class) {
         Class.new(described_class).tap { |c|
+          c.symbol = :some_ns
           c.base_url = 'https://api.example.com/ns'
           c.add_endpoint endpoint_class
           c.add_namespace child_class
@@ -120,10 +121,29 @@ module TLAW
 
       context 'documentation' do
         before { allow(namespace_class).to receive(:name).and_return('SomeNamespace') }
+
         describe '#inspect' do
           subject { namespace.inspect }
 
           it { is_expected.to eq '#<SomeNamespace namespaces: child_ns; endpoints: some_ep; docs: .describe>' }
+        end
+
+        describe '#describe' do # this describe just describes the describe. Problems, officer?
+          before {
+            namespace_class.description = "It's namespace, you know?..\nIt is ok."
+          }
+          subject { namespace.describe.to_s }
+
+          it { is_expected.to eq(%Q{
+            |some_ns
+            |  It's namespace, you know?..
+            |  It is ok.
+            |
+            |  Endpoints:
+            |
+            |  some_ep(foo: nil)
+            |    @param foo [#to_s]
+          }.unindent)}
         end
       end
     end
