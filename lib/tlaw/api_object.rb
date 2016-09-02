@@ -2,7 +2,12 @@ module TLAW
   class APIObject
     class << self
       attr_accessor :base_url, :path
-      attr_reader :description, :symbol
+      attr_reader :description
+
+      def symbol
+        @symbol || (name && "#{name}.new") or
+          fail(ArgumentError, "Undescribed API object #{self}")
+      end
 
       def description=(descr)
         @description = Util::Description.new(descr)
@@ -18,12 +23,12 @@ module TLAW
       end
 
       def to_method_definition
-        "#{symbol}(#{param_set.to_code})\n"
+        "#{symbol}(#{param_set.to_code})"
       end
 
       def describe
         Util::Description.new(
-          "#{to_method_definition}\n" +
+          ".#{to_method_definition}\n" +
             (description ? description.indent('  ') + "\n\n" : '') +
             param_set.describe.indent('  ')
         )

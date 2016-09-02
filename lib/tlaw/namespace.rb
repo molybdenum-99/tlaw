@@ -70,13 +70,24 @@ module TLAW
 
     def describe
       Util::Description.new(
-        #"#{self.class.symbol}\n" +
-        #Util::Description.new(self.class.description.to_s).indent('  ') +
-        self.class.describe +
-        "Endpoints:\n\n" +
-        endpoints.values.map(&:describe)
-          .map { |ed| ed.indent('  ') }.join("\n\n")
+        self.class.describe + namespaces_description + endpoints_description
       )
+    end
+
+    def namespaces_description
+      return '' if namespaces.empty?
+
+      "\n\n  Namespaces:\n\n" +
+        namespaces.values.map(&:describe)
+        .map { |ns| ns.indent('  ') }.join("\n\n") + "\n"
+    end
+
+    def endpoints_description
+      return '' if endpoints.empty?
+
+      "Endpoints:\n\n" +
+        endpoints.values.map(&:describe)
+        .map { |ed| ed.indent('  ') }.join("\n\n")
     end
   end
 end

@@ -28,6 +28,11 @@ module TLAW
         DSL::APIWrapper.new(self).define(&block)
       end
 
+      def describe
+        super.sub(/\A./, '')
+      end
+
+
       #def inspect
         #param_def = params.values
           #.partition(&:keyword_argument?).reverse.map { |args|

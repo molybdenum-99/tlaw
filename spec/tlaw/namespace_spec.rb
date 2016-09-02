@@ -135,13 +135,19 @@ module TLAW
           subject { namespace.describe.to_s }
 
           it { is_expected.to eq(%Q{
-            |some_ns
+            |.some_ns(apikey: nil)
             |  It's namespace, you know?..
             |  It is ok.
             |
+            |  @param apikey [#to_s]
+            |
+            |  Namespaces:
+            |
+            |  .child_ns()
+            |
             |  Endpoints:
             |
-            |  some_ep(foo: nil)
+            |  .some_ep(foo: nil)
             |    @param foo [#to_s]
           }.unindent)}
         end

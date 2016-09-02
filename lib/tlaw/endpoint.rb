@@ -6,7 +6,7 @@ module TLAW
   class Endpoint < APIObject
     class << self
       def to_code
-        "def #{to_method_definition}" +
+        "def #{to_method_definition}\n" +
         "  param = initial_params.merge({#{param_set.names.map { |n| "#{n}: #{n}" }.join(', ')}})\n" +
         "  endpoints[:#{symbol}].call(**param)\n" +
         "end"

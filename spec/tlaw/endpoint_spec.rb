@@ -163,7 +163,7 @@ module TLAW
         subject { endpoint.describe.to_s }
 
         it { is_expected.to eq(%Q{
-          |ep(arg3, arg1=nil, kv2:, kv1: nil)
+          |.ep(arg3, arg1=nil, kv2:, kv1: nil)
           |  This is cool endpoint!
           |  It works.
           |
