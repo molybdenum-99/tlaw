@@ -55,8 +55,8 @@ module TLAW
         else
           block.call(res)
           res
-        end
-      }.reject { |_, v| v.nil? }.derp(&method(:flatten))
+        end.derp(&method(:flatten))
+      }.reject { |_, v| v.nil? }
     end
 
     def datablize(hash)

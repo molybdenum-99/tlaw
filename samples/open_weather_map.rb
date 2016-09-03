@@ -43,6 +43,9 @@ module TLAW
             post_process('dt', &Time.method(:at))
             post_process('sys.sunrise', &Time.method(:at))
             post_process('sys.sunset', &Time.method(:at))
+
+            # See http://openweathermap.org/weather-conditions#How-to-get-icon-URL
+            post_process('weather.icon') { |i| "http://openweathermap.org/img/w/#{i}.png" }
           end
 
           endpoint :city_id, path: '?id={city_id}' do
