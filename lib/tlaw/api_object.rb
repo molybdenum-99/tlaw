@@ -22,6 +22,10 @@ module TLAW
         @param_set ||= ParamSet.new
       end
 
+      def response_processor
+        @response_processor ||= ResponseProcessor.new
+      end
+
       def to_method_definition
         "#{symbol}(#{param_set.to_code})"
       end

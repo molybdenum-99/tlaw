@@ -20,21 +20,27 @@ module TLAW
         param :units, enum: %w[standard metric imperial], default: 'standard',
           desc: 'Units for temperature and other values. Standard is Kelvin.'
 
-        post_process('weather', &:first)
-        post_process('dt', &Time.method(:at))
-        post_process('sys.sunrise', &Time.method(:at))
-        post_process('sys.sunset', &Time.method(:at))
+        WEATHER_POST_PROCESSOR = lambda do |*|
+          # Currently, it always provides array of exactly 1 item
+          post_process('weather', &:first)
 
-        # See http://openweathermap.org/weather-conditions#How-to-get-icon-URL
-        post_process('weather.icon') { |i| "http://openweathermap.org/img/w/#{i}.png" }
+          post_process('dt', &Time.method(:at))
+          post_process('sys.sunrise', &Time.method(:at))
+          post_process('sys.sunset', &Time.method(:at))
 
-        post_process_each('list', 'weather', &:first)
-        post_process_each('list', 'dt', &Time.method(:at))
-        post_process_each('list', 'sys.sunrise', &Time.method(:at))
-        post_process_each('list', 'sys.sunset', &Time.method(:at))
+          post_process { |e|
+            e['coord'] = Geo::Coord.new(e['coord.lat'], e['coord.lon']) if e['coord.lat'] && e['coord.lon']
+          }
+          post_process('coord.lat') { nil }
+          post_process('coord.lon') { nil }
 
-        # See http://openweathermap.org/weather-conditions#How-to-get-icon-URL
-        post_process_each('list', 'weather.icon') { |i| "http://openweathermap.org/img/w/#{i}.png" }
+          # See http://openweathermap.org/weather-conditions#How-to-get-icon-URL
+          post_process('weather.icon') { |i| "http://openweathermap.org/img/w/#{i}.png" }
+        end
+
+        instance_eval(&WEATHER_POST_PROCESSOR)
+
+        post_process_items('list', &WEATHER_POST_PROCESSOR)
 
         CURRENT_WEATHER_ENDPOINTS = lambda do |*|
           endpoint :city, path: '?q={city}{,country_code}' do
@@ -107,17 +113,6 @@ module TLAW
             param :type, enum: %w[accurate like], default: 'accurate', keyword_argument: false
 
             instance_eval(&CURRENT_WEATHER_ENDPOINTS)
-
-            post_process_each('list', 'weather', &:first)
-            post_process_each('list', 'dt', &Time.method(:at))
-            post_process_each('list', 'sys.sunrise', &Time.method(:at))
-            post_process_each('list', 'sys.sunset', &Time.method(:at))
-            post_process_each('list') { |e| e['coord'] = Geo::Coord.new(e['coord.lat'], e['coord.lon']) }
-            post_process_each('list', 'coord.lat'){nil}
-            post_process_each('list', 'coord.lon'){nil}
-
-            # See http://openweathermap.org/weather-conditions#How-to-get-icon-URL
-            post_process_each('list', 'weather.icon') { |i| "http://openweathermap.org/img/w/#{i}.png" }
           end
 
         # http://openweathermap.org/current#cities

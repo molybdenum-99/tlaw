@@ -42,8 +42,10 @@ module TLAW
       end
     end
 
-    def initialize
-      @post_processors = []
+    attr_reader :post_processors
+
+    def initialize(post_processors = [])
+      @post_processors = post_processors
     end
 
     def add_post_processor(key = nil, &block)
@@ -52,6 +54,14 @@ module TLAW
 
     def add_item_post_processor(key, subkey = nil, &block)
       @post_processors << Items.new(key, subkey, &block)
+    end
+
+    def merge(other)
+      dup.merge!(other)
+    end
+
+    def merge!(other)
+      @post_processors.concat(other.post_processors)
     end
 
     def flatten(hash)

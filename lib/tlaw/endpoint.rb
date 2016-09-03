@@ -11,10 +11,6 @@ module TLAW
         'end'
       end
 
-      def response_processor
-        @response_processor ||= ResponseProcessor.new
-      end
-
       def inspect
         "#<#{name || '(unnamed endpoint class)'}:" \
         " call-sequence: #{symbol}(#{param_set.to_code}); docs: .describe>"

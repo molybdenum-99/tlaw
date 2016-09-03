@@ -21,9 +21,7 @@ module TLAW
       def param(name, type = nil, **opts)
         @object.param_set.add(name, **opts.merge(type: type))
       end
-    end
 
-    class EndpointWrapper < BaseWrapper
       def post_process(key = nil, &block)
         @object.response_processor.add_post_processor(key, &block)
       end
@@ -31,6 +29,9 @@ module TLAW
       def post_process_each(key, subkey = nil, &block)
         @object.response_processor.add_item_post_processor(key, subkey, &block)
       end
+    end
+
+    class EndpointWrapper < BaseWrapper
     end
 
     # rubocop:disable Metrics/ParameterLists
@@ -43,18 +44,6 @@ module TLAW
         define_child(name, path, Namespace, NamespaceWrapper, **opts, &block)
       end
 
-      def post_process(key = nil, &block)
-        @object.endpoints.values.each do |e|
-          e.response_processor.add_post_processor(key, &block)
-        end
-      end
-
-      def post_process_each(key, subkey = nil, &block)
-        @object.endpoints.values.each do |e|
-          e.response_processor.add_item_post_processor(key, subkey, &block)
-        end
-      end
-
       private
 
       def define_child(name, path, child_class, wrapper_class, **_opts, &block)
@@ -65,6 +54,8 @@ module TLAW
           Addressable::Template.new(c.path).keys.each do |key|
             c.param_set.add key.to_sym, keyword_argument: false
           end
+
+          c.response_processor.merge!(@object.response_processor)
 
           wrapper_class.new(c).define(&block) if block
           @object.add_child(c)
