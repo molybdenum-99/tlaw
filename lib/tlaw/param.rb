@@ -2,13 +2,11 @@ module TLAW
   class Param
     Nonconvertible = Class.new(ArgumentError)
 
-    DEFAULT_OPTIONS = {keyword_argument: true}.freeze
-
     attr_reader :name, :options
 
     def initialize(name, **options)
       @name = name
-      @options = DEFAULT_OPTIONS.merge(options)
+      @options = options
       @formatter = make_formatter
     end
 
@@ -20,8 +18,8 @@ module TLAW
       options[:required]
     end
 
-    def keyword_argument?
-      options[:keyword_argument]
+    def default
+      options[:default]
     end
 
     def update(**new_options)
@@ -55,28 +53,13 @@ module TLAW
 
     alias_method :to_h, :options
 
-    def to_code
-      default = options[:default]
-
-      case
-      when keyword_argument? && required?
-        "#{name}:"
-      when keyword_argument?
-        # FIXME: this `inspect` will fail with, say, Time
-        "#{name}: #{default.inspect}"
-      when required?
-        name.to_s
-      else
-        "#{name}=#{default.inspect}"
-      end
-    end
-
     def description
       options[:description] || options[:desc]
     end
 
     def describe
-      ["@param #{name} [#{doc_type}]", description].compact.join(' ')
+      ["@param #{name} [#{doc_type}]", description]
+        .compact.join(' ')
         .derp(&Util::Description.method(:new))
     end
 
@@ -121,6 +104,36 @@ module TLAW
 
     def nonconvertible!(value, reason)
       fail Nonconvertible, "#{self} can't convert  #{value}: #{reason}"
+    end
+  end
+
+  class ArgumentParam < Param
+    def keyword_argument?
+      false
+    end
+
+    def to_code
+      if required?
+        name.to_s
+      else
+        # FIXME: this `inspect` will fail with, say, Time
+        "#{name}=#{default.inspect}"
+      end
+    end
+  end
+
+  class KeywordParam < Param
+    def keyword_argument?
+      true
+    end
+
+    def to_code
+      if required?
+        "#{name}:"
+      else
+        # FIXME: this `inspect` will fail with, say, Time
+        "#{name}: #{default.inspect}"
+      end
     end
   end
 end

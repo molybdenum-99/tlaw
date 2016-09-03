@@ -37,7 +37,7 @@ module TLAW
       def describe_short
         Util::Description.new(
           ".#{to_method_definition}" +
-            (description ? "\n" + description.split("\n\n").first.indent('  ') : '')
+            (description ? "\n" + description_first_para.indent('  ') : '')
         )
       end
 
@@ -45,6 +45,12 @@ module TLAW
         file, line = method(:to_code).source_location
         # line + 1 is where real definition, theoretically, starts
         host.module_eval(to_code, file, line + 1)
+      end
+
+      private
+
+      def description_first_para
+        description.split("\n\n").first
       end
     end
 

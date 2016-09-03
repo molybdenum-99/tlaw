@@ -10,7 +10,12 @@ module TLAW
       if @params[name]
         @params[name].update(**opts)
       else
-        @params[name] = Param.new(name, **opts)
+        @params[name] =
+          if opts[:keyword_argument] != false
+            KeywordParam.new(name, **opts)
+          else
+            ArgumentParam.new(name, **opts)
+          end
       end
     end
 

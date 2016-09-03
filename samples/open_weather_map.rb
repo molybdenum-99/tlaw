@@ -1,3 +1,5 @@
+require 'geo/coord'
+
 module TLAW
   module Samples
     class OpenWeatherMap < TLAW::API
@@ -18,16 +20,23 @@ module TLAW
         param :units, enum: %w[standard metric imperial], default: 'standard',
           desc: 'Units for temperature and other values. Standard is Kelvin.'
 
-        # http://openweathermap.org/current
-        namespace :current, path: '/weather' do
-          desc %Q{
-            Allows to obtain current weather at one place, designated
-            by city, location or zip code. See also {#batch_current} for
-            obtaining weather in several places at once.
+        post_process('weather', &:first)
+        post_process('dt', &Time.method(:at))
+        post_process('sys.sunrise', &Time.method(:at))
+        post_process('sys.sunset', &Time.method(:at))
 
-            Docs: http://openweathermap.org/current
-          }
+        # See http://openweathermap.org/weather-conditions#How-to-get-icon-URL
+        post_process('weather.icon') { |i| "http://openweathermap.org/img/w/#{i}.png" }
 
+        post_process_each('list', 'weather', &:first)
+        post_process_each('list', 'dt', &Time.method(:at))
+        post_process_each('list', 'sys.sunrise', &Time.method(:at))
+        post_process_each('list', 'sys.sunset', &Time.method(:at))
+
+        # See http://openweathermap.org/weather-conditions#How-to-get-icon-URL
+        post_process_each('list', 'weather.icon') { |i| "http://openweathermap.org/img/w/#{i}.png" }
+
+        CURRENT_WEATHER_ENDPOINTS = lambda do |*|
           endpoint :city, path: '?q={city}{,country_code}' do
             desc %Q{
               Current weather by city name (with optional country code
@@ -38,14 +47,6 @@ module TLAW
 
             param :city, required: true, desc: 'City name'
             param :country_code, desc: 'ISO 3166 2-letter country code'
-
-            post_process('weather', &:first)
-            post_process('dt', &Time.method(:at))
-            post_process('sys.sunrise', &Time.method(:at))
-            post_process('sys.sunset', &Time.method(:at))
-
-            # See http://openweathermap.org/weather-conditions#How-to-get-icon-URL
-            post_process('weather.icon') { |i| "http://openweathermap.org/img/w/#{i}.png" }
           end
 
           endpoint :city_id, path: '?id={city_id}' do
@@ -85,6 +86,39 @@ module TLAW
             param :country_code, desc: 'ISO 3166 2-letter country code'
           end
         end
+
+        namespace :current, path: '/weather',
+          desc: %Q{
+            Allows to obtain current weather at one place, designated
+            by city, location or zip code. See also {#batch_current} for
+            obtaining weather in several places at once.
+
+            Docs: http://openweathermap.org/current
+          },
+          &CURRENT_WEATHER_ENDPOINTS
+
+        namespace :find, path: '/find',
+          desc: %Q{
+            Allows to find some place (and weather in it) by set of input
+            parameters.
+
+            Docs: http://openweathermap.org/current#accuracy
+          } do
+            param :type, enum: %w[accurate like], default: 'accurate', keyword_argument: false
+
+            instance_eval(&CURRENT_WEATHER_ENDPOINTS)
+
+            post_process_each('list', 'weather', &:first)
+            post_process_each('list', 'dt', &Time.method(:at))
+            post_process_each('list', 'sys.sunrise', &Time.method(:at))
+            post_process_each('list', 'sys.sunset', &Time.method(:at))
+            post_process_each('list') { |e| e['coord'] = Geo::Coord.new(e['coord.lat'], e['coord.lon']) }
+            post_process_each('list', 'coord.lat'){nil}
+            post_process_each('list', 'coord.lon'){nil}
+
+            # See http://openweathermap.org/weather-conditions#How-to-get-icon-URL
+            post_process_each('list', 'weather.icon') { |i| "http://openweathermap.org/img/w/#{i}.png" }
+          end
 
         # http://openweathermap.org/current#cities
         namespace :batch_current, path: '' do
