@@ -28,9 +28,9 @@ module TLAW
 
       def describe
         Util::Description.new(
-          ".#{to_method_definition}\n" +
-            (description ? description.indent('  ') + "\n\n" : '') +
-            param_set.describe.indent('  ')
+          ".#{to_method_definition}" +
+            (description ? "\n" + description.indent('  ') + "\n" : '') +
+            (param_set.empty? ? '' : "\n" + param_set.describe.indent('  '))
         )
       end
     end

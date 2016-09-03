@@ -55,7 +55,7 @@ module TLAW
     attr_reader :endpoints, :namespaces, :initial_params
 
     def initialize(**initial_params)
-      @initial_params = initial_params # TODO: parent namespace here too
+      @initial_params = initial_params
 
       @namespaces = self.class.namespaces.map { |name, klass| [name, klass.new(initial_params)] }.to_h
       @endpoints = self.class.endpoints.map { |name, klass| [name, klass.new] }.to_h
@@ -70,7 +70,9 @@ module TLAW
 
     def describe
       Util::Description.new(
-        self.class.describe + namespaces_description + endpoints_description
+        self.class.describe +
+        namespaces_description +
+        endpoints_description
       )
     end
 
@@ -79,13 +81,13 @@ module TLAW
 
       "\n\n  Namespaces:\n\n" +
         namespaces.values.map(&:describe)
-        .map { |ns| ns.indent('  ') }.join("\n\n") + "\n"
+        .map { |ns| ns.indent('  ') }.join("\n\n")
     end
 
     def endpoints_description
       return '' if endpoints.empty?
 
-      "Endpoints:\n\n" +
+      "\n\n  Endpoints:\n\n" +
         endpoints.values.map(&:describe)
         .map { |ed| ed.indent('  ') }.join("\n\n")
     end

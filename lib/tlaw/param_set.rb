@@ -30,6 +30,10 @@ module TLAW
       @params.keys
     end
 
+    def empty?
+      @params.empty?
+    end
+
     def to_code
       ordered.map(&:to_code).join(', ')
     end

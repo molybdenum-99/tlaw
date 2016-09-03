@@ -28,6 +28,23 @@ module TLAW
         end
       end
 
+      describe '#description' do
+        it 'writes description to object' do
+          expect(namespace).to receive(:description=).with('It is cool')
+          wrapper.description 'It is cool'
+        end
+
+        it 'deindents descriptino' do
+          expect(namespace).to receive(:description=).with("It is pretty cool.\nAnd concise, see.\n\nMultispace!")
+          wrapper.description %Q{
+            It is pretty cool.
+            And concise, see.
+
+            Multispace!
+          }
+        end
+      end
+
       describe '#param' do
         it 'adds parameter' do
           expect(namespace.param_set).to receive(:add)

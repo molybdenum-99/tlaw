@@ -1,11 +1,5 @@
 module TLAW
   module DSL
-    module ParamDefiner
-      def param(name, type = nil, **opts)
-        @object.param_set.add(name, **opts.merge(type: type))
-      end
-    end
-
     class BaseWrapper
       def initialize(object)
         @object = object
@@ -14,11 +8,19 @@ module TLAW
       def define(&block)
         instance_eval(&block)
       end
+
+      def description(text)
+        @object.description = text
+          .gsub(/^[ \t]+/, '')         # remove spaces at a beginning of string
+          .gsub(/\A\n|\n\s*\Z/, '') # remove empty strings before and after
+      end
+
+      def param(name, type = nil, **opts)
+        @object.param_set.add(name, **opts.merge(type: type))
+      end
     end
 
     class EndpointWrapper < BaseWrapper
-      include ParamDefiner
-
       def post_process(key = nil, &block)
         @object.response_processor.add_post_processor(key, &block)
       end
@@ -29,8 +31,6 @@ module TLAW
     end
 
     class NamespaceWrapper < BaseWrapper
-      include ParamDefiner
-
       def endpoint(name, path: nil, **opts, &block)
         define_child(name, path, Endpoint, EndpointWrapper, :add_endpoint, **opts, &block)
       end
@@ -70,7 +70,7 @@ module TLAW
 
     class APIWrapper < NamespaceWrapper
       def base(url)
-        @object.__send__(:base_url=, url)
+        @object.base_url=  url
       end
     end
   end
