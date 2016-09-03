@@ -33,14 +33,14 @@ module TLAW
       end
     end
 
-    # rubocop:disable Metrics/LineLength,Metrics/ParameterLists
+    # rubocop:disable Metrics/ParameterLists
     class NamespaceWrapper < BaseWrapper
       def endpoint(name, path: nil, **opts, &block)
-        define_child(name, path, Endpoint, EndpointWrapper, :add_endpoint, **opts, &block)
+        define_child(name, path, Endpoint, EndpointWrapper, **opts, &block)
       end
 
       def namespace(name, path: nil, **opts, &block)
-        define_child(name, path, Namespace, NamespaceWrapper, :add_namespace, **opts, &block)
+        define_child(name, path, Namespace, NamespaceWrapper, **opts, &block)
       end
 
       def post_process(key = nil, &block)
@@ -57,7 +57,7 @@ module TLAW
 
       private
 
-      def define_child(name, path, child_class, wrapper_class, adder, **_opts, &block)
+      def define_child(name, path, child_class, wrapper_class, **_opts, &block)
         Class.new(child_class).tap do |c|
           c.path = path || "/#{name}"
           c.symbol = name
@@ -67,11 +67,11 @@ module TLAW
           end
 
           wrapper_class.new(c).define(&block) if block
-          @object.send(adder, c)
+          @object.add_child(c)
         end
       end
     end
-    # rubocop:enable Metrics/LineLength,Metrics/ParameterLists
+    # rubocop:enable Metrics/ParameterLists
 
     class APIWrapper < NamespaceWrapper
       def base(url)

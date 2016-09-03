@@ -9,6 +9,7 @@ module TLAW
     def initialize(name, **options)
       @name = name
       @options = DEFAULT_OPTIONS.merge(options)
+      @formatter = make_formatter
     end
 
     def type
@@ -75,14 +76,13 @@ module TLAW
     end
 
     def describe
-      if description
-        Util::Description.new("@param #{name} [#{doc_type}] #{description}")
-      else
-        Util::Description.new("@param #{name} [#{doc_type}]")
-      end
+      ["@param #{name} [#{doc_type}]", description].compact.join(' ')
+        .derp(&Util::Description.method(:new))
     end
 
     private
+
+    attr_reader :formatter
 
     def doc_type
       case type
@@ -104,19 +104,19 @@ module TLAW
       end
     end
 
-    def formatter
-      @formatter ||=
-        case options[:format]
+    def make_formatter
+      options[:format].derp { |f|
+        case f
         when Proc
-          options[:format]
-        when ->(f) { f.respond_to?(:to_proc) }
-          options[:format].to_proc
+          f
+        when ->(ff) { ff.respond_to?(:to_proc) }
+          f.to_proc
         when nil
           ->(v) { v }
         else
-          fail ArgumentError,
-               "#{self}: unsupporter formatter #{options[:format]}"
+          fail ArgumentError, "#{self}: unsupporter formatter #{f}"
         end
+      }
     end
 
     def nonconvertible!(value, reason)

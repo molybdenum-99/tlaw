@@ -4,64 +4,46 @@ module TLAW
       def base_url=(url)
         @base_url = url
 
-        [*namespaces.values, *endpoints.values].each do |child|
+        children.values.each do |child|
           if child.path && !child.base_url
             child.base_url = base_url + child.path
           end
         end
       end
 
-      def add_endpoint(endpoint)
-        name = endpoint.symbol
+      def namespaces
+        children.select { |_k, v| v.is_a?(Namespace) }
+      end
+
+      def endpoints
+        children.select { |_k, v| v.is_a?(Endpoint) }
+      end
+
+      def to_code
+        "def #{to_method_definition}\n" \
+        "  child(:#{symbol}, Namespace, {#{param_set.to_hash_code}})\n" \
+        'end'
+      end
+
+      def add_child(child)
+        name = child.symbol
 
         # TODO:
         # * validate if it is classifiable
         # * provide reasonable defaults for non-classifiable (like :[])
         # * provide additional option for non-default class name
-        const_set(Util.camelize(name), endpoint)
-        endpoints[name] = endpoint
-        endpoint.param_set.parent = param_set
-        if endpoint.path && !endpoint.base_url && base_url
-          endpoint.base_url = base_url + endpoint.path
-        end
-
-        module_eval(endpoint.to_code)
-      end
-
-      def endpoints
-        @endpoints ||= {}
-      end
-
-      def add_namespace(child)
-        name = child.symbol
-
-        # TODO: validate if it is classifiable
         const_set(Util.camelize(name), child)
-        namespaces[name] = child
+        children[name] = child
         child.param_set.parent = param_set
         if child.path && !child.base_url && base_url
           child.base_url = base_url + child.path
         end
-
-        define_method(name) { @namespaces[name] }
+        child.define_method_on(self)
       end
 
-      def namespaces
-        @namespaces ||= {}
+      def children
+        @children ||= {}
       end
-    end
-
-    attr_reader :endpoints, :namespaces, :initial_params
-
-    def initialize(**initial_params)
-      @initial_params = initial_params
-
-      @namespaces =
-        self.class.namespaces
-            .map { |name, klass| [name, klass.new(initial_params)] }.to_h
-      @endpoints =
-        self.class.endpoints
-            .map { |name, klass| [name, klass.new] }.to_h
     end
 
     def inspect
@@ -101,6 +83,20 @@ module TLAW
       "\n\n  Endpoints:\n\n" +
         endpoints.values.map(&:describe)
                  .map { |ed| ed.indent('  ') }.join("\n\n")
+    end
+
+    private
+
+    def child(symbol, expected_class, **params)
+      self
+        .class.children[symbol]
+        .tap { |child_class|
+          child_class && child_class < expected_class or
+            fail ArgumentError,
+                 "Unregistered #{expected_class.name.downcase}: #{symbol}"
+        }.derp { |child_class|
+          child_class.new(@parent_params.merge(params))
+        }
     end
   end
 end

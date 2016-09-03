@@ -33,6 +33,16 @@ module TLAW
             (param_set.empty? ? '' : "\n" + param_set.describe.indent('  '))
         )
       end
+
+      def define_method_on(host)
+        file, line = method(:to_code).source_location
+        # line + 1 is where real definition, theoretically, starts
+        host.module_eval(to_code, file, line + 1)
+      end
+    end
+
+    def initialize(**parent_params)
+      @parent_params = parent_params
     end
   end
 end

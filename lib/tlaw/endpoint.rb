@@ -7,8 +7,7 @@ module TLAW
     class << self
       def to_code
         "def #{to_method_definition}\n" \
-        "  param = initial_params.merge({#{param_set.to_hash_code}})\n" \
-        "  endpoints[:#{symbol}].call(**param)\n" \
+        "  child(:#{symbol}, Endpoint).call({#{param_set.to_hash_code}})\n" \
         'end'
       end
 
@@ -41,15 +40,17 @@ module TLAW
 
     attr_reader :url_template
 
-    def initialize
+    def initialize(**parent_params)
+      super
+
       @client = Faraday.new
       @url_template = self.class.construct_template
     end
 
     def call(**params)
-      url = construct_url(**params)
+      url = construct_url(**@parent_params.merge(params))
 
-      @client.get(construct_url(**params))
+      @client.get(url)
              .tap { |response| guard_errors!(response) }
              .derp { |response| JSON.parse(response.body) }
              .derp { |response|

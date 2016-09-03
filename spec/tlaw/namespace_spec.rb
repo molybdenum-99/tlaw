@@ -7,55 +7,29 @@ module TLAW
         }
       }
 
-      describe '.define' do
-      end
-
       its(:param_set) { is_expected.to be_a ParamSet }
 
-      describe '.add_endpoint' do
-        let(:endpoint) {
-          Class.new(Endpoint).tap { |c|
+      describe '.add_child' do
+        let(:child) {
+          Class.new(APIObject).tap { |c|
             c.symbol = :some_endpoint
             c.path = '/ep'
           }
         }
 
         before {
-          namespace.add_endpoint(endpoint)
+          expect(child).to receive(:define_method_on).with(namespace)
+          namespace.add_child(child)
         }
 
         its(:constants) { is_expected.to include(:SomeEndpoint) }
-        its(:instance_methods) { is_expected.to include(:some_endpoint) }
-        its(:endpoints) { is_expected.to include(some_endpoint: endpoint) }
-
-        context 'updates endpoint' do
-          subject { endpoint }
-
-          its(:'param_set.parent') { is_expected.to eq namespace.param_set }
-          its(:base_url) { is_expected.to eq 'https://example.com/ns/ep' }
-        end
-      end
-
-      describe '.add_namespace' do
-        let(:child) {
-          Class.new(Namespace).tap { |c|
-            c.symbol = :some_namespace
-            c.path = '/ns2'
-          }
-        }
-        before {
-          namespace.add_namespace(child)
-        }
-
-        its(:constants) { is_expected.to include(:SomeNamespace) }
-        its(:instance_methods) { is_expected.to include(:some_namespace) }
-        its(:namespaces) { is_expected.to include(some_namespace: child) }
+        its(:children) { is_expected.to include(some_endpoint: child) }
 
         context 'updates child' do
           subject { child }
 
           its(:'param_set.parent') { is_expected.to eq namespace.param_set }
-          its(:base_url) { is_expected.to eq 'https://example.com/ns/ns2' }
+          its(:base_url) { is_expected.to eq 'https://example.com/ns/ep' }
         end
       end
     end
