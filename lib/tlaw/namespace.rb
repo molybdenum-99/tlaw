@@ -12,17 +12,37 @@ module TLAW
       end
 
       def namespaces
-        children.select { |_k, v| v.is_a?(Namespace) }
+        children.select { |_k, v| v < Namespace }
       end
 
       def endpoints
-        children.select { |_k, v| v.is_a?(Endpoint) }
+        children.select { |_k, v| v < Endpoint }
       end
 
       def to_code
         "def #{to_method_definition}\n" \
         "  child(:#{symbol}, Namespace, {#{param_set.to_hash_code}})\n" \
         'end'
+      end
+
+      def inspect
+        "#<#{name || '(unnamed namespace class)'}: " \
+        "call-sequence: #{symbol}(#{param_set.to_code});" +
+          inspect_docs
+      end
+
+      def inspect_docs
+        inspect_namespaces + inspect_endpoints + ' docs: .describe>'
+      end
+
+      def inspect_namespaces
+        return '' if namespaces.empty?
+        " namespaces: #{namespaces.keys.join(', ')};"
+      end
+
+      def inspect_endpoints
+        return '' if endpoints.empty?
+        " endpoints: #{endpoints.keys.join(', ')};"
       end
 
       def add_child(child)
@@ -46,19 +66,17 @@ module TLAW
       end
     end
 
+    def namespaces
+      self.class.namespaces
+    end
+
+    def endpoints
+      self.class.endpoints
+    end
+
     def inspect
-      "#<#{self.class.name || '(unnamed namespace class)'}" +
-        inspect_namespaces + inspect_endpoints + ' docs: .describe>'
-    end
-
-    def inspect_namespaces
-      return '' if namespaces.empty?
-      " namespaces: #{namespaces.keys.join(', ')};"
-    end
-
-    def inspect_endpoints
-      return '' if endpoints.empty?
-      " endpoints: #{endpoints.keys.join(', ')};"
+      "#<#{self.class.symbol}(#{param_set.to_hash_code(@parent_params)})" +
+        self.class.inspect_docs
     end
 
     def describe
@@ -69,11 +87,15 @@ module TLAW
       )
     end
 
+    def describe_short
+      self.class.describe_short
+    end
+
     def namespaces_description
       return '' if namespaces.empty?
 
       "\n\n  Namespaces:\n\n" +
-        namespaces.values.map(&:describe)
+        namespaces.values.map(&:describe_short)
                   .map { |ns| ns.indent('  ') }.join("\n\n")
     end
 
@@ -81,11 +103,15 @@ module TLAW
       return '' if endpoints.empty?
 
       "\n\n  Endpoints:\n\n" +
-        endpoints.values.map(&:describe)
+        endpoints.values.map(&:describe_short)
                  .map { |ed| ed.indent('  ') }.join("\n\n")
     end
 
     private
+
+    def param_set
+      self.class.param_set
+    end
 
     def child(symbol, expected_class, **params)
       self

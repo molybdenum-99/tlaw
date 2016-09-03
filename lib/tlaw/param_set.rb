@@ -38,8 +38,12 @@ module TLAW
       ordered.map(&:to_code).join(', ')
     end
 
-    def to_hash_code
-      names.map { |n| "#{n}: #{n}" }.join(', ')
+    def to_hash_code(values = nil)
+      if values
+        names.map { |n| "#{n}: #{values[n].inspect}" }.join(', ')
+      else
+        names.map { |n| "#{n}: #{n}" }.join(', ')
+      end
     end
 
     def describe

@@ -54,8 +54,8 @@ module TLAW
         Class.new(described_class).tap { |c|
           c.symbol = :some_ns
           c.base_url = 'https://api.example.com/ns'
-          c.add_endpoint endpoint_class
-          c.add_namespace child_class
+          c.add_child endpoint_class
+          c.add_child child_class
           c.param_set.add :apikey
         }
       }
@@ -96,10 +96,16 @@ module TLAW
       context 'documentation' do
         before { allow(namespace_class).to receive(:name).and_return('SomeNamespace') }
 
+        describe '.inspect' do
+          subject { namespace_class.inspect }
+
+          it { is_expected.to eq '#<SomeNamespace: call-sequence: some_ns(apikey: nil); namespaces: child_ns; endpoints: some_ep; docs: .describe>' }
+        end
+
         describe '#inspect' do
           subject { namespace.inspect }
 
-          it { is_expected.to eq '#<SomeNamespace namespaces: child_ns; endpoints: some_ep; docs: .describe>' }
+          it { is_expected.to eq '#<some_ns(apikey: nil) namespaces: child_ns; endpoints: some_ep; docs: .describe>' }
         end
 
         describe '#describe' do # this describe just describes the describe. Problems, officer?

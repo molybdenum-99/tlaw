@@ -34,6 +34,13 @@ module TLAW
         )
       end
 
+      def describe_short
+        Util::Description.new(
+          ".#{to_method_definition}" +
+            (description ? "\n" + description.split("\n\n").first.indent('  ') : '')
+        )
+      end
+
       def define_method_on(host)
         file, line = method(:to_code).source_location
         # line + 1 is where real definition, theoretically, starts
