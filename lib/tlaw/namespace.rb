@@ -4,9 +4,9 @@ module TLAW
       def base_url=(url)
         @base_url = url
 
-        endpoints.values.each do |endpoint|
-          if endpoint.path && !endpoint.base_url
-            endpoint.base_url = base_url + endpoint.path
+        [*namespaces.values, *endpoints.values].each do |child|
+          if child.path && !child.base_url
+            child.base_url = base_url + child.path
           end
         end
       end
@@ -39,9 +39,7 @@ module TLAW
         const_set(Util.camelize(name), child)
         namespaces[name] = child
         child.param_set.parent = param_set
-        if child.path && !child.base_url
-          base_url or
-            fail(NameError, 'Current namespace does not define base url')
+        if child.path && !child.base_url && base_url
           child.base_url = base_url + child.path
         end
 

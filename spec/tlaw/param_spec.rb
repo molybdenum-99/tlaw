@@ -84,7 +84,7 @@ module TLAW
       specify { expect(param.convert_and_format(3.3)).to eq '6' }
     end
 
-    describe '#generate_definition' do
+    describe '#to_code' do
       subject { param.to_code }
 
       context 'keyword - required' do
@@ -115,6 +115,31 @@ module TLAW
       context 'argument - with default' do
         let(:param) { Param.new(:p, keyword_argument: false, default: "foo") }
         it { is_expected.to eq 'p="foo"' }
+      end
+    end
+
+    describe '#describe' do
+      subject { param.describe }
+
+      context 'simplest' do
+        let(:param) { Param.new(:p, type: :to_i) }
+        it { is_expected.to eq '@param p [#to_i]' }
+      end
+
+      context 'with description' do
+        let(:param) { Param.new(:p, type: :to_i, description: 'Foo bar') }
+        it { is_expected.to eq '@param p [#to_i] Foo bar' }
+      end
+
+      context 'description synonym' do
+        let(:param) { Param.new(:p, type: :to_i, desc: 'Foo bar') }
+        it { is_expected.to eq '@param p [#to_i] Foo bar' }
+      end
+
+      context 'default value' do
+      end
+
+      context 'enum' do
       end
     end
   end

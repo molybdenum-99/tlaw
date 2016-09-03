@@ -70,8 +70,16 @@ module TLAW
       end
     end
 
+    def description
+      options[:description] || options[:desc]
+    end
+
     def describe
-      Util::Description.new("@param #{name} [#{doc_type}]")
+      if description
+        Util::Description.new("@param #{name} [#{doc_type}] #{description}")
+      else
+        Util::Description.new("@param #{name} [#{doc_type}]")
+      end
     end
 
     private

@@ -3,8 +3,8 @@ module TLAW
     module_function
 
     def camelize(string)
-      # TODO: coool things
-      # return 'Brackets' if string == :[]
+      # TODO: test this
+      return 'Element' if string == :[]
 
       string
         .to_s
