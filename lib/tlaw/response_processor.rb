@@ -22,18 +22,18 @@ module TLAW
           else
             block.call(h)
             h
-          end.reject { |k, v| v.nil? }
+          end.reject { |_, v| v.nil? }
         }
       }]
     end
 
     def flatten(hash)
-      hash.map { |k, v|
+      hash.flat_map { |k, v|
         case v
         when Hash
           flatten(v).map { |k1, v1| ["#{k}.#{k1}", v1] }
         when Array
-          if v.all? {|v1| v1.is_a?(Hash) }
+          if v.all? { |v1| v1.is_a?(Hash) }
             [[k, v.map(&method(:flatten))]]
           else
             [[k, v]]
@@ -41,13 +41,13 @@ module TLAW
         else
           [[k, v]]
         end
-      }.flatten(1).to_h
+      }.to_h
     end
 
     def post_process(hash)
       @post_processors.inject(hash) { |res, (key, block)|
         if key
-          if res.has_key?(key)
+          if res.key?(key)
             res.merge(key => block.call(res[key]))
           else
             res
@@ -56,7 +56,7 @@ module TLAW
           block.call(res)
           res
         end
-      }.reject { |k, v| v.nil? }.derp(&method(:flatten))
+      }.reject { |_, v| v.nil? }.derp(&method(:flatten))
     end
 
     def datablize(hash)

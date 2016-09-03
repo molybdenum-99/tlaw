@@ -10,10 +10,13 @@ module TLAW
       end
 
       def description(text)
-        @object.description = text
-          .gsub(/^[ \t]+/, '')         # remove spaces at a beginning of string
+        @object.description =
+          text
+          .gsub(/^[ \t]+/, '')      # remove spaces at a beginning of each line
           .gsub(/\A\n|\n\s*\Z/, '') # remove empty strings before and after
       end
+
+      alias_method :desr, :description
 
       def param(name, type = nil, **opts)
         @object.param_set.add(name, **opts.merge(type: type))
@@ -30,6 +33,7 @@ module TLAW
       end
     end
 
+    # rubocop:disable Metrics/LineLength,Metrics/ParameterLists
     class NamespaceWrapper < BaseWrapper
       def endpoint(name, path: nil, **opts, &block)
         define_child(name, path, Endpoint, EndpointWrapper, :add_endpoint, **opts, &block)
@@ -53,7 +57,7 @@ module TLAW
 
       private
 
-      def define_child(name, path, child_class, wrapper_class, adder, **opts, &block)
+      def define_child(name, path, child_class, wrapper_class, adder, **_opts, &block)
         Class.new(child_class).tap do |c|
           c.path = path || "/#{name}"
           c.symbol = name
@@ -67,10 +71,11 @@ module TLAW
         end
       end
     end
+    # rubocop:enable Metrics/LineLength,Metrics/ParameterLists
 
     class APIWrapper < NamespaceWrapper
       def base(url)
-        @object.base_url=  url
+        @object.base_url = url
       end
     end
   end

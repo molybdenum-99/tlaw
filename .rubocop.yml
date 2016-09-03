@@ -1,0 +1,75 @@
+inherit_from: .rubocop_todo.yml
+
+AllCops:
+  Include:
+    - 'lib/**/*'
+  Exclude:
+    - 'spec/**/*'
+    - 'samples/**/*'
+    - 'tmp/**/*'
+  DisplayCopNames: true
+
+# My personal style
+# -----------------
+
+Style/MultilineBlockChain:
+  Enabled: false
+
+Style/SpaceInsideHashLiteralBraces:
+  EnforcedStyle: no_space
+
+Style/Alias:
+  EnforcedStyle: prefer_alias_method
+
+Style/SignalException:
+  EnforcedStyle: semantic
+
+Style/RescueModifier:
+  Enabled: false
+
+# see http://zverok.github.io/blog/2016-02-23-control-flow.html
+Style/AndOr:
+  Enabled: false
+
+# My style can't be described by any existing setting :(
+Style/BlockDelimiters:
+  Enabled: false
+
+# That's just how things are here
+# -------------------------------
+
+Metrics/AbcSize:
+  Max: 18
+
+Metrics/MethodLength:
+  Max: 15
+
+# Working on it!
+# --------------
+
+Style/Documentation:
+  Enabled: false
+
+Style/Lambda:
+  Exclude:
+    - 'lib/tlaw/response_processor.rb'
+
+# Useful for temp. commented-out parts, remove before release!
+Style/LeadingCommentSpace:
+  Enabled: false
+
+Style/CommentIndentation:
+  Enabled: false
+
+# Those are just useless
+# ----------------------
+
+Style/EmptyCaseCondition:
+  Enabled: false
+
+Style/CommentAnnotation:
+  Enabled: false
+
+Performance/RedundantBlockCall:
+  Enabled: false
+

@@ -18,7 +18,7 @@ module TLAW
         # * validate if it is classifiable
         # * provide reasonable defaults for non-classifiable (like :[])
         # * provide additional option for non-default class name
-        const_set(Util::camelize(name), endpoint)
+        const_set(Util.camelize(name), endpoint)
         endpoints[name] = endpoint
         endpoint.param_set.parent = param_set
         if endpoint.path && !endpoint.base_url && base_url
@@ -36,11 +36,12 @@ module TLAW
         name = child.symbol
 
         # TODO: validate if it is classifiable
-        const_set(Util::camelize(name), child)
+        const_set(Util.camelize(name), child)
         namespaces[name] = child
         child.param_set.parent = param_set
         if child.path && !child.base_url
-          base_url or fail(NameError, 'Current namespace does not define base url')
+          base_url or
+            fail(NameError, 'Current namespace does not define base url')
           child.base_url = base_url + child.path
         end
 
@@ -57,15 +58,27 @@ module TLAW
     def initialize(**initial_params)
       @initial_params = initial_params
 
-      @namespaces = self.class.namespaces.map { |name, klass| [name, klass.new(initial_params)] }.to_h
-      @endpoints = self.class.endpoints.map { |name, klass| [name, klass.new] }.to_h
+      @namespaces =
+        self.class.namespaces
+            .map { |name, klass| [name, klass.new(initial_params)] }.to_h
+      @endpoints =
+        self.class.endpoints
+            .map { |name, klass| [name, klass.new] }.to_h
     end
 
     def inspect
       "#<#{self.class.name || '(unnamed namespace class)'}" +
-        (namespaces.empty? ? '' : " namespaces: #{namespaces.keys.join(', ')};") +
-        (endpoints.empty? ? '' : " endpoints: #{endpoints.keys.join(', ')};") +
-        ' docs: .describe>'
+        inspect_namespaces + inspect_endpoints + ' docs: .describe>'
+    end
+
+    def inspect_namespaces
+      return '' if namespaces.empty?
+      " namespaces: #{namespaces.keys.join(', ')};"
+    end
+
+    def inspect_endpoints
+      return '' if endpoints.empty?
+      " endpoints: #{endpoints.keys.join(', ')};"
     end
 
     def describe
@@ -81,7 +94,7 @@ module TLAW
 
       "\n\n  Namespaces:\n\n" +
         namespaces.values.map(&:describe)
-        .map { |ns| ns.indent('  ') }.join("\n\n")
+                  .map { |ns| ns.indent('  ') }.join("\n\n")
     end
 
     def endpoints_description
@@ -89,7 +102,7 @@ module TLAW
 
       "\n\n  Endpoints:\n\n" +
         endpoints.values.map(&:describe)
-        .map { |ed| ed.indent('  ') }.join("\n\n")
+                 .map { |ed| ed.indent('  ') }.join("\n\n")
     end
   end
 end

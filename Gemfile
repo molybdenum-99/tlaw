@@ -10,3 +10,7 @@ group :test do
   gem 'webmock'
   gem 'faker'
 end
+
+group :dev do
+  gem 'rubocop'
+end

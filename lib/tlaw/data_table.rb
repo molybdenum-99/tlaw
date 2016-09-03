@@ -2,7 +2,10 @@ module TLAW
   class DataTable < Array
     def initialize(hashes)
       hashes = hashes.each_with_index.map { |h, i|
-        h.is_a?(Hash) or fail ArgumentError, "All rows are expected to be hashes, row #{i} is #{h.class}"
+        h.is_a?(Hash) or
+          fail ArgumentError,
+               "All rows are expected to be hashes, row #{i} is #{h.class}"
+
         h.map { |k, v| [k.to_s, v] }.to_h
       }
       empty = hashes.map(&:keys).flatten.uniq.map { |k| [k, nil] }.to_h
@@ -21,7 +24,9 @@ module TLAW
       when String, Symbol
         map { |h| h[index_or_column.to_s] }
       else
-        fail ArgumentError, "Expected integer or string/symbol index, got #{index_or_column.class}"
+        fail ArgumentError,
+             'Expected integer or string/symbol index' \
+             ", got #{index_or_column.class}"
       end
     end
 

@@ -32,10 +32,12 @@ module TLAW
       when nil
         value
       when Symbol
-        value.respond_to?(type) or nonconvertible!(value, "not responding to #{type}")
+        value.respond_to?(type) or
+          nonconvertible!(value, "not responding to #{type}")
         value.send(type)
       when Class
-        value.kind_of?(type) or nonconvertible!(value, "is not #{type}")
+        value.is_a?(type) or
+          nonconvertible!(value, "is not #{type}")
         value
       else
         nonconvertible!(value, "undefined type #{type}")
@@ -59,9 +61,10 @@ module TLAW
       when keyword_argument? && required?
         "#{name}:"
       when keyword_argument?
+        # FIXME: this `inspect` will fail with, say, Time
         "#{name}: #{default.inspect}"
       when required?
-        "#{name}"
+        name
       else
         "#{name}=#{default.inspect}"
       end
@@ -83,6 +86,7 @@ module TLAW
         type.name
       end
     end
+
     def to_url_part(value)
       case value
       when Array
@@ -102,7 +106,8 @@ module TLAW
         when nil
           ->(v) { v }
         else
-          fail ArgumentError, "#{self}: unsupporter formatter #{options[:format]}"
+          fail ArgumentError,
+               "#{self}: unsupporter formatter #{options[:format]}"
         end
     end
 

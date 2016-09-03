@@ -38,17 +38,20 @@ module TLAW
       ordered.map(&:to_code).join(', ')
     end
 
+    def to_hash_code
+      names.map { |n| "#{n}: #{n}" }.join(', ')
+    end
+
     def describe
       Util::Description.new(ordered.map(&:describe).join("\n"))
     end
 
     def process(**input)
-      (input.keys - all_params.keys).tap { |unknown|
-        unknown.empty? or raise(ArgumentError, "Unknown parameters: #{unknown.join(', ')}")
-      }
+      validate_unknown(input)
+
       all_params
         .map { |name, dfn| [name, dfn, input[name]] }
-        .each { |name, dfn, val| dfn.required? && val.nil? and raise(ArgumentError, "Required parameter #{name} is missing") }
+        .tap(&method(:validate_required))
         .reject { |*, val| val.nil? }
         .map { |name, dfn, val| [name, dfn.convert_and_format(val)] }
         .to_h
@@ -60,11 +63,25 @@ module TLAW
 
     private
 
+    def validate_unknown
+      (input.keys - all_params.keys).tap { |unknown|
+        unknown.empty? or
+          fail(ArgumentError, "Unknown parameters: #{unknown.join(', ')}")
+      }
+    end
+
+    def validate_required(definitions_and_params)
+      definitions_and_params.each do |name, dfn, val|
+        dfn.required? && val.nil? and
+          fail ArgumentError, "Required parameter #{name} is missing"
+      end
+    end
+
     def ordered
       @params.values
-        .partition(&:keyword_argument?).reverse.map { |args|
-          args.partition(&:required?)
-        }.flatten
+             .partition(&:keyword_argument?).reverse.map { |args|
+               args.partition(&:required?)
+             }.flatten
     end
   end
 end

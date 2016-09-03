@@ -6,10 +6,10 @@ module TLAW
   class Endpoint < APIObject
     class << self
       def to_code
-        "def #{to_method_definition}\n" +
-        "  param = initial_params.merge({#{param_set.names.map { |n| "#{n}: #{n}" }.join(', ')}})\n" +
-        "  endpoints[:#{symbol}].call(**param)\n" +
-        "end"
+        "def #{to_method_definition}\n" \
+        "  param = initial_params.merge({#{param_set.to_hash_code}})\n" \
+        "  endpoints[:#{symbol}].call(**param)\n" \
+        'end'
       end
 
       def response_processor
@@ -17,7 +17,25 @@ module TLAW
       end
 
       def inspect
-        "#<#{name || '(unnamed endpoint class)'}: call-sequence: #{symbol}(#{param_set.to_code}); docs: .describe>"
+        "#<#{name || '(unnamed endpoint class)'}:" \
+        " call-sequence: #{symbol}(#{param_set.to_code}); docs: .describe>"
+      end
+
+      def construct_template
+        tpl = if query_string_params.empty?
+                base_url
+              else
+                joiner = base_url.include?('?') ? '&' : '?'
+                "#{base_url}{#{joiner}#{query_string_params.join(',')}}"
+              end
+        Addressable::Template.new(tpl)
+      end
+
+      private
+
+      def query_string_params
+        param_set.all_params.keys.map(&:to_s) -
+          Addressable::Template.new(base_url).keys
       end
     end
 
@@ -25,21 +43,23 @@ module TLAW
 
     def initialize
       @client = Faraday.new
-      @url_template = construct_template
+      @url_template = self.class.construct_template
     end
 
     def call(**params)
       url = construct_url(**params)
 
       @client.get(construct_url(**params))
-        .tap { |response| guard_errors!(response) }
-        .derp { |response| JSON.parse(response.body) }
-        .derp { |response| self.class.response_processor.process(response) }
+             .tap { |response| guard_errors!(response) }
+             .derp { |response| JSON.parse(response.body) }
+             .derp { |response|
+               self.class.response_processor.process(response)
+             }
     rescue API::Error
-      raise
+      raise # Not catching in the next block
     rescue => e
       raise unless url
-      fail API::Error, "#{e.class} at #{url}: #{e.message}"
+      raise API::Error, "#{e.class} at #{url}: #{e.message}"
     end
 
     extend Forwardable
@@ -53,30 +73,14 @@ module TLAW
     end
 
     def guard_errors!(response)
-      return response if (200...400).include?(response.status)
+      return response if (200...400).cover?(response.status)
 
       body = JSON.parse(response.body) rescue nil
       message = body && (body['message'] || body['error'])
 
-      if message
-        fail API::Error, "HTTP #{response.status} at #{response.env[:url]}: #{message}"
-      else
-        fail API::Error, "HTTP #{response.status} at #{response.env[:url]}"
-      end
-    end
-
-    def construct_template
-      t = Addressable::Template.new(self.class.base_url)
-      query_params = self.class.param_set.all_params.reject { |k, v| t.keys.include?(k.to_s) }
-
-      tpl = if query_params.empty?
-          self.class.base_url
-        else
-          joiner = self.class.base_url.include?('?') ? '&' : '?'
-
-          self.class.base_url + '{' + joiner + query_params.keys.join(',') + '}'
-        end
-      Addressable::Template.new(tpl)
+      fail API::Error,
+           "HTTP #{response.status} at #{response.env[:url]}" +
+           (message ? ': ' + message : '')
     end
 
     def construct_url(**params)
