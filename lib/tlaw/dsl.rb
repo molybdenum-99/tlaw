@@ -16,7 +16,7 @@ module TLAW
           .gsub(/\A\n|\n\s*\Z/, '') # remove empty strings before and after
       end
 
-      alias_method :desr, :description
+      alias_method :desc, :description
 
       def param(name, type = nil, **opts)
         @object.param_set.add(name, **opts.merge(type: type))

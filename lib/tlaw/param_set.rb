@@ -63,7 +63,7 @@ module TLAW
 
     private
 
-    def validate_unknown
+    def validate_unknown(input)
       (input.keys - all_params.keys).tap { |unknown|
         unknown.empty? or
           fail(ArgumentError, "Unknown parameters: #{unknown.join(', ')}")

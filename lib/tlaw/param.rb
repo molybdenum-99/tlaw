@@ -64,7 +64,7 @@ module TLAW
         # FIXME: this `inspect` will fail with, say, Time
         "#{name}: #{default.inspect}"
       when required?
-        name
+        name.to_s
       else
         "#{name}=#{default.inspect}"
       end
