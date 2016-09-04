@@ -21,10 +21,16 @@ module TLAW
           desc: 'Units for temperature and other values. Standard is Kelvin.'
 
         WEATHER_POST_PROCESSOR = lambda do |*|
-          # Currently, it always provides array of exactly 1 item
+          # Most of the time there is exactly one weather item...
+          # ...but sometimes there are two. So, flatterning them looks
+          # more reasonable than having DataTable of 1-2 rows.
+          post_process { |h|
+            h['weather2'] = h['weather'].last if h['weather'] && h['weather'].count > 1
+          }
           post_process('weather', &:first)
 
           post_process('dt', &Time.method(:at))
+          post_process('dt_txt') { nil } # TODO: we need cleaner way to say "remove this"
           post_process('sys.sunrise', &Time.method(:at))
           post_process('sys.sunset', &Time.method(:at))
 
@@ -38,11 +44,22 @@ module TLAW
           post_process('weather.icon') { |i| "http://openweathermap.org/img/w/#{i}.png" }
         end
 
+        # For endpoints returning weather in one place
         instance_eval(&WEATHER_POST_PROCESSOR)
 
+        # For endpoints returning list of weathers (forecast or several
+        # cities).
         post_process_items('list', &WEATHER_POST_PROCESSOR)
 
-        CURRENT_WEATHER_ENDPOINTS = lambda do |*|
+        namespace :current, path: '/weather',
+          desc: %Q{
+            Allows to obtain current weather at one place, designated
+            by city, location or zip code. See also {#batch_current} for
+            obtaining weather in several places at once.
+
+            Docs: http://openweathermap.org/current
+          } do
+
           endpoint :city, path: '?q={city}{,country_code}' do
             desc %Q{
               Current weather by city name (with optional country code
@@ -93,37 +110,72 @@ module TLAW
           end
         end
 
-        namespace :current, path: '/weather',
-          desc: %Q{
-            Allows to obtain current weather at one place, designated
-            by city, location or zip code. See also {#batch_current} for
-            obtaining weather in several places at once.
-
-            Docs: http://openweathermap.org/current
-          },
-          &CURRENT_WEATHER_ENDPOINTS
-
-        namespace :find, path: '/find',
+        namespace :find,
           desc: %Q{
             Allows to find some place (and weather in it) by set of input
             parameters.
 
             Docs: http://openweathermap.org/current#accuracy
           } do
-            param :type, enum: %w[accurate like], default: 'accurate', keyword_argument: false
 
-            instance_eval(&CURRENT_WEATHER_ENDPOINTS)
+            endpoint :by_name, path: '?q={start_with}{,country_code}' do
+              desc %Q{
+                Looks for cities by beginning of their names.
+
+                Docs: http://openweathermap.org/current#accuracy
+              }
+
+              param :start_with, required: true, desc: 'Beginning of city name'
+              param :country_code, desc: 'ISO 3166 2-letter country code'
+
+              param :cnt, :to_i, range: 1..50, default: 10,
+                desc: 'Max number of results to return'
+
+              # TODO: param :accurate, enum: {true => 'accurate', false => 'like'}
+              param :type, enum: %w[accurate like],
+                    default: 'accurate', keyword_argument: false,
+                    desc: %Q{Accuracy level of result.
+                     'accurate' returns exact match values.
+                     'like' returns results by searching for that substring.
+                    }
+            end
+
+            endpoint :around, path: '?lat={lat}&lon={lng}' do
+              desc %Q{
+                Looks for cities around geographical coordinates.
+
+                Docs: http://openweathermap.org/current#cycle
+              }
+
+              param :lat, :to_f, required: true
+              param :lng, :to_f, required: true
+
+              param :cnt, :to_i, range: 1..50, default: 10,
+                desc: 'Max number of results to return'
+
+              # TODO: cluster
+            end
+
+            # Real path is api/bbox/city - not inside /find, but logically
+            # we want to place it here
+            endpoint :inside, path: '/../box/city?bbox={lng_left},{lat_bottom},{lng_right},{lat_top}' do
+              desc %Q{
+                Looks for cities inside specified rectangle zone.
+
+                Docs: http://openweathermap.org/current#rectangle
+              }
+
+              param :lat_top, :to_f, required: true, keyword_argument: true
+              param :lat_bottom, :to_f, required: true, keyword_argument: true
+              param :lng_left, :to_f, required: true, keyword_argument: true
+              param :lng_right, :to_f, required: true, keyword_argument: true
+
+              # TODO: cluster
+            end
           end
 
         # http://openweathermap.org/current#cities
         namespace :batch_current, path: '' do
-          endpoint :bbox, path: '/box/city?bbox={lon_left},{lat_bottom},{lon_right},{lat_top}'
-
-          endpoint :around, path: '/find?lat={lat}&lon={lng}' do
-            param :lat, :to_f, required: true
-            param :lng, :to_f, required: true
-            param :cnt, :to_i
-          end
 
           endpoint :group, path: '/group?id={city_ids}' do
             param :city_ids, :to_a, required: true
@@ -136,10 +188,6 @@ module TLAW
           endpoint :city, path: '?q={city}{,country_code}' do
             param :city, required: true, keyword_argument: false
             param :country_code
-
-            post_process_each('list', 'weather', &:first)
-            post_process_each('list', 'dt', &Time.method(:at))
-            post_process_each('list', 'dt_txt'){nil}
           end
         end
       end

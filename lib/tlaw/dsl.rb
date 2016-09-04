@@ -26,8 +26,19 @@ module TLAW
         @object.response_processor.add_post_processor(key, &block)
       end
 
-      def post_process_each(key, subkey = nil, &block)
-        @object.response_processor.add_item_post_processor(key, subkey, &block)
+      class PostProcessProxy
+        def initialize(parent_key, parent)
+          @parent_key = parent_key
+          @parent = parent
+        end
+
+        def post_process(key = nil, &block)
+          @parent.add_item_post_processor(@parent_key, key, &block)
+        end
+      end
+
+      def post_process_items(key, &block)
+        PostProcessProxy.new(key, @object.response_processor).instance_eval(&block)
       end
     end
 
