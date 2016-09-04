@@ -20,6 +20,14 @@ module TLAW
         param :units, enum: %w[standard metric imperial], default: 'standard',
           desc: 'Units for temperature and other values. Standard is Kelvin.'
 
+        # OpenWeatherMap reports most of logical errors with HTTP code
+        # 200 and responses like {cod: "500", message: "Error message"}
+        post_process { |h|
+          (200..400).cover?(h['cod'].to_i) or
+            fail h['message']
+            # TODO: error!(msg) -- which will add current URL to error knowledge.
+        }
+
         WEATHER_POST_PROCESSOR = lambda do |*|
           # Most of the time there is exactly one weather item...
           # ...but sometimes there are two. So, flatterning them looks
