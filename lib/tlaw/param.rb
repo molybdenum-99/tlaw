@@ -16,6 +16,8 @@ module TLAW
       @name = name
       @options = options
       process_enum
+      @options[:desc] ||= @options[:description]
+      @options[:desc].gsub!(/\n( *)/, "\n  ") if @options[:desc]
       @formatter = make_formatter
     end
 
@@ -72,14 +74,18 @@ module TLAW
     alias_method :to_h, :options
 
     def description
-      options[:description] || options[:desc]
+      options[:desc] || options[:desc]
     end
 
     def describe
       [
-        "@param #{name} [#{doc_type}]",
+        '@param', name,
+        if doc_type then "[#{doc_type}]" end,
         description,
-        default ? "(default = #{default.inspect})" : nil
+        if @options[:enum]
+          "\n  Possible values: #{options[:enum].map(&:inspect).join(', ')}"
+        end,
+        if default then "(default = #{default.inspect})" end
       ].compact.join(' ')
         .derp(&Util::Description.method(:new))
     end
@@ -90,12 +96,12 @@ module TLAW
 
     def doc_type
       case type
-      when nil
-        '#to_s'
       when Symbol
         "##{type}"
       when Class
         type.name
+      else
+        nil
       end
     end
 

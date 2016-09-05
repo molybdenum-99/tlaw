@@ -64,6 +64,29 @@ module TLAW
       def children
         @children ||= {}
       end
+
+      def describe
+        super + namespaces_description + endpoints_description
+      end
+
+      private
+
+      def namespaces_description
+        return '' if namespaces.empty?
+
+        "\n\n  Namespaces:\n\n" +
+          namespaces.values.map(&:describe_short)
+                    .map { |ns| ns.indent('  ') }.join("\n\n")
+      end
+
+      def endpoints_description
+        return '' if endpoints.empty?
+
+        "\n\n  Endpoints:\n\n" +
+          endpoints.values.map(&:describe_short)
+                   .map { |ed| ed.indent('  ') }.join("\n\n")
+      end
+
     end
 
     def namespaces
@@ -89,22 +112,6 @@ module TLAW
 
     def describe_short
       self.class.describe_short
-    end
-
-    def namespaces_description
-      return '' if namespaces.empty?
-
-      "\n\n  Namespaces:\n\n" +
-        namespaces.values.map(&:describe_short)
-                  .map { |ns| ns.indent('  ') }.join("\n\n")
-    end
-
-    def endpoints_description
-      return '' if endpoints.empty?
-
-      "\n\n  Endpoints:\n\n" +
-        endpoints.values.map(&:describe_short)
-                 .map { |ed| ed.indent('  ') }.join("\n\n")
     end
 
     private

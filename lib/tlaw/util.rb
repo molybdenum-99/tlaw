@@ -24,6 +24,10 @@ module TLAW
       def indent(indentation = '  ')
         gsub(/(\A|\n)/, '\1' + indentation)
       end
+
+      def +(other)
+        self.class.new(super)
+      end
     end
   end
 end
