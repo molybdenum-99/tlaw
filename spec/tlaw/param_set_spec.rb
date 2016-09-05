@@ -66,6 +66,17 @@ module TLAW
         expect { set.process(param3: 'foo') }.to raise_error(ArgumentError, "Unknown parameters: param3")
       end
 
+      context 'param renaming' do
+        before {
+          set.add(:param2, field: :foo)
+        }
+
+        it 'renames' do
+          expect(set.process(param2: :val3)).to \
+            eq(foo: 'val3')
+        end
+      end
+
       context 'parent scope' do
         let(:parent) { described_class.new }
         before {

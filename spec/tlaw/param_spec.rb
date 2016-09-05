@@ -52,6 +52,17 @@ module TLAW
       end
 
       context 'enum' do
+        let(:param) { Param.new(:p, enum: {true => 'yes', false => 'no'}) }
+
+        context 'when included' do
+          let(:value) { true }
+          it { is_expected.to eq 'yes' }
+        end
+
+        context 'when not' do
+          let(:value) { 'foo' }
+          it { expect { subject }.to raise_error Param::Nonconvertible }
+        end
       end
     end
 

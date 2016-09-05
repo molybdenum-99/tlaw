@@ -15,6 +15,7 @@ module TLAW
     def initialize(name, **options)
       @name = name
       @options = options
+      process_enum
       @formatter = make_formatter
     end
 
@@ -34,6 +35,10 @@ module TLAW
       Param.make(name, @options.merge(new_options))
     end
 
+    def field
+      options[:field] || name
+    end
+
     def convert(value)
       case type
       when nil
@@ -46,6 +51,11 @@ module TLAW
         value.is_a?(type) or
           nonconvertible!(value, "is not #{type}")
         value
+      when Hash
+        type.key?(value) or
+          nonconvertible!(value, "is not one of #{type.keys.map(&:inspect).join(', ')}")
+
+        type[value]
       else
         nonconvertible!(value, "undefined type #{type}")
       end
@@ -114,7 +124,22 @@ module TLAW
     end
 
     def nonconvertible!(value, reason)
-      fail Nonconvertible, "#{self} can't convert  #{value}: #{reason}"
+      fail Nonconvertible, "#{self} can't convert  #{value.inspect}: #{reason}"
+    end
+
+    def process_enum
+      @options[:enum].tap { |enum|
+        return unless enum
+        @options[:type] =
+          case enum
+          when Hash
+            enum
+          when Array
+            enum.map { |n| [n, n] }.to_h
+          else
+            fail ArgumentError, "Unparseable enum: #{enum.inspect}"
+          end
+      }
     end
   end
 

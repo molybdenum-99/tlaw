@@ -29,7 +29,7 @@ module TLAW
       private
 
       def query_string_params
-        param_set.all_params.keys.map(&:to_s) -
+        param_set.all_params.values.map(&:field).map(&:to_s) -
           Addressable::Template.new(base_url).keys
       end
     end
