@@ -38,7 +38,9 @@ module TLAW
       end
 
       def post_process_items(key, &block)
-        PostProcessProxy.new(key, @object.response_processor).instance_eval(&block)
+        PostProcessProxy
+          .new(key, @object.response_processor)
+          .instance_eval(&block)
       end
     end
 

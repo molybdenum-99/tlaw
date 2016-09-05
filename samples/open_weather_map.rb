@@ -23,9 +23,8 @@ module TLAW
         # OpenWeatherMap reports most of logical errors with HTTP code
         # 200 and responses like {cod: "500", message: "Error message"}
         post_process { |h|
-          (200..400).cover?(h['cod'].to_i) or
-            fail h['message']
-            # TODO: error!(msg) -- which will add current URL to error knowledge.
+          !h.key?('cod') || (200..400).cover?(h['cod'].to_i) or
+            fail "#{h['cod']}: #{h['message']}"
         }
 
         WEATHER_POST_PROCESSOR = lambda do |*|
@@ -116,6 +115,18 @@ module TLAW
             param :zip, required: true, desc: 'ZIP code'
             param :country_code, desc: 'ISO 3166 2-letter country code'
           end
+
+          endpoint :group, path: '/../group?id={city_ids}' do
+            desc %Q{
+              Current weather in several cities by their ids.
+
+              List of city ID city.list.json.gz can be downloaded at
+              http://bulk.openweathermap.org/sample/
+
+              Docs: http://openweathermap.org/current#cities
+            }
+            param :city_ids, :to_a, required: true
+          end
         end
 
         namespace :find,
@@ -126,67 +137,59 @@ module TLAW
             Docs: http://openweathermap.org/current#accuracy
           } do
 
-            endpoint :by_name, path: '?q={start_with}{,country_code}' do
-              desc %Q{
-                Looks for cities by beginning of their names.
+          endpoint :by_name, path: '?q={start_with}{,country_code}' do
+            desc %Q{
+              Looks for cities by beginning of their names.
 
-                Docs: http://openweathermap.org/current#accuracy
-              }
+              Docs: http://openweathermap.org/current#accuracy
+            }
 
-              param :start_with, required: true, desc: 'Beginning of city name'
-              param :country_code, desc: 'ISO 3166 2-letter country code'
+            param :start_with, required: true, desc: 'Beginning of city name'
+            param :country_code, desc: 'ISO 3166 2-letter country code'
 
-              param :cnt, :to_i, range: 1..50, default: 10,
-                desc: 'Max number of results to return'
+            param :cnt, :to_i, range: 1..50, default: 10,
+              desc: 'Max number of results to return'
 
-              # TODO: param :accurate, enum: {true => 'accurate', false => 'like'}
-              param :type, enum: %w[accurate like],
-                    default: 'accurate', keyword_argument: false,
-                    desc: %Q{Accuracy level of result.
-                     'accurate' returns exact match values.
-                     'like' returns results by searching for that substring.
-                    }
-            end
-
-            endpoint :around, path: '?lat={lat}&lon={lng}' do
-              desc %Q{
-                Looks for cities around geographical coordinates.
-
-                Docs: http://openweathermap.org/current#cycle
-              }
-
-              param :lat, :to_f, required: true
-              param :lng, :to_f, required: true
-
-              param :cnt, :to_i, range: 1..50, default: 10,
-                desc: 'Max number of results to return'
-
-              # TODO: cluster
-            end
-
-            # Real path is api/bbox/city - not inside /find, but logically
-            # we want to place it here
-            endpoint :inside, path: '/../box/city?bbox={lng_left},{lat_bottom},{lng_right},{lat_top}' do
-              desc %Q{
-                Looks for cities inside specified rectangle zone.
-
-                Docs: http://openweathermap.org/current#rectangle
-              }
-
-              param :lat_top, :to_f, required: true, keyword_argument: true
-              param :lat_bottom, :to_f, required: true, keyword_argument: true
-              param :lng_left, :to_f, required: true, keyword_argument: true
-              param :lng_right, :to_f, required: true, keyword_argument: true
-
-              # TODO: cluster
-            end
+            # TODO: param :accurate, enum: {true => 'accurate', false => 'like'}
+            param :type, enum: %w[accurate like],
+                  default: 'accurate', keyword_argument: false,
+                  desc: %Q{Accuracy level of result.
+                   'accurate' returns exact match values.
+                   'like' returns results by searching for that substring.
+                  }
           end
 
-        # http://openweathermap.org/current#cities
-        namespace :batch_current, path: '' do
+          endpoint :around, path: '?lat={lat}&lon={lng}' do
+            desc %Q{
+              Looks for cities around geographical coordinates.
 
-          endpoint :group, path: '/group?id={city_ids}' do
-            param :city_ids, :to_a, required: true
+              Docs: http://openweathermap.org/current#cycle
+            }
+
+            param :lat, :to_f, required: true, desc: 'Latitude'
+            param :lng, :to_f, required: true, desc: 'Longitude'
+
+            param :cnt, :to_i, range: 1..50, default: 10,
+              desc: 'Max number of results to return'
+
+            # TODO: cluster
+          end
+
+          # Real path is api/bbox/city - not inside /find, but logically
+          # we want to place it here
+          endpoint :inside, path: '/../box/city?bbox={lng_left},{lat_bottom},{lng_right},{lat_top}' do
+            desc %Q{
+              Looks for cities inside specified rectangle zone.
+
+              Docs: http://openweathermap.org/current#rectangle
+            }
+
+            param :lat_top, :to_f, required: true, keyword_argument: true
+            param :lat_bottom, :to_f, required: true, keyword_argument: true
+            param :lng_left, :to_f, required: true, keyword_argument: true
+            param :lng_right, :to_f, required: true, keyword_argument: true
+
+            # TODO: cluster
           end
         end
 
