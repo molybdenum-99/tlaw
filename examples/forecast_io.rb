@@ -14,7 +14,6 @@ module TLAW
         param :exclude, Array
         param :lang
 
-        # synopsys: forecast(location)
         endpoint :forecast, path: '/{lat},{lng}' do
           param :lat, :to_f, required: true
           param :lng, :to_f, required: true
@@ -23,7 +22,6 @@ module TLAW
             enum: {false => nil, true => 'hourly'}
         end
 
-        # synopsys: time_machine(location, time)
         endpoint :time_machine, path: '/{lat},{lng},{at}' do
           param :lat, :to_f, required: true
           param :lng, :to_f, required: true
@@ -45,5 +43,9 @@ module TLAW
     end
 
     # TODO: X-Forecast-API-Calls header is useful!
+    # TODO: The Forecast Data API supports HTTP compression.
+    #   We heartily recommend using it, as it will make responses much
+    #   smaller over the wire. To enable it, simply add an
+    #   Accept-Encoding: gzip header to your request.
   end
 end
