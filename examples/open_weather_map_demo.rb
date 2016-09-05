@@ -1,9 +1,5 @@
 #!/usr/bin/env ruby
-require 'pp'
-
-$:.unshift 'lib'
-require 'tlaw'
-
+require_relative 'demo_base'
 require_relative 'open_weather_map'
 
 # This is demonstration of TLAW (The Last API Wrapper) library's behavior
@@ -123,10 +119,10 @@ p TLAW::Examples::OpenWeatherMap::Current.instance_method(:city).parameters
 # You need to create key here: http://openweathermap.org/appid
 # And run the script this way:
 #
-#    OPEN_WEATHER_MAP_APPID={your_id} examples/open_weather_map_demo.rb
+#    OPEN_WEATHER_MAP={your_id} examples/open_weather_map_demo.rb
 #
 weather = TLAW::Examples::OpenWeatherMap
-  .new(appid: ENV['OPEN_WEATHER_MAP_APPID'], units: :metric)
+  .new(appid: ENV['OPEN_WEATHER_MAP'], units: :metric)
 p weather
 # => #<TLAW::Examples::OpenWeatherMap.new(appid: {your id}, lang: nil, units: :metric) namespaces: current, find, forecast; docs: .describe>
 

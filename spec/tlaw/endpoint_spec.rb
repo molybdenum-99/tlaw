@@ -183,7 +183,7 @@ module TLAW
           |  It works.
           |
           |  @param arg3 [#to_time]
-          |  @param arg1 [#to_s]
+          |  @param arg1
           |  @param kv2 [#to_i]
           |  @param kv1 [Time]
         }.unindent)}

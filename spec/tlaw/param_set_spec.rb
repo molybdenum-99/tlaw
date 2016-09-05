@@ -94,7 +94,7 @@ module TLAW
       before {
         set.add :kv1, type: Time
         set.add :kv2, type: :to_i, required: true
-        set.add :kv3, default: 14
+        set.add :kv3, default: 3, enum: (1..5)
 
         set.add :arg1, keyword_argument: false
         set.add :arg2, keyword_argument: false, default: 'foo'
@@ -104,7 +104,7 @@ module TLAW
       describe '#definition' do
         subject { set.to_code }
 
-        it { is_expected.to  eq 'arg3, arg1=nil, arg2="foo", kv2:, kv1: nil, kv3: 14' }
+        it { is_expected.to  eq 'arg3, arg1=nil, arg2="foo", kv2:, kv1: nil, kv3: 3' }
       end
 
       describe '#description' do
@@ -113,11 +113,12 @@ module TLAW
         it { is_expected.to be_a Util::Description }
         it { is_expected.to eq %Q{
           |@param arg3 [#to_time]
-          |@param arg1 [#to_s]
-          |@param arg2 [#to_s]
+          |@param arg1
+          |@param arg2 (default = "foo")
           |@param kv2 [#to_i]
           |@param kv1 [Time]
-          |@param kv3 [#to_s]
+          |@param kv3
+          |  Possible values: 1, 2, 3, 4, 5 (default = 3)
         }.unindent }
       end
     end

@@ -14,4 +14,5 @@ end
 
 group :dev do
   gem 'rubocop'
+  gem 'dotenv'
 end

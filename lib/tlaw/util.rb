@@ -18,7 +18,7 @@ module TLAW
       alias_method :inspect, :to_s
 
       def initialize(str)
-        super(str.to_s.gsub(/\n +\n/, "\n\n"))
+        super(str.to_s.gsub(/ +\n/, "\n"))
       end
 
       def indent(indentation = '  ')

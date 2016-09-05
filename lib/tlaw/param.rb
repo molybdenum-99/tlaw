@@ -140,7 +140,7 @@ module TLAW
           case enum
           when Hash
             enum
-          when Array
+          when ->(e) { e.respond_to?(:map) }
             enum.map { |n| [n, n] }.to_h
           else
             fail ArgumentError, "Unparseable enum: #{enum.inspect}"
