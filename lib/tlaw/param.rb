@@ -2,6 +2,14 @@ module TLAW
   class Param
     Nonconvertible = Class.new(ArgumentError)
 
+    def self.make(name, **options)
+      if options[:keyword_argument] != false
+        KeywordParam.new(name, **options)
+      else
+        ArgumentParam.new(name, **options)
+      end
+    end
+
     attr_reader :name, :options
 
     def initialize(name, **options)
@@ -22,8 +30,8 @@ module TLAW
       options[:default]
     end
 
-    def update(**new_options)
-      @options.update(new_options)
+    def merge(**new_options)
+      Param.make(name, @options.merge(new_options))
     end
 
     def convert(value)
@@ -58,8 +66,11 @@ module TLAW
     end
 
     def describe
-      ["@param #{name} [#{doc_type}]", description]
-        .compact.join(' ')
+      [
+        "@param #{name} [#{doc_type}]",
+        description,
+        default ? "(default = #{default.inspect})" : nil
+      ].compact.join(' ')
         .derp(&Util::Description.method(:new))
     end
 

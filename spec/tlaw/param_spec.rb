@@ -1,6 +1,15 @@
 module TLAW
   describe Param do
-    describe '#required?' do
+    describe '.make' do
+      context 'default' do
+        subject { described_class.make(:foo) }
+        it { is_expected.to be_a KeywordParam }
+      end
+
+      context 'non-keyword' do
+        subject { described_class.make(:bar, keyword_argument: false) }
+        it { is_expected.to be_a ArgumentParam }
+      end
     end
 
     describe '#convert' do
@@ -84,36 +93,59 @@ module TLAW
       specify { expect(param.convert_and_format(3.3)).to eq '6' }
     end
 
+    describe '#merge' do
+      let(:param) { described_class.make(:p, required: true) }
+      subject { param.merge(default: 5) }
+
+      its(:name) { is_expected.to eq :p }
+      it { is_expected.to be_a KeywordParam }
+      it { is_expected.to be_required }
+      its(:default) { is_expected.to eq 5 }
+      its(:object_id) { is_expected.not_to eq param.object_id }
+
+      context 'when non-keyword param' do
+        subject { param.merge(default: 5, keyword_argument: false) }
+
+        it { is_expected.to be_a ArgumentParam }
+
+        context 'with class change' do
+          subject { param.merge(default: 5, keyword_argument: true) }
+
+          it { is_expected.to be_a KeywordParam }
+        end
+      end
+    end
+
     describe '#to_code' do
       subject { param.to_code }
 
       context 'keyword - required' do
-        let(:param) { Param.new(:p, required: true) }
+        let(:param) { described_class.make(:p, required: true) }
         it { is_expected.to eq 'p:' }
       end
 
       context 'keyword - optional' do
-        let(:param) { Param.new(:p) }
+        let(:param) { described_class.make(:p) }
         it { is_expected.to eq 'p: nil' }
       end
 
       context 'keyword - with default' do
-        let(:param) { Param.new(:p, default: 'foo') }
+        let(:param) { described_class.make(:p, default: 'foo') }
         it { is_expected.to eq 'p: "foo"' }
       end
 
       context 'argument - required' do
-        let(:param) { Param.new(:p, keyword_argument: false, required: true) }
+        let(:param) { described_class.make(:p, keyword_argument: false, required: true) }
         it { is_expected.to eq 'p' }
       end
 
       context 'argument - optional' do
-        let(:param) { Param.new(:p, keyword_argument: false) }
+        let(:param) { described_class.make(:p, keyword_argument: false) }
         it { is_expected.to eq 'p=nil' }
       end
 
       context 'argument - with default' do
-        let(:param) { Param.new(:p, keyword_argument: false, default: "foo") }
+        let(:param) { described_class.make(:p, keyword_argument: false, default: "foo") }
         it { is_expected.to eq 'p="foo"' }
       end
     end
@@ -137,6 +169,8 @@ module TLAW
       end
 
       context 'default value' do
+        let(:param) { Param.new(:p, type: :to_i, desc: 'Foo bar', default: 8) }
+        it { is_expected.to eq '@param p [#to_i] Foo bar (default = 8)' }
       end
 
       context 'enum' do

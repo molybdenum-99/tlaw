@@ -25,6 +25,16 @@ module TLAW
         its(:name) { is_expected.to eq :param1 }
         its(:type) { is_expected.to eq Integer }
         it { is_expected.to be_required }
+
+        context 'when type is changed on update' do
+          before {
+            set.add(:param1)
+            set.add(:param1, keyword_argument: false)
+          }
+
+          subject { set[:param1] }
+          it { is_expected.to be_a ArgumentParam }
+        end
       end
     end
 

@@ -7,16 +7,12 @@ module TLAW
     end
 
     def add(name, **opts)
-      if @params[name]
-        @params[name].update(**opts)
-      else
-        @params[name] =
-          if opts[:keyword_argument] != false
-            KeywordParam.new(name, **opts)
-          else
-            ArgumentParam.new(name, **opts)
-          end
-      end
+      @params[name] =
+        if @params[name]
+          @params[name].merge(**opts)
+        else
+          @params[name] = Param.make(name, **opts)
+        end
     end
 
     def [](name)
