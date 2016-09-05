@@ -74,7 +74,7 @@ module TLAW
     alias_method :to_h, :options
 
     def description
-      options[:desc] || options[:desc]
+      options[:desc]
     end
 
     def describe
