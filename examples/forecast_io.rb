@@ -1,8 +1,3 @@
-require 'pp'
-
-$:.unshift 'lib'
-require 'tlaw'
-
 module TLAW
   module Examples
     class ForecastIO < TLAW::API

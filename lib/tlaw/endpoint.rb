@@ -26,6 +26,12 @@ module TLAW
         Addressable::Template.new(tpl)
       end
 
+      def to_tree
+        Util::Description.new(
+          ".#{to_method_definition} #{construct_template.pattern}"
+        )
+      end
+
       private
 
       def query_string_params
@@ -44,7 +50,7 @@ module TLAW
     end
 
     def call(**params)
-      url = construct_url(**@parent_params.merge(params))
+      url = construct_url(**@parent_params.merge(params.reject { |k, v| v.nil? }))
 
       @client.get(url)
              .tap { |response| guard_errors!(response) }
@@ -74,6 +80,7 @@ module TLAW
 
       body = JSON.parse(response.body) rescue nil
       message = body && (body['message'] || body['error'])
+      puts response.body
 
       fail API::Error,
            "HTTP #{response.status} at #{response.env[:url]}" +
@@ -82,7 +89,7 @@ module TLAW
 
     def construct_url(**params)
       url_params = self.class.param_set.process(**params)
-      @url_template.expand(url_params).to_s
+      @url_template.expand(url_params).normalize.to_s
     end
   end
 end

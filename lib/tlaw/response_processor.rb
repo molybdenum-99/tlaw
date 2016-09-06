@@ -28,6 +28,12 @@ module TLAW
       end
     end
 
+    class Replace < Base
+      def call(hash)
+        hash.derp(&@block)
+      end
+    end
+
     class Items < Base
       def initialize(key, subkey = nil, &block)
         @key = key
@@ -52,6 +58,10 @@ module TLAW
       @post_processors << (key ? Key.new(key, &block) : Base.new(&block))
     end
 
+    def add_replacer(&block)
+      @post_processors << Replace.new(&block)
+    end
+
     def add_item_post_processor(key, subkey = nil, &block)
       @post_processors << Items.new(key, subkey, &block)
     end
@@ -64,17 +74,22 @@ module TLAW
       @post_processors.concat(other.post_processors)
     end
 
-    def flatten(hash)
+    def flatten(value)
+      case value
+      when Hash
+        flatten_hash(value)
+      when Array
+        value.map(&method(:flatten))
+      else
+        value
+      end
+    end
+
+    def flatten_hash(hash)
       hash.flat_map { |k, v|
-        case v
-        when Hash
-          flatten(v).map { |k1, v1| ["#{k}.#{k1}", v1] }
-        when Array
-          if v.all? { |v1| v1.is_a?(Hash) }
-            [[k, v.map(&method(:flatten))]]
-          else
-            [[k, v]]
-          end
+        v = flatten(v)
+        if v.is_a?(Hash)
+          v.map {|k1,v1| ["#{k}.#{k1}", v1] }
         else
           [[k, v]]
         end
@@ -87,14 +102,19 @@ module TLAW
       }
     end
 
-    def datablize(hash)
-      hash.map { |k, v|
-        if v.is_a?(Array) && !v.empty? && v.all? { |v1| v1.is_a?(Hash) }
-          [k, DataTable.new(v)]
+    def datablize(value)
+      case value
+      when Hash
+        hash.map { |k, v| [k, datablize(v)] }.to_h
+      when Array
+        if !value.empty? && value.all? { |el| el.is_a?(Hash) }
+          DataTable.new(value)
         else
-          [k, v]
+          value
         end
-      }.to_h
+      else
+        value
+      end
     end
 
     def process(hash)

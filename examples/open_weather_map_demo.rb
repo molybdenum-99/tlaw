@@ -218,3 +218,5 @@ p forecasts.columns('dt', 'main.temp').to_a.first(3)
 #
 # Again, EVERYTHING you can see in this example is created by short and
 # focused API definition: TODO URL
+
+puts TLAW::Examples::OpenWeatherMap.to_tree

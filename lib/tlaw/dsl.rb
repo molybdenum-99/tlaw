@@ -26,6 +26,10 @@ module TLAW
         @object.response_processor.add_post_processor(key, &block)
       end
 
+      def post_process_replace(&block)
+        @object.response_processor.add_replacer(&block)
+      end
+
       class PostProcessProxy
         def initialize(parent_key, parent)
           @parent_key = parent_key

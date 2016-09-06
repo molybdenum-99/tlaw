@@ -1,5 +1,9 @@
 module TLAW
   class DataTable < Array
+    def self.from_rows(column_names, rows)
+      new rows.map { |r| column_names.zip(r).to_h }
+    end
+
     def initialize(hashes)
       hashes = hashes.each_with_index.map { |h, i|
         h.is_a?(Hash) or

@@ -69,6 +69,15 @@ module TLAW
         super + namespaces_description + endpoints_description
       end
 
+      def to_tree
+        Util::Description.new(
+          ".#{to_method_definition}\n" +
+          children.values.partition { |c| c.is_a?(Namespace) }.flatten.
+            map(&:to_tree).map { |d| d.indent('  ') }.join("\n") +
+          "\n"
+        )
+      end
+
       private
 
       def namespaces_description
