@@ -18,6 +18,10 @@ module TLAW
 
       alias_method :desc, :description
 
+      def docs(link)
+        @object.docs_link = link
+      end
+
       def param(name, type = nil, **opts)
         @object.param_set.add(name, **opts.merge(type: type))
       end

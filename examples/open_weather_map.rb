@@ -7,9 +7,9 @@ module TLAW
         desc %Q{
           API for [OpenWeatherMap](http://openweathermap.org/). Only parts
           available for free are implemented (as only them could be tested).
-
-          See full docs at http://openweathermap.org/api
         }
+
+        docs 'http://openweathermap.org/api'
 
         base 'http://api.openweathermap.org/data/2.5'
 
@@ -35,9 +35,9 @@ module TLAW
             desc %Q{
               Current weather by city name (with optional country code
               specification).
-
-              Docs: http://openweathermap.org/current#name
             }
+
+            docs 'http://openweathermap.org/current#name'
 
             param :city, required: true, desc: 'City name'
             param :country_code, desc: 'ISO 3166 2-letter country code'
@@ -60,9 +60,9 @@ module TLAW
           endpoint :location, path: '?lat={lat}&lon={lng}' do
             desc %Q{
               Current weather by geographic coordinates.
-
-              Docs: http://openweathermap.org/current#geo
             }
+
+            docs 'http://openweathermap.org/current#geo'
 
             param :lat, :to_f, required: true, desc: 'Latitude'
             param :lng, :to_f, required: true, desc: 'Longitude'
@@ -72,9 +72,9 @@ module TLAW
             desc %Q{
               Current weather by ZIP code (with optional country code
               specification).
-
-              Docs: http://openweathermap.org/current#zip
             }
+
+            docs 'http://openweathermap.org/current#zip'
 
             param :zip, required: true, desc: 'ZIP code'
             param :country_code, desc: 'ISO 3166 2-letter country code'
@@ -86,9 +86,10 @@ module TLAW
 
               List of city ID city.list.json.gz can be downloaded at
               http://bulk.openweathermap.org/sample/
-
-              Docs: http://openweathermap.org/current#cities
             }
+
+            docs 'http://openweathermap.org/current#cities'
+
             param :city_ids, :to_a, required: true
           end
         end
@@ -97,16 +98,16 @@ module TLAW
           desc %Q{
             Allows to find some place (and weather in it) by set of input
             parameters.
-
-            Docs: http://openweathermap.org/current#accuracy
           }
+
+          docs 'http://openweathermap.org/current#accuracy'
 
           endpoint :by_name, path: '?q={start_with}{,country_code}' do
             desc %Q{
               Looks for cities by beginning of their names.
-
-              Docs: http://openweathermap.org/current#accuracy
             }
+
+            docs 'http://openweathermap.org/current#accuracy'
 
             param :start_with, required: true, desc: 'Beginning of city name'
             param :country_code, desc: 'ISO 3166 2-letter country code'
@@ -126,9 +127,9 @@ module TLAW
           endpoint :around, path: '?lat={lat}&lon={lng}' do
             desc %Q{
               Looks for cities around geographical coordinates.
-
-              Docs: http://openweathermap.org/current#cycle
             }
+
+            docs 'http://openweathermap.org/current#cycle'
 
             param :lat, :to_f, required: true, desc: 'Latitude'
             param :lng, :to_f, required: true, desc: 'Longitude'
@@ -144,9 +145,9 @@ module TLAW
           endpoint :inside, path: '/../box/city?bbox={lng_left},{lat_bottom},{lng_right},{lat_top}' do
             desc %Q{
               Looks for cities inside specified rectangle zone.
-
-              Docs: http://openweathermap.org/current#rectangle
             }
+
+            docs 'http://openweathermap.org/current#rectangle'
 
             param :lat_top, :to_f, required: true, keyword_argument: true
             param :lat_bottom, :to_f, required: true, keyword_argument: true
@@ -166,11 +167,10 @@ module TLAW
             NB: OpenWeatherMap also implement [16-day forecast](http://openweathermap.org/forecast16),
             but it have no free option and can not be tested. That's why
             we don't implement it.
-
-            Docs: http://openweathermap.org/forecast5
           }
 
-          # TODO: forecast{/daily}, param :daily, values: {true => 'daily', false => nil}
+          docs 'http://openweathermap.org/forecast5'
+
           endpoint :city, path: '?q={city}{,country_code}' do
             param :city, required: true, keyword_argument: false
             param :country_code

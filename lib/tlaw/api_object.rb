@@ -3,8 +3,7 @@ require 'forwardable'
 module TLAW
   class APIObject
     class << self
-      attr_accessor :base_url, :path, :xml
-      attr_reader :description
+      attr_accessor :base_url, :path, :xml, :docs_link
 
       def symbol
         @symbol || (name && "#{name}.new") or
@@ -13,6 +12,14 @@ module TLAW
 
       def description=(descr)
         @description = Util::Description.new(descr)
+      end
+
+      def description
+        return unless @description || @docs_link
+        Util::Description.new(
+          [@description, ("Docs: #{@docs_link}" if @docs_link)]
+            .compact.join("\n\n")
+        )
       end
 
       def symbol=(sym)
