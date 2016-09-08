@@ -184,8 +184,6 @@ pp weather.current.city('Kharkiv')
 pp weather.forecast.city('Kharkiv')
 # {"city.id"=>706483,
 #  "city.name"=>"Kharkiv",
-#  "city.coord.lon"=>36.25,
-#  "city.coord.lat"=>50,
 #  "city.country"=>"UA",
 #  "city.population"=>0,
 #  "city.sys.population"=>0,
@@ -193,7 +191,8 @@ pp weather.forecast.city('Kharkiv')
 #  "message"=>0.0276,
 #  "cnt"=>40,
 #  "list"=>
-#   #<TLAW::DataTable[dt, main.temp, main.temp_min, main.temp_max, main.pressure, main.sea_level, main.grnd_level, main.humidity, main.temp_kf, weather.id, weather.main, weather.description, weather.icon, clouds.all, wind.speed, wind.deg, sys.pod] x 40>}
+#   #<TLAW::DataTable[dt, main.temp, main.temp_min, main.temp_max, main.pressure, main.sea_level, main.grnd_level, main.humidity, main.temp_kf, weather.id, weather.main, weather.description, weather.icon, clouds.all, wind.speed, wind.deg, sys.pod] x 40>,
+#  "city.coord"=>#<Geo::Coord 50.000000,36.250000>}
 
 # Hmm? What is this DataTable thingy? It is (loosy) implementation of
 # DataFrame data type. You can think of it as an array of homogenous
@@ -218,5 +217,3 @@ p forecasts.columns('dt', 'main.temp').to_a.first(3)
 #
 # Again, EVERYTHING you can see in this example is created by short and
 # focused API definition: TODO URL
-
-puts TLAW::Examples::OpenWeatherMap.to_tree

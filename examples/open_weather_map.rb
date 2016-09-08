@@ -169,10 +169,18 @@ module TLAW
 
             Docs: http://openweathermap.org/forecast5
           }
+
           # TODO: forecast{/daily}, param :daily, values: {true => 'daily', false => nil}
           endpoint :city, path: '?q={city}{,country_code}' do
             param :city, required: true, keyword_argument: false
             param :country_code
+
+            post_process { |e|
+              e['city.coord'] = Geo::Coord.new(e['city.coord.lat'], e['city.coord.lon']) \
+                if e['city.coord.lat'] && e['city.coord.lon']
+            }
+            post_process('city.coord.lat') { nil }
+            post_process('city.coord.lon') { nil }
           end
         end
 

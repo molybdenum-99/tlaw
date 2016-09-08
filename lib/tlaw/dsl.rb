@@ -73,9 +73,10 @@ module TLAW
             c.param_set.add key.to_sym, keyword_argument: false
           end
 
-          c.response_processor.merge!(@object.response_processor)
+          c.response_processor.parent = @object.response_processor
 
           wrapper_class.new(c).define(&block) if block
+
           @object.add_child(c)
         end
       end

@@ -49,6 +49,7 @@ module TLAW
     end
 
     attr_reader :post_processors
+    attr_accessor :parent
 
     def initialize(post_processors = [])
       @post_processors = post_processors
@@ -64,14 +65,6 @@ module TLAW
 
     def add_item_post_processor(key, subkey = nil, &block)
       @post_processors << Items.new(key, subkey, &block)
-    end
-
-    def merge(other)
-      dup.merge!(other)
-    end
-
-    def merge!(other)
-      @post_processors.concat(other.post_processors)
     end
 
     def flatten(value)
@@ -97,9 +90,13 @@ module TLAW
     end
 
     def post_process(hash)
-      @post_processors.inject(hash) { |res, processor|
+      all_post_processors.inject(hash) { |res, processor|
         processor.call(res).derp(&method(:flatten))
       }
+    end
+
+    def all_post_processors
+      [*(parent ? parent.all_post_processors : nil), *@post_processors]
     end
 
     def datablize(value)
