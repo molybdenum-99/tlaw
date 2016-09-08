@@ -177,17 +177,10 @@ module TLAW
               specification).
             }
 
-            docs 'http://openweathermap.org/current#name'
+            docs 'http://openweathermap.org/forecast5#name5'
 
             param :city, required: true, desc: 'City name'
             param :country_code, desc: 'ISO 3166 2-letter country code'
-
-            post_process { |e|
-              e['city.coord'] = Geo::Coord.new(e['city.coord.lat'], e['city.coord.lon']) \
-                if e['city.coord.lat'] && e['city.coord.lon']
-            }
-            post_process('city.coord.lat') { nil }
-            post_process('city.coord.lon') { nil }
           end
 
           endpoint :city_id, path: '?id={city_id}' do
@@ -199,10 +192,28 @@ module TLAW
               http://bulk.openweathermap.org/sample/
             }
 
-            docs 'http://openweathermap.org/current#cityid'
+            docs 'http://openweathermap.org/forecast5#cityid5'
 
             param :city_id, required: true, desc: 'City ID (as defined by OpenWeatherMap)'
           end
+
+          endpoint :location, path: '?lat={lat}&lon={lng}' do
+            desc %Q{
+              Weather forecast by geographic coordinates.
+            }
+
+            docs 'http://openweathermap.org/forecast5#geo5'
+
+            param :lat, :to_f, required: true, desc: 'Latitude'
+            param :lng, :to_f, required: true, desc: 'Longitude'
+          end
+
+          post_process { |e|
+            e['city.coord'] = Geo::Coord.new(e['city.coord.lat'], e['city.coord.lon']) \
+              if e['city.coord.lat'] && e['city.coord.lon']
+          }
+          post_process('city.coord.lat') { nil }
+          post_process('city.coord.lon') { nil }
         end
 
         # OpenWeatherMap reports most of logical errors with HTTP code
