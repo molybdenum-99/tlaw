@@ -89,7 +89,7 @@ module TLAW
       hash.flat_map { |k, v|
         v = flatten(v)
         if v.is_a?(Hash)
-          v.map {|k1,v1| ["#{k}.#{k1}", v1] }
+          v.map { |k1, v1| ["#{k}.#{k1}", v1] }
         else
           [[k, v]]
         end

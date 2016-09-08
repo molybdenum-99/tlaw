@@ -4,10 +4,8 @@ module TLAW
       def base_url=(url)
         @base_url = url
 
-        children.values.each do |child|
-          if child.path && !child.base_url
-            child.base_url = base_url + child.path
-          end
+        children.values.each do |c|
+          c.base_url = base_url + c.path if c.path && !c.base_url
         end
       end
 
@@ -72,8 +70,10 @@ module TLAW
       def to_tree
         Util::Description.new(
           ".#{to_method_definition}\n" +
-          children.values.partition { |c| c.is_a?(Namespace) }.flatten.
-            map(&:to_tree).map { |d| d.indent('  ') }.join("\n") +
+          children
+            .values
+            .partition { |c| c.is_a?(Namespace) }.flatten
+            .map(&:to_tree).map { |d| d.indent('  ') }.join("\n") +
           "\n"
         )
       end
@@ -95,16 +95,10 @@ module TLAW
           endpoints.values.map(&:describe_short)
                    .map { |ed| ed.indent('  ') }.join("\n\n")
       end
-
     end
 
-    def namespaces
-      self.class.namespaces
-    end
-
-    def endpoints
-      self.class.endpoints
-    end
+    def_delegators :object_class,
+                   :namespaces, :endpoints, :describe_short, :param_set
 
     def inspect
       "#<#{self.class.symbol}(#{param_set.to_hash_code(@parent_params)})" +
@@ -119,15 +113,7 @@ module TLAW
       )
     end
 
-    def describe_short
-      self.class.describe_short
-    end
-
     private
-
-    def param_set
-      self.class.param_set
-    end
 
     def child(symbol, expected_class, **params)
       self

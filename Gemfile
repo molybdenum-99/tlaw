@@ -3,6 +3,7 @@ source 'https://rubygems.org'
 gem 'faraday'
 gem 'addressable'
 gem 'geo_coord'
+gem 'crack'
 
 group :test do
   gem 'rspec'

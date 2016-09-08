@@ -63,10 +63,11 @@ module TLAW
 
       private
 
-      def define_child(name, path, child_class, wrapper_class, **_opts, &block)
+      def define_child(name, path, child_class, wrapper_class, **opts, &block)
         Class.new(child_class).tap do |c|
           c.path = path || "/#{name}"
           c.symbol = name
+          c.xml = opts[:xml]
 
           Addressable::Template.new(c.path).keys.each do |key|
             c.param_set.add key.to_sym, keyword_argument: false

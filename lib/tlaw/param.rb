@@ -10,19 +10,15 @@ module TLAW
       end
     end
 
-    attr_reader :name, :options
+    attr_reader :name, :type, :options
 
     def initialize(name, **options)
       @name = name
       @options = options
-      process_enum
+      @type = Type.parse(options)
       @options[:desc] ||= @options[:description]
       @options[:desc].gsub!(/\n( *)/, "\n  ") if @options[:desc]
       @formatter = make_formatter
-    end
-
-    def type
-      options[:type]
     end
 
     def required?
@@ -42,25 +38,7 @@ module TLAW
     end
 
     def convert(value)
-      case type
-      when nil
-        value
-      when Symbol
-        value.respond_to?(type) or
-          nonconvertible!(value, "not responding to #{type}")
-        value.send(type)
-      when Class
-        value.is_a?(type) or
-          nonconvertible!(value, "is not #{type}")
-        value
-      when Hash
-        type.key?(value) or
-          nonconvertible!(value, "is not one of #{type.keys.map(&:inspect).join(', ')}")
-
-        type[value]
-      else
-        nonconvertible!(value, "undefined type #{type}")
-      end
+      type.convert(value)
     end
 
     def format(value)
@@ -80,12 +58,12 @@ module TLAW
     def describe
       [
         '@param', name,
-        if doc_type then "[#{doc_type}]" end,
+        ("[#{doc_type}]" if doc_type),
         description,
         if @options[:enum]
           "\n  Possible values: #{options[:enum].map(&:inspect).join(', ')}"
         end,
-        if default then "(default = #{default.inspect})" end
+        ("(default = #{default.inspect})" if default)
       ].compact.join(' ')
         .derp(&Util::Description.method(:new))
     end
@@ -100,8 +78,6 @@ module TLAW
         "##{type}"
       when Class
         type.name
-      else
-        nil
       end
     end
 
@@ -126,25 +102,6 @@ module TLAW
         else
           fail ArgumentError, "#{self}: unsupporter formatter #{f}"
         end
-      }
-    end
-
-    def nonconvertible!(value, reason)
-      fail Nonconvertible, "#{self} can't convert  #{value.inspect}: #{reason}"
-    end
-
-    def process_enum
-      @options[:enum].tap { |enum|
-        return unless enum
-        @options[:type] =
-          case enum
-          when Hash
-            enum
-          when ->(e) { e.respond_to?(:map) }
-            enum.map { |n| [n, n] }.to_h
-          else
-            fail ArgumentError, "Unparseable enum: #{enum.inspect}"
-          end
       }
     end
   end
@@ -179,3 +136,5 @@ module TLAW
     end
   end
 end
+
+require_relative 'param/type'

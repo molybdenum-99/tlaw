@@ -58,7 +58,7 @@ module TLAW
         .map { |name, dfn| [name, dfn, input[name]] }
         .tap(&method(:validate_required))
         .reject { |*, val| val.nil? }
-        .map { |name, dfn, val| [dfn.field, dfn.convert_and_format(val)] }
+        .map { |_name, dfn, val| [dfn.field, dfn.convert_and_format(val)] }
         .to_h
     end
 

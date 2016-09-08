@@ -1,7 +1,9 @@
+require 'forwardable'
+
 module TLAW
   class APIObject
     class << self
-      attr_accessor :base_url, :path
+      attr_accessor :base_url, :path, :xml
       attr_reader :description
 
       def symbol
@@ -58,8 +60,16 @@ module TLAW
       end
     end
 
+    extend Forwardable
+
     def initialize(**parent_params)
       @parent_params = parent_params
+    end
+
+    private
+
+    def object_class
+      self.class
     end
   end
 end
