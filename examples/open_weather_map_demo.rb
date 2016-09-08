@@ -217,3 +217,5 @@ p forecasts.columns('dt', 'main.temp').to_a.first(3)
 #
 # Again, EVERYTHING you can see in this example is created by short and
 # focused API definition: TODO URL
+
+pp weather.forecast.city_id(524901)['list']

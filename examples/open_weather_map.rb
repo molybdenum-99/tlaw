@@ -27,9 +27,9 @@ module TLAW
           desc %Q{
             Allows to obtain current weather at one place, designated
             by city, location or zip code.
-
-            Docs: http://openweathermap.org/current
           }
+
+          docs 'http://openweathermap.org/current'
 
           endpoint :city, path: '?q={city}{,country_code}' do
             desc %Q{
@@ -50,9 +50,9 @@ module TLAW
 
               List of city ID city.list.json.gz can be downloaded at
               http://bulk.openweathermap.org/sample/
-
-              Docs: http://openweathermap.org/current#cityid
             }
+
+            docs 'http://openweathermap.org/current#cityid'
 
             param :city_id, required: true, desc: 'City ID (as defined by OpenWeatherMap)'
           end
@@ -172,8 +172,15 @@ module TLAW
           docs 'http://openweathermap.org/forecast5'
 
           endpoint :city, path: '?q={city}{,country_code}' do
-            param :city, required: true, keyword_argument: false
-            param :country_code
+            desc %Q{
+              Weather forecast by city name (with optional country code
+              specification).
+            }
+
+            docs 'http://openweathermap.org/current#name'
+
+            param :city, required: true, desc: 'City name'
+            param :country_code, desc: 'ISO 3166 2-letter country code'
 
             post_process { |e|
               e['city.coord'] = Geo::Coord.new(e['city.coord.lat'], e['city.coord.lon']) \
@@ -181,6 +188,20 @@ module TLAW
             }
             post_process('city.coord.lat') { nil }
             post_process('city.coord.lon') { nil }
+          end
+
+          endpoint :city_id, path: '?id={city_id}' do
+            desc %Q{
+              Current weather by city id. Recommended by OpenWeatherMap
+              docs.
+
+              List of city ID city.list.json.gz can be downloaded at
+              http://bulk.openweathermap.org/sample/
+            }
+
+            docs 'http://openweathermap.org/current#cityid'
+
+            param :city_id, required: true, desc: 'City ID (as defined by OpenWeatherMap)'
           end
         end
 
