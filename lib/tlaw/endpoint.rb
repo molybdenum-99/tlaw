@@ -90,6 +90,8 @@ module TLAW
     def construct_url(**params)
       url_params = self.class.param_set.process(**params)
       @url_template.expand(url_params).normalize.to_s
+        .split('?', 2).derp { |url, param| [url.gsub('%2F', '/'), param] }
+        .compact.join('?')
     end
   end
 end

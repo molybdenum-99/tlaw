@@ -30,10 +30,16 @@ module TLAW
         ]
 
         COMMON_PARAMS = lambda do |*|
-          param :features, Array #enum: FEATURES # TODO: Array+enum
+          param :features, Array, format: ->(a) { a.join('/') }
+            #TODO: enum: FEATURES
           param :pws, enum: {false => 0, true => 1}
           param :bestfct, enum: {false => 0, true => 1}
         end
+
+        post_process { |h|
+          h.key?('response.error.type') and
+            fail h['response.error.type']
+        }
 
         endpoint :city, path: '{/country}/{city}.json' do
           param :city, required: true

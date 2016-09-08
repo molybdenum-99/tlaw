@@ -105,7 +105,7 @@ module TLAW
     def datablize(value)
       case value
       when Hash
-        hash.map { |k, v| [k, datablize(v)] }.to_h
+        value.map { |k, v| [k, datablize(v)] }.to_h
       when Array
         if !value.empty? && value.all? { |el| el.is_a?(Hash) }
           DataTable.new(value)

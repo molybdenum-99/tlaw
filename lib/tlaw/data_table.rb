@@ -1,5 +1,9 @@
 module TLAW
   class DataTable < Array
+    def self.from_columns(column_names, columns)
+      from_rows(column_names, columns.transpose)
+    end
+
     def self.from_rows(column_names, rows)
       new rows.map { |r| column_names.zip(r).to_h }
     end
