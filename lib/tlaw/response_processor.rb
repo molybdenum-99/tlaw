@@ -67,6 +67,16 @@ module TLAW
       @post_processors << Items.new(key, subkey, &block)
     end
 
+    def process(hash)
+      flatten(hash).derp(&method(:post_process)).derp(&method(:datablize))
+    end
+
+    def all_post_processors
+      [*(parent ? parent.all_post_processors : nil), *@post_processors]
+    end
+
+    private
+
     def flatten(value)
       case value
       when Hash
@@ -95,10 +105,6 @@ module TLAW
       }
     end
 
-    def all_post_processors
-      [*(parent ? parent.all_post_processors : nil), *@post_processors]
-    end
-
     def datablize(value)
       case value
       when Hash
@@ -114,8 +120,5 @@ module TLAW
       end
     end
 
-    def process(hash)
-      flatten(hash).derp(&method(:post_process)).derp(&method(:datablize))
-    end
   end
 end

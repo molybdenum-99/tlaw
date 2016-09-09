@@ -137,12 +137,14 @@ module TLAW
             param :cnt, :to_i, range: 1..50, default: 10,
               desc: 'Max number of results to return'
 
-            # TODO: cluster
+            param :cluster, enum: {true => 'yes', false: 'no'},
+              default: true,
+              desc: 'Use server clustering of points'
           end
 
           # Real path is api/bbox/city - not inside /find, but logically
           # we want to place it here
-          endpoint :inside, path: '/../box/city?bbox={lng_left},{lat_bottom},{lng_right},{lat_top}' do
+          endpoint :inside, path: '/../box/city?bbox={lng_left},{lat_bottom},{lng_right},{lat_top},{zoom}' do
             desc %Q{
               Looks for cities inside specified rectangle zone.
             }
@@ -153,8 +155,12 @@ module TLAW
             param :lat_bottom, :to_f, required: true, keyword_argument: true
             param :lng_left, :to_f, required: true, keyword_argument: true
             param :lng_right, :to_f, required: true, keyword_argument: true
+            param :zoom, :to_i, default: 10, keyword_argument: true,
+              desc: 'Map zoom level.'
 
-            # TODO: cluster
+            param :cluster, enum: {true => 'yes', false: 'no'},
+              default: true,
+              desc: 'Use server clustering of points'
           end
         end
 
@@ -237,6 +243,7 @@ module TLAW
           post_process('sys.sunrise', &Time.method(:at))
           post_process('sys.sunset', &Time.method(:at))
 
+          # https://github.com/zverok/geo_coord promo here!
           post_process { |e|
             e['coord'] = Geo::Coord.new(e['coord.lat'], e['coord.lon']) if e['coord.lat'] && e['coord.lon']
           }
