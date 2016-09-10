@@ -24,6 +24,10 @@ module TLAW
         @type = type
       end
 
+      def to_doc_type
+        nil
+      end
+
       def convert(value)
         validate(value) && _convert(value)
       end
@@ -44,12 +48,16 @@ module TLAW
 
     class ClassType < Type
       def validate(value)
-        value.respond_to?(type) or
-          nonconvertible!(value, "not responding to #{type}")
+        value.is_a?(type) or
+          nonconvertible!(value, "not an instance of #{type}")
       end
 
       def _convert(value)
-        value.send(type)
+        value
+      end
+
+      def to_doc_type
+        type.name
       end
     end
 
@@ -61,6 +69,10 @@ module TLAW
       def validate(value)
         value.respond_to?(type) or
           nonconvertible!(value, "not responding to #{type}")
+      end
+
+      def to_doc_type
+        "##{type}"
       end
     end
 

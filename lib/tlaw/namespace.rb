@@ -44,18 +44,13 @@ module TLAW
       end
 
       def add_child(child)
-        name = child.symbol
+        const_set(make_class_name(child.symbol), child)
+        children[child.symbol] = child
 
-        # TODO:
-        # * validate if it is classifiable
-        # * provide reasonable defaults for non-classifiable (like :[])
-        # * provide additional option for non-default class name
-        const_set(Util.camelize(name), child)
-        children[name] = child
-        child.param_set.parent = param_set
-        if child.path && !child.base_url && base_url
+        if !child.base_url && base_url
           child.base_url = base_url + child.path
         end
+
         child.define_method_on(self)
       end
 
@@ -94,6 +89,22 @@ module TLAW
         "\n\n  Endpoints:\n\n" +
           endpoints.values.map(&:describe_short)
                    .map { |ed| ed.indent('  ') }.join("\n\n")
+      end
+
+      def make_class_name(string)
+        # TODO:
+        # * validate if it is classifiable
+        # * provide reasonable defaults for non-classifiable (like :[])
+        # * ...and test them
+        # * provide additional option for non-default class name
+        return 'Element' if string == :[]
+
+        string
+          .to_s
+          .sub(/^[a-z\d]*/, &:capitalize)
+          .gsub(%r{(?:_|(/))([a-z\d]*)}i) {
+            "#{$1}#{$2.capitalize}" # rubocop:disable Style/PerlBackrefs
+          }
       end
     end
 

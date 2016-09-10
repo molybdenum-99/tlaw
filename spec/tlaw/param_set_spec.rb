@@ -10,7 +10,7 @@ module TLAW
 
         it { is_expected.to be_a Param }
         its(:name) { is_expected.to eq :param1 }
-        its(:type) { is_expected.to eq Integer }
+        its(:'type.type') { is_expected.to eq Integer }
       end
 
       context 'when already exists' do
@@ -23,7 +23,7 @@ module TLAW
 
         it { is_expected.to be_a Param }
         its(:name) { is_expected.to eq :param1 }
-        its(:type) { is_expected.to eq Integer }
+        its(:'type.type') { is_expected.to eq Integer }
         it { is_expected.to be_required }
 
         context 'when type is changed on update' do
@@ -35,6 +35,17 @@ module TLAW
           subject { set[:param1] }
           it { is_expected.to be_a ArgumentParam }
         end
+      end
+
+      context 'when exists in parent param_set' do
+        let(:parent) { described_class.new }
+        before {
+          set.parent = parent
+          parent.add(:param1, keyword_argument: false)
+          set.add(:param1, type: Integer)
+        }
+        specify { expect(set[:param1]).to be_nil }
+        specify { expect(parent[:param1]).to be_an ArgumentParam }
       end
     end
 

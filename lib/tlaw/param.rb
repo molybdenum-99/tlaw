@@ -3,6 +3,8 @@ module TLAW
     Nonconvertible = Class.new(ArgumentError)
 
     def self.make(name, **options)
+      # NB: Sic. :keyword_agument is nil (not provided) should still
+      #     make a keyword argument.
       if options[:keyword_argument] != false
         KeywordParam.new(name, **options)
       else
@@ -73,12 +75,7 @@ module TLAW
     attr_reader :formatter
 
     def doc_type
-      case type
-      when Symbol
-        "##{type}"
-      when Class
-        type.name
-      end
+      type.to_doc_type
     end
 
     def to_url_part(value)

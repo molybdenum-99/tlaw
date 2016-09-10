@@ -15,7 +15,7 @@ module TLAW
       subject(:url) { endpoint.__send__(:construct_url, params) }
 
       context 'no params' do
-        it { is_expected.to eq 'https://api.example.com' }
+        it { is_expected.to eq 'https://api.example.com/' }
       end
 
       context 'only query params' do
@@ -25,7 +25,7 @@ module TLAW
         }
         let(:params) { {q: 'Kharkiv oblast', pagesize: 10} }
 
-        it { is_expected.to eq 'https://api.example.com?q=Kharkiv%20oblast&pagesize=100' }
+        it { is_expected.to eq 'https://api.example.com/?q=Kharkiv%20oblast&pagesize=100' }
       end
 
       context 'path & query params' do
@@ -49,7 +49,7 @@ module TLAW
 
         let(:url_template) { 'https://api.example.com?q={q}' }
 
-        it { is_expected.to eq 'https://api.example.com?q=Kharkiv&pagesize=100' }
+        it { is_expected.to eq 'https://api.example.com/?q=Kharkiv&pagesize=100' }
       end
 
       context 'parent-defined params'
@@ -112,7 +112,7 @@ module TLAW
 
           specify {
             expect { endpoint.call(q: 'Why') }
-              .to raise_error(API::Error, 'HTTP 404 at https://api.example.com?q=Why')
+              .to raise_error(API::Error, 'HTTP 404 at https://api.example.com/?q=Why')
           }
         end
         context 'code + json message'
@@ -127,7 +127,7 @@ module TLAW
 
           specify {
             expect { endpoint.call(q: 'Why') }
-              .to raise_error(API::Error, 'JSON::ParserError at https://api.example.com?q=Why: Unparseable!')
+              .to raise_error(API::Error, 'JSON::ParserError at https://api.example.com/?q=Why: Unparseable!')
           }
         end
       end

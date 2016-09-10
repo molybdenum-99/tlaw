@@ -7,11 +7,14 @@ module TLAW
     end
 
     def add(name, **opts)
+      # Not updating parent param, just make sure it exists
+      return if @parent && @parent.all_params[name]
+
       @params[name] =
         if @params[name]
           @params[name].merge(**opts)
         else
-          @params[name] = Param.make(name, **opts)
+          Param.make(name, **opts)
         end
     end
 
@@ -32,7 +35,7 @@ module TLAW
     end
 
     def empty?
-      @params.empty?
+      @params.empty? && (!@parent || @parent.empty?)
     end
 
     def to_code
@@ -65,6 +68,13 @@ module TLAW
     def all_params
       (@parent ? @parent.all_params : {}).merge(@params)
     end
+
+    def inspect
+      "#<#{self.class.name} #{names.join(', ')}"\
+        "#{" (parent=#{parent.inspect})" if parent && !parent.empty?}>"
+    end
+
+    alias_method :to_s, :inspect
 
     private
 
