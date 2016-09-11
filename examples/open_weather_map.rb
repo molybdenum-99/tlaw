@@ -23,7 +23,7 @@ module TLAW
         param :units, enum: %i[standard metric imperial], default: :standard,
           desc: 'Units for temperature and other values. Standard is Kelvin.'
 
-        namespace :current, path: '/weather' do
+        namespace :current, '/weather' do
           desc %Q{
             Allows to obtain current weather at one place, designated
             by city, location or zip code.
@@ -31,7 +31,7 @@ module TLAW
 
           docs 'http://openweathermap.org/current'
 
-          endpoint :city, path: '?q={city}{,country_code}' do
+          endpoint :city, '?q={city}{,country_code}' do
             desc %Q{
               Current weather by city name (with optional country code
               specification).
@@ -43,7 +43,7 @@ module TLAW
             param :country_code, desc: 'ISO 3166 2-letter country code'
           end
 
-          endpoint :city_id, path: '?id={city_id}' do
+          endpoint :city_id, '?id={city_id}' do
             desc %Q{
               Current weather by city id. Recommended by OpenWeatherMap
               docs.
@@ -57,7 +57,7 @@ module TLAW
             param :city_id, required: true, desc: 'City ID (as defined by OpenWeatherMap)'
           end
 
-          endpoint :location, path: '?lat={lat}&lon={lng}' do
+          endpoint :location, '?lat={lat}&lon={lng}' do
             desc %Q{
               Current weather by geographic coordinates.
             }
@@ -68,7 +68,7 @@ module TLAW
             param :lng, :to_f, required: true, desc: 'Longitude'
           end
 
-          endpoint :zip, path: '?zip={zip}{,country_code}' do
+          endpoint :zip, '?zip={zip}{,country_code}' do
             desc %Q{
               Current weather by ZIP code (with optional country code
               specification).
@@ -80,7 +80,7 @@ module TLAW
             param :country_code, desc: 'ISO 3166 2-letter country code'
           end
 
-          endpoint :group, path: '/../group?id={city_ids}' do
+          endpoint :group, '/../group?id={city_ids}' do
             desc %Q{
               Current weather in several cities by their ids.
 
@@ -102,7 +102,7 @@ module TLAW
 
           docs 'http://openweathermap.org/current#accuracy'
 
-          endpoint :by_name, path: '?q={start_with}{,country_code}' do
+          endpoint :by_name, '?q={start_with}{,country_code}' do
             desc %Q{
               Looks for cities by beginning of their names.
             }
@@ -124,7 +124,7 @@ module TLAW
               }
           end
 
-          endpoint :around, path: '?lat={lat}&lon={lng}' do
+          endpoint :around, '?lat={lat}&lon={lng}' do
             desc %Q{
               Looks for cities around geographical coordinates.
             }
@@ -144,7 +144,7 @@ module TLAW
 
           # Real path is api/bbox/city - not inside /find, but logically
           # we want to place it here
-          endpoint :inside, path: '/../box/city?bbox={lng_left},{lat_bottom},{lng_right},{lat_top},{zoom}' do
+          endpoint :inside, '/../box/city?bbox={lng_left},{lat_bottom},{lng_right},{lat_top},{zoom}' do
             desc %Q{
               Looks for cities inside specified rectangle zone.
             }
@@ -165,7 +165,7 @@ module TLAW
         end
 
         # http://openweathermap.org/forecast5
-        namespace :forecast, path: '/forecast' do
+        namespace :forecast do
           desc %Q{
             Allows to obtain weather forecast for 5 days with 3-hour
             frequency.
@@ -177,7 +177,7 @@ module TLAW
 
           docs 'http://openweathermap.org/forecast5'
 
-          endpoint :city, path: '?q={city}{,country_code}' do
+          endpoint :city, '?q={city}{,country_code}' do
             desc %Q{
               Weather forecast by city name (with optional country code
               specification).
@@ -189,7 +189,7 @@ module TLAW
             param :country_code, desc: 'ISO 3166 2-letter country code'
           end
 
-          endpoint :city_id, path: '?id={city_id}' do
+          endpoint :city_id, '?id={city_id}' do
             desc %Q{
               Current weather by city id. Recommended by OpenWeatherMap
               docs.
@@ -203,7 +203,7 @@ module TLAW
             param :city_id, required: true, desc: 'City ID (as defined by OpenWeatherMap)'
           end
 
-          endpoint :location, path: '?lat={lat}&lon={lng}' do
+          endpoint :location, '?lat={lat}&lon={lng}' do
             desc %Q{
               Weather forecast by geographic coordinates.
             }

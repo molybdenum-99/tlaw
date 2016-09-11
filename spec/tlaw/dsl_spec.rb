@@ -90,7 +90,7 @@ module TLAW
 
           expect(namespace).to receive(:add_child).with(endpoint)
 
-          wrapper.endpoint :ep1, path: '/ns1/ns2/ep1', &block
+          wrapper.endpoint :ep1, '/ns1/ns2/ep1', &block
         end
 
         it 'guesses params from url' do
@@ -109,7 +109,7 @@ module TLAW
 
           expect(namespace).to receive(:add_child).with(endpoint)
 
-          wrapper.endpoint :ep1, path: '/ns1/ns2/{city}', &block
+          wrapper.endpoint :ep1, '/ns1/ns2/{city}', &block
         end
       end
 
@@ -154,7 +154,7 @@ module TLAW
 
           expect(namespace).to receive(:add_child).with(child)
 
-          wrapper.namespace :ns1, path: '/ns1/ns2', &block
+          wrapper.namespace :ns1, '/ns1/ns2', &block
         end
       end
     end

@@ -41,7 +41,7 @@ module TLAW
             fail h['response.error.type']
         }
 
-        endpoint :city, path: '{/country}/{city}.json' do
+        endpoint :city, '{/country}/{city}.json' do
           param :city, required: true
 
           instance_eval(&COMMON_PARAMS)

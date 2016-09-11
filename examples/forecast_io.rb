@@ -9,7 +9,7 @@ module TLAW
         param :exclude, Array
         param :lang
 
-        endpoint :forecast, path: '/{lat},{lng}' do
+        endpoint :forecast, '/{lat},{lng}' do
           param :lat, :to_f, required: true
           param :lng, :to_f, required: true
 
@@ -17,7 +17,7 @@ module TLAW
             enum: {false => nil, true => 'hourly'}
         end
 
-        endpoint :time_machine, path: '/{lat},{lng},{at}' do
+        endpoint :time_machine, '/{lat},{lng},{at}' do
           param :lat, :to_f, required: true
           param :lng, :to_f, required: true
           param :at, :to_time, format: :to_i, required: true

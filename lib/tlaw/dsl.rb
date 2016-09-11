@@ -57,11 +57,11 @@ module TLAW
 
     # rubocop:disable Metrics/ParameterLists
     class NamespaceWrapper < BaseWrapper
-      def endpoint(name, path: nil, **opts, &block)
+      def endpoint(name, path = nil, **opts, &block)
         define_child(name, path, Endpoint, EndpointWrapper, **opts, &block)
       end
 
-      def namespace(name, path: nil, **opts, &block)
+      def namespace(name, path = nil, **opts, &block)
         define_child(name, path, Namespace, NamespaceWrapper, **opts, &block)
       end
 
