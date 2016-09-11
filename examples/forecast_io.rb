@@ -20,7 +20,7 @@ module TLAW
         endpoint :time_machine, path: '/{lat},{lng},{at}' do
           param :lat, :to_f, required: true
           param :lng, :to_f, required: true
-          param :at, :to_time, format: :to_i, required: true, keyword_argument: false
+          param :at, :to_time, format: :to_i, required: true
         end
 
         post_process 'currently.time', &Time.method(:at)

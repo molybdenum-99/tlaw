@@ -29,7 +29,7 @@ module TLAW
         context 'when type is changed on update' do
           before {
             set.add(:param1)
-            set.add(:param1, keyword_argument: false)
+            set.add(:param1, keyword: false)
           }
 
           subject { set[:param1] }
@@ -41,7 +41,7 @@ module TLAW
         let(:parent) { described_class.new }
         before {
           set.parent = parent
-          parent.add(:param1, keyword_argument: false)
+          parent.add(:param1, keyword: false)
           set.add(:param1, type: Integer)
         }
         specify { expect(set[:param1]).to be_nil }
@@ -107,9 +107,9 @@ module TLAW
         set.add :kv2, type: :to_i, required: true
         set.add :kv3, default: 3, enum: (1..5)
 
-        set.add :arg1, keyword_argument: false
-        set.add :arg2, keyword_argument: false, default: 'foo'
-        set.add :arg3, type: :to_time, keyword_argument: false, required: true
+        set.add :arg1, keyword: false
+        set.add :arg2, keyword: false, default: 'foo'
+        set.add :arg3, type: :to_time, keyword: false, required: true
       }
 
       describe '#definition' do

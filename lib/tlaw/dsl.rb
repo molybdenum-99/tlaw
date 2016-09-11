@@ -76,7 +76,7 @@ module TLAW
           c.param_set.parent = @object.param_set
 
           Addressable::Template.new(c.path).keys.each do |key|
-            c.param_set.add key.to_sym, keyword_argument: false
+            c.param_set.add key.to_sym, keyword: false
           end
 
           c.response_processor.parent = @object.response_processor

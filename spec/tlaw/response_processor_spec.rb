@@ -15,7 +15,7 @@ module TLAW
         }
       }
 
-      subject { processor.flatten(source) }
+      subject { processor.send(:flatten, source) }
 
       it { is_expected.to eq(
           'response.count' => 10,
@@ -42,7 +42,7 @@ module TLAW
         }
       }
 
-      subject { processor.post_process(source) }
+      subject { processor.send(:post_process, source) }
 
       context 'global' do
         before {
@@ -119,7 +119,7 @@ module TLAW
         }
       }
 
-      subject { processor.datablize(source)['list'] }
+      subject { processor.send(:datablize, source)['list'] }
 
       it { is_expected.to be_a DataTable }
       its(:keys) { is_expected.to eq %w[i val] }

@@ -3,6 +3,7 @@ $:.unshift 'lib'
 require 'rspec/its'
 require 'faker'
 require 'webmock/rspec'
+require 'byebug'
 
 require 'tlaw'
 
@@ -48,5 +49,12 @@ class String
     gsub(/\n\s+?\|/, "\n")    # for all lines looking like "<spaces>|" -- remove this.
     .gsub(/\|\n/, "\n")       # allow to write trailing space not removed by editor
     .gsub(/\A\n|\n\s+\Z/, '') # remove empty strings before and after
+  end
+end
+
+class TLAW::Util::Description
+  # to make it easily comparable with strings expected.
+  def inspect
+    to_s.inspect
   end
 end

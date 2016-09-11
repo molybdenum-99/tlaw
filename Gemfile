@@ -11,6 +11,7 @@ group :test do
   gem 'vcr'
   gem 'webmock'
   gem 'faker'
+  gem 'byebug'
 end
 
 group :dev do

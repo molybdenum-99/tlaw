@@ -7,7 +7,7 @@ module TLAW
       end
 
       context 'non-keyword' do
-        subject { described_class.make(:bar, keyword_argument: false) }
+        subject { described_class.make(:bar, keyword: false) }
         it { is_expected.to be_a ArgumentParam }
       end
     end
@@ -115,12 +115,12 @@ module TLAW
       its(:object_id) { is_expected.not_to eq param.object_id }
 
       context 'when non-keyword param' do
-        subject { param.merge(default: 5, keyword_argument: false) }
+        subject { param.merge(default: 5, keyword: false) }
 
         it { is_expected.to be_a ArgumentParam }
 
         context 'with class change' do
-          subject { param.merge(default: 5, keyword_argument: true) }
+          subject { param.merge(default: 5, keyword: true) }
 
           it { is_expected.to be_a KeywordParam }
         end
@@ -146,17 +146,17 @@ module TLAW
       end
 
       context 'argument - required' do
-        let(:param) { described_class.make(:p, keyword_argument: false, required: true) }
+        let(:param) { described_class.make(:p, keyword: false, required: true) }
         it { is_expected.to eq 'p' }
       end
 
       context 'argument - optional' do
-        let(:param) { described_class.make(:p, keyword_argument: false) }
+        let(:param) { described_class.make(:p, keyword: false) }
         it { is_expected.to eq 'p=nil' }
       end
 
       context 'argument - with default' do
-        let(:param) { described_class.make(:p, keyword_argument: false, default: "foo") }
+        let(:param) { described_class.make(:p, keyword: false, default: "foo") }
         it { is_expected.to eq 'p="foo"' }
       end
     end

@@ -3,9 +3,9 @@ module TLAW
     Nonconvertible = Class.new(ArgumentError)
 
     def self.make(name, **options)
-      # NB: Sic. :keyword_agument is nil (not provided) should still
+      # NB: Sic. :keyword is nil (not provided) should still
       #     make a keyword argument.
-      if options[:keyword_argument] != false
+      if options[:keyword] != false
         KeywordParam.new(name, **options)
       else
         ArgumentParam.new(name, **options)
@@ -101,10 +101,15 @@ module TLAW
         end
       }
     end
+
+    def default_to_code
+      # FIXME: this `inspect` will fail with, say, Time
+      default.inspect
+    end
   end
 
   class ArgumentParam < Param
-    def keyword_argument?
+    def keyword?
       false
     end
 
@@ -112,14 +117,13 @@ module TLAW
       if required?
         name.to_s
       else
-        # FIXME: this `inspect` will fail with, say, Time
-        "#{name}=#{default.inspect}"
+        "#{name}=#{default_to_code}"
       end
     end
   end
 
   class KeywordParam < Param
-    def keyword_argument?
+    def keyword?
       true
     end
 
@@ -127,8 +131,7 @@ module TLAW
       if required?
         "#{name}:"
       else
-        # FIXME: this `inspect` will fail with, say, Time
-        "#{name}: #{default.inspect}"
+        "#{name}: #{default_to_code}"
       end
     end
   end

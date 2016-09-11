@@ -34,8 +34,9 @@ module TLAW
           wrapper.description 'It is cool'
         end
 
-        it 'deindents descriptino' do
-          expect(namespace).to receive(:description=).with("It is pretty cool.\nAnd concise, see.\n\nMultispace!")
+        it 'deindents description' do
+          expect(namespace).to receive(:description=)
+            .with("It is pretty cool.\nAnd concise, see.\n\nMultispace!")
           wrapper.description %Q{
             It is pretty cool.
             And concise, see.
@@ -69,7 +70,7 @@ module TLAW
 
           expect(endpoint_wrapper).to receive(:define){|&b| expect(b).to eq block }
 
-          expect(namespace).to receive(:add_endpoint).with(endpoint)
+          expect(namespace).to receive(:add_child).with(endpoint)
 
           wrapper.endpoint :ep1, &block
         end
@@ -87,7 +88,7 @@ module TLAW
 
           expect(endpoint_wrapper).to receive(:define){|&b| expect(b).to eq block }
 
-          expect(namespace).to receive(:add_endpoint).with(endpoint)
+          expect(namespace).to receive(:add_child).with(endpoint)
 
           wrapper.endpoint :ep1, path: '/ns1/ns2/ep1', &block
         end
@@ -98,7 +99,7 @@ module TLAW
 
           expect(endpoint).to receive(:path=).with('/ns1/ns2/{city}').and_call_original
           expect(endpoint).to receive(:symbol=).with(:ep1)
-          expect(endpoint.param_set).to receive(:add).with(:city, keyword_argument: false)
+          expect(endpoint.param_set).to receive(:add).with(:city, keyword: false)
 
           expect(DSL::EndpointWrapper).to receive(:new)
             .with(endpoint)
@@ -106,7 +107,7 @@ module TLAW
 
           expect(endpoint_wrapper).to receive(:define){|&b| expect(b).to eq block }
 
-          expect(namespace).to receive(:add_endpoint).with(endpoint)
+          expect(namespace).to receive(:add_child).with(endpoint)
 
           wrapper.endpoint :ep1, path: '/ns1/ns2/{city}', &block
         end
@@ -133,7 +134,7 @@ module TLAW
 
           expect(namespace_wrapper).to receive(:define){|&b| expect(b).to eq block }
 
-          expect(namespace).to receive(:add_namespace).with(child)
+          expect(namespace).to receive(:add_child).with(child)
 
           wrapper.namespace :ns1, &block
         end
@@ -151,7 +152,7 @@ module TLAW
 
           expect(namespace_wrapper).to receive(:define){|&b| expect(b).to eq block }
 
-          expect(namespace).to receive(:add_namespace).with(child)
+          expect(namespace).to receive(:add_child).with(child)
 
           wrapper.namespace :ns1, path: '/ns1/ns2', &block
         end
@@ -192,13 +193,17 @@ module TLAW
 
       describe '#post_process_each' do
         it 'adds post processor without key' do
-          expect(endpoint.response_processor).to receive(:add_item_post_processor).with('list', nil)
-          wrapper.post_process_each('list') { |h| }
+          expect(endpoint.response_processor)
+            .to receive(:add_item_post_processor)
+            .with('list', nil)
+          wrapper.post_process_items('list') { post_process { |h|  } }
         end
 
         it 'adds post processor with key' do
-          expect(endpoint.response_processor).to receive(:add_item_post_processor).with('list', 'dt')
-          wrapper.post_process_each('list', 'dt') { |h| }
+          expect(endpoint.response_processor)
+            .to receive(:add_item_post_processor)
+            .with('list', 'dt')
+          wrapper.post_process_items('list') { post_process('dt') { |h| } }
         end
       end
     end
@@ -221,7 +226,7 @@ module TLAW
     let(:api) { api_class.new }
 
     it 'produces reasonable outcome' do
-      expect(api.some_ns.endpoints[:some_ep].class.base_url)
+      expect(api.some_ns.endpoints[:some_ep].base_url)
         .to eq 'http://api.example.com/some_ns/some_ep'
 
       expect(api.some_ns.method(:some_ep).parameters).to eq [[:key, :foo]]

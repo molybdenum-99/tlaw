@@ -83,7 +83,6 @@ module TLAW
 
       body = JSON.parse(response.body) rescue nil
       message = body && (body['message'] || body['error'])
-      puts response.body
 
       fail API::Error,
            "HTTP #{response.status} at #{response.env[:url]}" +

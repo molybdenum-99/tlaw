@@ -151,11 +151,11 @@ module TLAW
 
             docs 'http://openweathermap.org/current#rectangle'
 
-            param :lat_top, :to_f, required: true, keyword_argument: true
-            param :lat_bottom, :to_f, required: true, keyword_argument: true
-            param :lng_left, :to_f, required: true, keyword_argument: true
-            param :lng_right, :to_f, required: true, keyword_argument: true
-            param :zoom, :to_i, default: 10, keyword_argument: true,
+            param :lat_top, :to_f, required: true, keyword: true
+            param :lat_bottom, :to_f, required: true, keyword: true
+            param :lng_left, :to_f, required: true, keyword: true
+            param :lng_right, :to_f, required: true, keyword: true
+            param :zoom, :to_i, default: 10, keyword: true,
               desc: 'Map zoom level.'
 
             param :cluster, enum: {true => 'yes', false: 'no'},

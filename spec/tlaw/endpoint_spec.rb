@@ -141,9 +141,9 @@ module TLAW
         endpoint_class.param_set.add :kv2, required: true
         endpoint_class.param_set.add :kv3, default: 14
 
-        endpoint_class.param_set.add :arg1, keyword_argument: false
-        endpoint_class.param_set.add :arg2, keyword_argument: false, default: 'foo'
-        endpoint_class.param_set.add :arg3, keyword_argument: false, required: true
+        endpoint_class.param_set.add :arg1, keyword: false
+        endpoint_class.param_set.add :arg2, keyword: false, default: 'foo'
+        endpoint_class.param_set.add :arg3, keyword: false, required: true
       }
 
       subject { endpoint_class.to_code }
@@ -162,8 +162,8 @@ module TLAW
         endpoint_class.param_set.add :kv1, type: Time
         endpoint_class.param_set.add :kv2, type: :to_i, required: true
 
-        endpoint_class.param_set.add :arg1, keyword_argument: false
-        endpoint_class.param_set.add :arg3, type: :to_time, keyword_argument: false, required: true
+        endpoint_class.param_set.add :arg1, keyword: false
+        endpoint_class.param_set.add :arg3, type: :to_time, keyword: false, required: true
 
         allow(endpoint_class).to receive(:name).and_return('SomeEndpoint')
       }
