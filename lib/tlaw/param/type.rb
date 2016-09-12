@@ -89,6 +89,10 @@ module TLAW
           end
       end
 
+      def possible_values
+        type.keys
+      end
+
       def validate(value)
         type.key?(value) or
           nonconvertible!(

@@ -185,6 +185,17 @@ module TLAW
       end
 
       context 'enum' do
+        context 'hash' do
+          let(:param) { Param.new(:p, enum: {true => 'foo', false => 'bar'}) }
+
+          it { is_expected.to include('Possible values: true, false') }
+        end
+
+        context 'other enumerable' do
+          let(:param) { Param.new(:p, enum: ['foo', 'bar']) }
+
+          it { is_expected.to include('Possible values: "foo", "bar"') }
+        end
       end
     end
   end
