@@ -3,7 +3,7 @@ $:.unshift 'lib'
 require 'rspec/its'
 require 'faker'
 require 'webmock/rspec'
-require 'byebug'
+# require 'byebug'
 
 require 'tlaw'
 
