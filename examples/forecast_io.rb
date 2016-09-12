@@ -18,7 +18,7 @@ module TLAW
 
         param :api_key, required: true,
           desc: 'Register at https://developer.forecast.io/register to obtain it'
-        param :units, enum: %i[us si ca uk2 auto],
+        param :units, enum: %i[us si ca uk2 auto], default: :us,
           desc: %Q{
             Response units. Values:
             * `:us` is default;
@@ -32,7 +32,8 @@ module TLAW
               on geographic location.
           }
 
-        param :lang, desc: %Q{
+        param :lang, default: :en,
+          desc: %Q{
             Return summary properties in the desired language. (2-letters code)
           }
 
