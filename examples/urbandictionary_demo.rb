@@ -13,6 +13,10 @@ require_relative 'demo_base'
 # Its `lib` folder contains 7 files, 9 classes/modules and 300 lines of
 # code, I kid you not.
 #
+# I have no intention to offend that gem's author! I just saying that's
+# what you get when you need to design everything from scratch, like HTTP
+# client and params processing and response parsing and whatnot.
+#
 # Here is our version (17 codelines, including namespacing and bit of docs):
 #
 module TLAW
