@@ -46,6 +46,11 @@ Metrics/MethodLength:
 Lint/NonLocalExitFromIterator:
   Enabled: false
 
+# Rubocop doesn't allow to "exclude comments" here, and good examples in
+# comments require really long lines.
+Metrics/LineLength:
+  Enabled: false
+
 # Working on it!
 # --------------
 

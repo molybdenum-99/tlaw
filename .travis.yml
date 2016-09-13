@@ -1,0 +1,12 @@
+cache: bundler
+language: ruby
+rvm:
+  - "2.1"
+  - "2.2"
+  - "2.3.0"
+  - jruby
+install:
+  - bundle install --retry=3
+script:
+  - bundle exec rspec
+  - bundle exec rubocop
