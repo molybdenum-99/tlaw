@@ -1,6 +1,6 @@
 # TLAW - The Last API Wrapper
 
-TLAW (pronounce it like "tea+love", or whatever) is the last (and only) API
+TLAW (pronounce it like "tea+love"... or whatever) is the last (and only) API
 wrapper framework for _get-only APIes_<sup>[*](#get-only-api)</sup> (think
 weather, search, economical indicators, geonames and so on).
 
@@ -31,12 +31,12 @@ statistics... Typically, when trying to use one of them from Ruby (or,
 to be honest, from any programming language), you are stuck with two
 options:
 
-* Study and use (or invent and build) some custom hand-made Wrapper
+1. Study and use (or invent and build) some custom hand-made Wrapper
   Library™ with ton of very custom design decisions (should responses
   be just hashes, or [Hashie](https://github.com/intridea/hashie)s, or
   real classes for each kind of response? What are the inputs? Where should
-  api key go, to global param?);
-* Just "ride bareback" (forgive the boldness): construct URLs yourself,
+  api key go, to global param?); or
+2. Just "go commando" (sorry for the bad pun): construct URLs yourself,
   parse responses yourself, control params (or ignore the control) yourself.
 
 TLAW tries to close this gap: provide a base for _breath-easy_ API description
@@ -67,8 +67,8 @@ class Example < TLAW::API
   # Method call would be movie(id: '123')
   # Generated URL would be "http://api.example.com/movie?id=123"
 
-  # When param is part of the path
-  # You can use RFC-{TODO} URL template standard:
+  # When param is part of the path, you can use RFC 6570
+  # URL template standard:
   endpoint :movie, '/movies/{id}'
   # That would generate method which is called like movie('123')
   # ...and call to "http://api.example.com/movies/123"
@@ -99,10 +99,10 @@ end
 ```
 
 Links to definition DSL:
-* API itself
-* namespace
-* endpoint
 * param
+* endpoint
+* namespace
+* API itself
 
 ### Output processing
 
@@ -268,7 +268,7 @@ _(in no particular order)_
 
 ## Get-only API
 
-"GET-only API" is an API that is characterised by those properties:
+What is those "Get-only APIs" TLAW is suited for?
 
 * It is only for _getting_ data, not changing them (though, API may use
   HTTP POST requests in reality—for example, to transfer large request
@@ -281,6 +281,10 @@ _(in no particular order)_
   param in query" (though, TLAW plans to support more complex authentication);
 * It typically returns JSON answers (though, TLAW supports XML via
   awesome [crack](https://github.com/jnunemaker/crack)).
+
+Alongside already mentioned examples (weather and so on), you can build
+TLAW-backed "get-only" wrappers for bigger APIs (like Twitter), when
+"gathering twits" is all you need.
 
 ## Current status
 

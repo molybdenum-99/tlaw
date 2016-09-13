@@ -89,7 +89,7 @@ module TLAW
           end
       end
 
-      def possible_values
+      def values
         type.keys
       end
 
