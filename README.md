@@ -20,9 +20,9 @@ weather, search, economical indicators, geonames and so on).
   you have no 20-level dynamic dispatching, just your usual method calls
   with clearly defined arguments and compact backtraces.
 
-Take a look at our "model" OpenWeatherMap [wrapper](https://github.com/)
-and [demo](https://github.com/) of its usage, showing how all those things
-work in reality.
+Take a look at our "model" OpenWeatherMap [wrapper](https://github.com/molybdenum-99/tlaw/blob/master/examples/open_weather_map.rb)
+and [demo](https://github.com/molybdenum-99/tlaw/blob/master/examples/open_weather_map_demo.rb)
+of its usage, showing how all those things work in reality.
 
 ## Why TLAW?
 
@@ -291,18 +291,63 @@ All described response processing steps are performed in this order:
 
 ### Documentability
 
+You do it this way:
+
+```ruby
+class MyAPI < TLAW::API
+  desc %Q{
+    This is API, it works.
+  }
+
+  docs 'http://docs.example.com'
+
+  namespace :ns do
+    desc %Q{
+      It is some interesting thing.
+    }
+
+    docs 'http://docs.example.com/ns'
+
+    endpoint :baz do
+      desc %Q{
+        Should be useful.
+      }
+
+      docs 'http://docs.example.com/ns#baz'
+
+      param :param1,
+        desc: %Q{
+          You don't need it, really.
+        }
+    end
+  end
+end
+```
+
+All of above is optional, but when provided, allows to investigate
+things at runtime (in IRB/pry or test scripts). Again, look at
+[OpenWeatherMap demo](https://github.com/molybdenum-99/tlaw/blob/master/examples/open_weather_map_demo.rb),
+it shows how docs could be useful at runtime.
+
 ## Some demos
 
 * Full-featured API wrappers:
-  * OpenWeatherMap: wrapper, extensively documented demo code;
-  * ForecastIO: wrapper, demo code;
+  * OpenWeatherMap: [source API docs](http://openweathermap.org/api),
+    [wrapper](https://github.com/molybdenum-99/tlaw/blob/master/examples/open_weather_map.rb),
+    extensively documented [demo code](https://github.com/molybdenum-99/tlaw/blob/master/examples/open_weather_map_demo.rb);
+  * ForecastIO: [API docs](https://developer.forecast.io/docs/v2),
+    [wrapper](https://github.com/molybdenum-99/tlaw/blob/master/examples/forecast_io.rb),
+    [demo code](https://github.com/molybdenum-99/tlaw/blob/master/examples/forecast_io_demo.rb);
 * Demos of "fire-and-forget" wrappers:
   * Urbandictionary's small and unofficial API wrapper;
-  * Partial wrapper only for some features of large TMDB API.
+  * [Partial wrapper](https://github.com/molybdenum-99/tlaw/blob/master/examples/tmdb_demo.rb)
+    only for some features of large [TMDB API](docs.themoviedb.apiary.io/).
 
 ## Installation & compatibility
 
+Just `gem install tlaw` or add it to your `Gemfile`, nothing fancy.
 
+Required Ruby version is 2.1+, JRuby works, Rubinius seems like not.
 
 ## Upcoming features
 
@@ -316,7 +361,9 @@ _(in no particular order)_
 * [ ] Frequency-limited API support (requests counting);
 * [ ] YARD docs generation for resulting wrappers;
 * [ ] More solid wrapper demos (weather sites, geonames, worldbank);
-* [ ] splat parameters.
+* [ ] Approaches to testing generated wrappers (just good ol' VCR should
+      work, probably);
+* [ ] Splat parameters.
 
 ## Get-only API
 
@@ -341,6 +388,13 @@ authorization abilities is far simpler than
 [Twitter requirements](https://dev.twitter.com/oauth/application-only)).
 
 ## Current status
+
+It is version 0.0.1. It is tested and documented, but not "tested in
+battle", just invented. DSL is subject to be refined and validated,
+everything could change (or broke suddenly). Tests are lot, though.
+
+We plan to heavily utilize it for [reality](https://github.com/molybdenum-99/reality),
+that would be serious evaluation of approaches and weeknesses.
 
 ## Links
 
