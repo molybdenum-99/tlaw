@@ -1,9 +1,12 @@
-$:.unshift 'lib'
-
 require 'rspec/its'
 require 'faker'
 require 'webmock/rspec'
 # require 'byebug'
+
+require 'simplecov'
+SimpleCov.start
+
+$:.unshift 'lib'
 
 require 'tlaw'
 

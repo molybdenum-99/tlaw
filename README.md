@@ -98,8 +98,8 @@ class Example < TLAW::API
 end
 ```
 
-Links to definition API:
-* API
+Links to definition DSL:
+* API itself
 * namespace
 * endpoint
 * param
@@ -241,9 +241,9 @@ d.columns('date', 'temp').first # and so on
 
 Take a look at [DataTable docs]() and invest into its development!
 
-
-
 #### Post-processing
+
+#### All at once
 
 ### Documentability
 

@@ -3,5 +3,8 @@ require 'pp'
 $:.unshift 'lib'
 require 'tlaw'
 
-require 'dotenv'
-Dotenv.load
+begin
+  require 'dotenv'
+  Dotenv.load
+rescue LoadError
+end
