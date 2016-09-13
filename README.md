@@ -365,7 +365,8 @@ it shows how docs could be useful at runtime.
     [wrapper](https://github.com/molybdenum-99/tlaw/blob/master/examples/forecast_io.rb),
     [demo code](https://github.com/molybdenum-99/tlaw/blob/master/examples/forecast_io_demo.rb);
 * Demos of "fire-and-forget" wrappers:
-  * Urbandictionary's small and unofficial API wrapper;
+  * Urbandictionary's small and unofficial
+    [API wrapper](https://github.com/molybdenum-99/tlaw/blob/master/examples/urbandictionary_demo.rb);
   * [Partial wrapper](https://github.com/molybdenum-99/tlaw/blob/master/examples/tmdb_demo.rb)
     only for some features of large [TMDB API](docs.themoviedb.apiary.io/).
 
