@@ -4,6 +4,27 @@ TLAW (pronounce it like "tea+love"... or whatever) is the last (and only) API
 wrapper framework for _get-only APIes_<sup>[*](#get-only-api)</sup> (think
 weather, search, economical indicators, geonames and so on).
 
+## Table Of Contents
+
+* [Features](#features)
+* [Why TLAW?](#why-tlaw)
+* [Usage](#usage)
+  * [URLs and params description](#urls-and-params-description)
+  * [Response processing](#response-processing)
+    * [Flat hashes](#flat-hashes)
+    * [DataTable](#datatable)
+    * [Post-processing](#post-processing)
+    * [All at once](#all-at-once)
+  * [Documentability](#documentability)
+* [Some demos](#some-demos)
+* [Installation & compatibility](#installation-&-compatibility)
+* [Upcoming features](#upcoming-features)
+* [Get-only API](#get-only-api)
+* [Current status](#current-status)
+* [Links](#links)
+* [Author](#author)
+* [License](#license)
+
 ## Features
 
 * **Pragmatic**: thorougly designed with tens of real world examples in mind,
