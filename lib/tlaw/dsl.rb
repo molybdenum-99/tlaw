@@ -64,8 +64,8 @@ module TLAW
         define_child(name, path, Endpoint, EndpointWrapper, **opts, &block)
       end
 
-      def namespace(name, path = nil, **opts, &block)
-        define_child(name, path, Namespace, NamespaceWrapper, **opts, &block)
+      def namespace(name, path = nil, &block)
+        define_child(name, path, Namespace, NamespaceWrapper, &block)
       end
 
       private
