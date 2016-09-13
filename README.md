@@ -1,5 +1,10 @@
 # TLAW - The Last API Wrapper
 
+[![Gem Version](https://badge.fury.io/rb/tlaw.svg)](http://badge.fury.io/rb/tlaw)
+[![Code Climate](https://codeclimate.com/github/molybdenum-99/tlaw/badges/gpa.svg)](https://codeclimate.com/github/molybdenum-99/tlaw)
+[![Build Status](https://travis-ci.org/molybdenum-99/tlaw.svg?branch=master)](https://travis-ci.org/molybdenum-99/tlaw)
+[![Coverage Status](https://coveralls.io/repos/molybdenum-99/tlaw/badge.svg?branch=master)](https://coveralls.io/r/molybdenum-99/tlaw?branch=master)
+
 TLAW (pronounce it like "tea+love"... or whatever) is the last (and only) API
 wrapper framework for _get-only APIes_<sup>[*](#get-only-api)</sup> (think
 weather, search, economical indicators, geonames and so on).
