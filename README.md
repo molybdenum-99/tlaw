@@ -42,9 +42,9 @@ options:
 TLAW tries to close this gap: provide a base for _breath-easy_ API description
 which produces solid, fast and reliable wrappers.
 
-## What it does
+## Usage
 
-### Input/URLs description
+### URLs and params description
 
 ```ruby
 class Example < TLAW::API
@@ -104,7 +104,7 @@ Links to definition DSL:
 * namespace
 * API itself
 
-### Output processing
+### Response processing
 
 TLAW is really opinionated about response processing. Main things:
 
@@ -243,7 +243,46 @@ Take a look at [DataTable docs]() and invest into its development!
 
 #### Post-processing
 
+When you are not happy with result representation, you can post-process
+them in several ways:
+
+```ruby
+# input is entire response, block can mutate it
+post_process { |hash| hash['foo'] = 'bar' }
+
+# input is entire response, and response is fully replaced with block's
+# return value
+post_process { |hash| hash['foo'] } # Now only "foo"s value will be response
+
+# input is value of response's key "some_key", return value of a block
+# becames new value of "some_key".
+post_process('some_key') { |val| other_val }
+
+# Post-processing each item, if response['foo'] is array:
+post_process_items('foo') {
+  # mutate entire item
+  post_process { |item| item.delete('bar') }
+
+  # if item is a Hash, replace its "bar" value
+  post_process('bar') { |val| val.to_s }
+}
+
+# More realistic examples:
+post_process('meta.count', &:to_i)
+post_process('daily') {
+  post_process('date', &Date.method(:parse))
+}
+post_process('dummy') { nil } # Nil's will be thrown away completely
+
+```
+
 #### All at once
+
+All described response processing steps are performed in this order:
+* parsing and initial flattening of JSON (or XML) hash;
+* applying post-processors (and flatten the response after _each_ of
+  them);
+* make `DataTable`s from arrays of hashes.
 
 ### Documentability
 
@@ -253,11 +292,14 @@ Take a look at [DataTable docs]() and invest into its development!
 * ForecastIO
 * TMDB
 
+## Installation
+
 ## Upcoming features
 
 _(in no particular order)_
 
 * [ ] Expose Faraday options (backends, request headers);
+* [ ] Request-headers based auth;
 * [ ] Responses caching;
 * [ ] Response headers processing DSL;
 * [ ] Paging support;
@@ -284,7 +326,9 @@ What is those "Get-only APIs" TLAW is suited for?
 
 Alongside already mentioned examples (weather and so on), you can build
 TLAW-backed "get-only" wrappers for bigger APIs (like Twitter), when
-"gathering twits" is all you need.
+"gathering twits" is all you need. (Though, to be honest, TLAW's current
+authorization abilities is far simpler than
+[Twitter requirements](https://dev.twitter.com/oauth/application-only)).
 
 ## Current status
 
