@@ -1,6 +1,7 @@
 module TLAW
   class Namespace < APIObject
     class << self
+      # @private
       def base_url=(url)
         @base_url = url
 
@@ -17,6 +18,7 @@ module TLAW
         children.select { |_k, v| v < Endpoint }
       end
 
+      # @private
       def to_code
         "def #{to_method_definition}\n" \
         "  child(:#{symbol}, Namespace, {#{param_set.to_hash_code}})\n" \
@@ -29,20 +31,12 @@ module TLAW
           inspect_docs
       end
 
+      # @private
       def inspect_docs
         inspect_namespaces + inspect_endpoints + ' docs: .describe>'
       end
 
-      def inspect_namespaces
-        return '' if namespaces.empty?
-        " namespaces: #{namespaces.keys.join(', ')};"
-      end
-
-      def inspect_endpoints
-        return '' if endpoints.empty?
-        " endpoints: #{endpoints.keys.join(', ')};"
-      end
-
+      # @private
       def add_child(child)
         const_set(child.class_name, child)
         children[child.symbol] = child
@@ -60,11 +54,21 @@ module TLAW
         super + describe_children
       end
 
+      private
+
+      def inspect_namespaces
+        return '' if namespaces.empty?
+        " namespaces: #{namespaces.keys.join(', ')};"
+      end
+
+      def inspect_endpoints
+        return '' if endpoints.empty?
+        " endpoints: #{endpoints.keys.join(', ')};"
+      end
+
       def describe_children
         describe_namespaces + describe_endpoints
       end
-
-      private
 
       def describe_namespaces
         return '' if namespaces.empty?

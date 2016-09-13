@@ -2,5 +2,7 @@ Gemfile.lock
 tmp
 samples
 coverage
+doc
+.yardoc
 .env
 .byebug*

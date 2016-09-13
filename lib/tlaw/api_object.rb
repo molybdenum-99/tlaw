@@ -3,18 +3,22 @@ require 'forwardable'
 module TLAW
   class APIObject
     class << self
+      # @private
       attr_accessor :base_url, :path, :xml, :docs_link
 
+      # @private
       def symbol
         # FIXME: the second part is necessary only for describes,
         #   and probably should not be here.
         @symbol || (name && "#{name}.new")
       end
 
+      # @private
       CLASS_NAMES = {
         :[] => 'Element'
       }.freeze
 
+      # @private
       def class_name
         # TODO:
         # * validate if it is classifiable
@@ -22,10 +26,12 @@ module TLAW
         CLASS_NAMES[symbol] || Util.camelize(symbol.to_s)
       end
 
+      # @private
       def description=(descr)
         @description = Util::Description.new(descr)
       end
 
+      # @private
       def description
         return unless @description || @docs_link
 
@@ -35,6 +41,7 @@ module TLAW
         )
       end
 
+      # @private
       def symbol=(sym)
         @symbol = sym
         @path ||= "/#{sym}"
@@ -48,10 +55,12 @@ module TLAW
         @response_processor ||= ResponseProcessor.new
       end
 
+      # @private
       def to_method_definition
         "#{symbol}(#{param_set.to_code})"
       end
 
+      # @private
       def describe(definition = nil)
         Util::Description.new(
           ".#{definition || to_method_definition}" +
@@ -60,6 +69,7 @@ module TLAW
         )
       end
 
+      # @private
       def describe_short
         Util::Description.new(
           ".#{to_method_definition}" +
@@ -67,6 +77,7 @@ module TLAW
         )
       end
 
+      # @private
       def define_method_on(host)
         file, line = method(:to_code).source_location
         # line + 1 is where real definition, theoretically, starts

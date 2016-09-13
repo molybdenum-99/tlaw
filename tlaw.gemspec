@@ -26,6 +26,8 @@ Gem::Specification.new do |s|
   end
   s.require_paths = ["lib"]
 
+  s.required_ruby_version = '>= 2.1.0'
+
   s.add_runtime_dependency 'faraday'
   s.add_runtime_dependency 'addressable'
   s.add_runtime_dependency 'crack'

@@ -3,19 +3,43 @@ require 'addressable/template'
 require 'crack'
 
 module TLAW
+  # This class does all the hard work: actually calling some HTTP API
+  # and processing responses.
+  #
+  # Each real API endpoint is this class descendant, defining its own
+  # params and response processors. On each call small instance of this
+  # class is created, {#call}-ed and dies as you don't need it anymore.
+  #
+  # Typically, you will neither create nor use endpoint descendants or
+  # instances directly:
+  #
+  # * endpoint class definition is performed through {DSL} helpers,
+  # * and then, containing namespace obtains `.<current_endpoint_name>()`
+  #   method, which is (almost) everything you need to know.
+  #
   class Endpoint < APIObject
     class << self
+      # Inspects endpoint class prettily.
+      #
+      # Example:
+      #
+      # ```ruby
+      # some_api.some_namespace.endpoints[:my_endpoint]
+      # # => <SomeApi::SomeNamespace::MyEndpoint call-sequence: my_endpoint(param1, param2: nil), docs: .describe>
+      # ```
+      def inspect
+        "#<#{name || '(unnamed endpoint class)'}:" \
+        " call-sequence: #{symbol}(#{param_set.to_code}); docs: .describe>"
+      end
+
+      # @private
       def to_code
         "def #{to_method_definition}\n" \
         "  child(:#{symbol}, Endpoint).call({#{param_set.to_hash_code}})\n" \
         'end'
       end
 
-      def inspect
-        "#<#{name || '(unnamed endpoint class)'}:" \
-        " call-sequence: #{symbol}(#{param_set.to_code}); docs: .describe>"
-      end
-
+      # @private
       def construct_template
         tpl = if query_string_params.empty?
                 base_url
@@ -26,12 +50,7 @@ module TLAW
         Addressable::Template.new(tpl)
       end
 
-      def to_tree
-        Util::Description.new(
-          ".#{to_method_definition} #{construct_template.pattern}"
-        )
-      end
-
+      # @private
       def parse(body)
         if xml
           Crack::XML.parse(body)
@@ -50,6 +69,11 @@ module TLAW
 
     attr_reader :url_template
 
+    # Creates endpoint class (or  descendant) instance. Typically, you
+    # never use it directly.
+    #
+    # Params defined in parent namespace are passed here.
+    #
     def initialize(**parent_params)
       super
 
@@ -57,6 +81,14 @@ module TLAW
       @url_template = self.class.construct_template
     end
 
+    # Does the real call to the API, with all params passed to this method
+    # and to parent namespace.
+    #
+    # Typically, you don't use it directly, that's what called when you
+    # do `some_namespace.endpoint_name(**params)`.
+    #
+    # @return [Hash,Array] Parsed, flattened and post-processed response
+    #   body.
     def call(**params)
       url = construct_url(**full_params(params))
 

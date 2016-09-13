@@ -1,5 +1,6 @@
 module TLAW
   module DSL
+    # @private
     class BaseWrapper
       def initialize(object)
         @object = object
@@ -52,10 +53,12 @@ module TLAW
       end
     end
 
+    # @private
     class EndpointWrapper < BaseWrapper
     end
 
     # rubocop:disable Metrics/ParameterLists
+    # @private
     class NamespaceWrapper < BaseWrapper
       def endpoint(name, path = nil, **opts, &block)
         define_child(name, path, Endpoint, EndpointWrapper, **opts, &block)
@@ -89,6 +92,7 @@ module TLAW
     end
     # rubocop:enable Metrics/ParameterLists
 
+    # @private
     class APIWrapper < NamespaceWrapper
       def base(url)
         @object.base_url = url

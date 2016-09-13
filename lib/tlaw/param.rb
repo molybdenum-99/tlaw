@@ -108,6 +108,7 @@ module TLAW
     end
   end
 
+  # @private
   class ArgumentParam < Param
     def keyword?
       false
@@ -122,6 +123,7 @@ module TLAW
     end
   end
 
+  # @private
   class KeywordParam < Param
     def keyword?
       true

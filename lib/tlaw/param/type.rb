@@ -1,5 +1,6 @@
 module TLAW
   class Param
+    # @private
     class Type
       attr_reader :type
 
@@ -46,6 +47,7 @@ module TLAW
       end
     end
 
+    # @private
     class ClassType < Type
       def validate(value)
         value.is_a?(type) or
@@ -61,6 +63,7 @@ module TLAW
       end
     end
 
+    # @private
     class DuckType < Type
       def _convert(value)
         value.send(type)
@@ -76,6 +79,7 @@ module TLAW
       end
     end
 
+    # @private
     class EnumType < Type
       def initialize(enum)
         @type =

@@ -20,8 +20,9 @@ weather, search, economical indicators, geonames and so on).
   you have no 20-level dynamic dispatching, just your usual method calls
   with clearly defined arguments and compact backtraces.
 
-Take a look at our "model" OpenWeatherMap [wrapper]() and [demo]() of its usage,
-showing how all those things work in reality.
+Take a look at our "model" OpenWeatherMap [wrapper](https://github.com/)
+and [demo](https://github.com/) of its usage, showing how all those things
+work in reality.
 
 ## Why TLAW?
 
@@ -109,8 +110,8 @@ Links to definition DSL:
 TLAW is really opinionated about response processing. Main things:
 
 1. [Hashes are "flattened"](#flat-hashes);
-2. [Arrays of hashes are converted to dataframes](#dataframes);
-3. [Post-processors for single and multiple fields are easily defined](#post-processing)
+2. [Arrays of hashes are converted to `DataTable`s](#datatable);
+3. [Post-processors for fields are easily defined](#post-processing)
 
 #### Flat hashes
 
@@ -152,7 +153,7 @@ this way:
 }
 ```
 
-Reason: if you think of it and experiment with several examples, typically
+Reason? If you think of it and experiment with several examples, typically
 with new & unexplored API you'll came up with code like:
 
 ```ruby
@@ -178,10 +179,10 @@ data key, deep to the deepest depth.
   which would also still allow you to do `response['weather']` and receive
   that "slice". Or it would not :) We are experimenting!
 
-#### Dataframes
+#### DataTable
 
-The second main type of (JSON) API answer, or part of an answer is an
-array of homogenous hashes, like:
+The second main type of a (JSON) API answer, or of a part of an answer
+is an array of homogenous hashes, like:
 
 * list of data points (date - weather at that date);
 * list of data objects (city id - city name - latitude - longitude);
@@ -190,8 +191,10 @@ array of homogenous hashes, like:
 
 TLAW wraps this kind of data (array of homogenous hashes, or tables with
 named columns) into `DataTable` structure, which you can think of as an
-Excel spreadsheet, or loose DataFrame pattern implementation (just like
-pandas or daru, but seriously simpler—and much more suited to the case).
+Excel spreadsheet (2d array with named columns), or loose DataFrame
+pattern implementation (just like [daru](https://github.com/v0dro/daru)
+or [pandas](http://pandas.pydata.org/), but seriously simpler—and much
+more suited to the case).
 
 Imagine you have an API responding something like:
 
@@ -213,6 +216,8 @@ With TLAW, you'll see this response this way:
 pp response
 {"meta.count"=>20,
  "data"=>#<TLAW::DataTable[date, temp, humidity] x 20>}
+# ^ That's all. Small and easy to grasp what is what. 3 named columns,
+#   20 similar rows.
 
 d = response['data']
 # => #<TLAW::DataTable[date, temp, humidity] x 20>
@@ -239,7 +244,8 @@ d.columns('date', 'temp').first # and so on
 # => {"date" => "2016-09-01", "temp" => 20}
 ```
 
-Take a look at [DataTable docs]() and invest into its development!
+Take a look at [DataTable docs](http://www.rubydoc.info/gems/tlaw/TLAW/DataTable)
+and join designing it!
 
 #### Post-processing
 
@@ -272,8 +278,7 @@ post_process('meta.count', &:to_i)
 post_process('daily') {
   post_process('date', &Date.method(:parse))
 }
-post_process('dummy') { nil } # Nil's will be thrown away completely
-
+post_process('auxiliary_value') { nil } # Nil's will be thrown away completely
 ```
 
 #### All at once
@@ -288,11 +293,16 @@ All described response processing steps are performed in this order:
 
 ## Some demos
 
-* OpenWeatherMap
-* ForecastIO
-* TMDB
+* Full-featured API wrappers:
+  * OpenWeatherMap: wrapper, extensively documented demo code;
+  * ForecastIO: wrapper, demo code;
+* Demos of "fire-and-forget" wrappers:
+  * Urbandictionary's small and unofficial API wrapper;
+  * Partial wrapper only for some features of large TMDB API.
 
-## Installation
+## Installation & compatibility
+
+
 
 ## Upcoming features
 

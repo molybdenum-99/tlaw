@@ -2,6 +2,9 @@ require 'open-uri'
 require 'json'
 require 'addressable'
 
+# Let no one know! But they in Ruby committee just too long to add
+# something like this to the language.
+# @private
 class Object
   def derp
     yield self
