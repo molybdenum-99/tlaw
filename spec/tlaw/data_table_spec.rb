@@ -10,10 +10,6 @@ module TLAW
 
     subject(:table) { described_class.new(data) }
 
-    context '#initialize' do
-      it 'is initialized by array of hashes'
-    end
-
     context '#==' do
       it { is_expected.to eq described_class.new(data) }
     end
