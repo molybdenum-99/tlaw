@@ -369,6 +369,8 @@ it shows how docs could be useful at runtime.
     [API wrapper](https://github.com/molybdenum-99/tlaw/blob/master/examples/urbandictionary_demo.rb);
   * [Partial wrapper](https://github.com/molybdenum-99/tlaw/blob/master/examples/tmdb_demo.rb)
     only for some features of large [TMDB API](docs.themoviedb.apiary.io/).
+    It also shows [on-the-fly updating](https://github.com/molybdenum-99/tlaw/blob/master/examples/tmdb_demo.rb#L85)
+    of already existing API wrapper to add some features.
 
 ## Installation & compatibility
 
