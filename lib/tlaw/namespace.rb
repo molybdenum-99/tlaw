@@ -38,7 +38,6 @@ module TLAW
 
       # @private
       def add_child(child)
-        const_set(child.class_name, child)
         children[child.symbol] = child
 
         child.base_url = base_url + child.path if !child.base_url && base_url

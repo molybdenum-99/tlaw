@@ -71,23 +71,14 @@ module TLAW
       private
 
       def define_child(name, path, child_class, wrapper_class, **opts, &block)
-        Class.new(child_class).tap do |c|
-          c.path = path || "/#{name}"
-          c.symbol = name
-          c.xml = opts[:xml]
-
-          c.param_set.parent = @object.param_set
-
-          Addressable::Template.new(c.path).keys.each do |key|
-            c.param_set.add key.to_sym, keyword: false
-          end
-
-          c.response_processor.parent = @object.response_processor
-
-          wrapper_class.new(c).define(&block) if block
-
-          @object.add_child(c)
-        end
+        @object.add_child(
+          child_class.inherit(@object, path: path || "/#{name}", symbol: name, **opts)
+          .tap { |c| c.setup_parents(@object) }
+          .tap(&:params_from_path!)
+          .tap { |c|
+            wrapper_class.new(c).define(&block) if block
+          }
+        )
       end
     end
     # rubocop:enable Metrics/ParameterLists

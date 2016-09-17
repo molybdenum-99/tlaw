@@ -23,7 +23,6 @@ module TLAW
             namespace.add_child(child)
           }
 
-          its(:constants) { is_expected.to include(:SomeEndpoint) }
           its(:children) { is_expected.to include(some_endpoint: child) }
 
           context 'updates child' do

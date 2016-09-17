@@ -41,6 +41,24 @@ module TLAW
         )
       end
 
+      def inherit(namespace, **attrs)
+        Class.new(self).tap do |subclass|
+          attrs.each { |a, v| subclass.send("#{a}=", v) }
+          namespace.const_set(subclass.class_name, subclass)
+        end
+      end
+
+      def params_from_path!
+        Addressable::Template.new(path).keys.each do |key|
+          param_set.add key.to_sym, keyword: false
+        end
+      end
+
+      def setup_parents(parent)
+        param_set.parent = parent.param_set
+        response_processor.parent = parent.response_processor
+      end
+
       # @private
       def symbol=(sym)
         @symbol = sym

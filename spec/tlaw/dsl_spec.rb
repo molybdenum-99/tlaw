@@ -1,6 +1,6 @@
 module TLAW
   describe DSL do
-    let(:block) { ->{} }
+    let(:block) { ->(*){} }
 
     describe DSL::APIWrapper do
       let!(:api) { Class.new(API) }
@@ -19,6 +19,11 @@ module TLAW
     describe DSL::NamespaceWrapper do
       let!(:namespace) { Class.new(Namespace) }
       let!(:wrapper) { described_class.new(namespace) }
+
+      before {
+        namespace.base_url = 'https://api.example.com'
+        stub_const('Ns', namespace)
+      }
 
       describe '#define' do
         let(:block) { ->{} }
@@ -54,108 +59,59 @@ module TLAW
         end
       end
 
-      describe '#endpoint' do
-        let(:endpoint) { Class.new(TLAW::Endpoint) }
-        let(:endpoint_wrapper) { instance_double('TLAW::DSL::EndpointWrapper') }
+      shared_examples 'child definition' do |klass, definer, getter|
+        after {
+          Ns.send(:remove_const, :Ep1)
+        }
 
-        it 'creates endpoint and adds it' do
-          expect(Class).to receive(:new)
-            .with(Endpoint).and_return(endpoint)
+        subject { namespace.send(getter)[:ep1] }
 
-          expect(endpoint).to receive(:path=).with('/ep1').and_call_original
-          expect(endpoint).to receive(:symbol=).with(:ep1)
+        context 'default' do
+          before {
+            wrapper.send definer, :ep1
+          }
 
-          expect(DSL::EndpointWrapper).to receive(:new)
-            .with(endpoint).and_return(endpoint_wrapper)
-
-          expect(endpoint_wrapper).to receive(:define){|&b| expect(b).to eq block }
-
-          expect(namespace).to receive(:add_child).with(endpoint)
-
-          wrapper.endpoint :ep1, &block
+          it { is_expected.to be_a Class }
+          it { is_expected.to be < klass }
+          its(:symbol) { is_expected.to eq :ep1 }
+          its(:path) { is_expected.to eq '/ep1' }
+          its(:name) { is_expected.to eq 'Ns::Ep1' }
+          its(:base_url) { is_expected.to eq 'https://api.example.com/ep1' }
+          its(:'param_set.parent') { is_expected.to eq namespace.param_set }
+          its(:'response_processor.parent') { is_expected.to eq namespace.response_processor }
         end
 
-        it 'allows explicit path' do
-          expect(Class).to receive(:new)
-            .with(Endpoint).and_return(endpoint)
+        context 'calling the block' do
+          before {
+            wrapper.send(definer, :ep1) do
+              param :foo
+            end
+          }
 
-          expect(endpoint).to receive(:path=).with('/ns1/ns2/ep1').and_call_original
-          expect(endpoint).to receive(:symbol=).with(:ep1)
-
-          expect(DSL::EndpointWrapper).to receive(:new)
-            .with(endpoint)
-            .and_return(endpoint_wrapper)
-
-          expect(endpoint_wrapper).to receive(:define){|&b| expect(b).to eq block }
-
-          expect(namespace).to receive(:add_child).with(endpoint)
-
-          wrapper.endpoint :ep1, '/ns1/ns2/ep1', &block
+          its(:'param_set.names') { is_expected.to include(:foo) }
         end
 
-        it 'guesses params from url' do
-          expect(Class).to receive(:new)
-            .with(Endpoint).and_return(endpoint)
+        context 'explicit path' do
+          before {
+            wrapper.send definer, :ep1, '/foo/bar'
+          }
+          its(:path) { is_expected.to eq '/foo/bar' }
+        end
 
-          expect(endpoint).to receive(:path=).with('/ns1/ns2/{city}').and_call_original
-          expect(endpoint).to receive(:symbol=).with(:ep1)
-          expect(endpoint.param_set).to receive(:add).with(:city, keyword: false)
-
-          expect(DSL::EndpointWrapper).to receive(:new)
-            .with(endpoint)
-            .and_return(endpoint_wrapper)
-
-          expect(endpoint_wrapper).to receive(:define){|&b| expect(b).to eq block }
-
-          expect(namespace).to receive(:add_child).with(endpoint)
-
-          wrapper.endpoint :ep1, '/ns1/ns2/{city}', &block
+        context 'params guessing from url' do
+          before {
+            wrapper.send definer, :ep1, '/foo/{bar}{/baz}'
+          }
+          its(:'param_set.names') { is_expected.to include(:bar, :baz) }
         end
       end
 
+      describe '#endpoint' do
+        it_should_behave_like 'child definition', Endpoint, :endpoint, :endpoints
+      end
+
       describe '#namespace' do
-        let(:child) { Class.new(Namespace) }
-        let(:namespace_wrapper) { instance_double('TLAW::DSL::NamespaceWrapper') }
-
-        before {
-          namespace.base_url = 'https://api.example.com'
-        }
-
-        it 'creates namespace and adds it' do
-          expect(Class).to receive(:new)
-            .with(Namespace).and_return(child)
-
-          expect(child).to receive(:path=).with('/ns1').and_call_original
-          expect(child).to receive(:symbol=).with(:ns1)
-
-          expect(DSL::NamespaceWrapper).to receive(:new)
-            .with(child)
-            .and_return(namespace_wrapper)
-
-          expect(namespace_wrapper).to receive(:define){|&b| expect(b).to eq block }
-
-          expect(namespace).to receive(:add_child).with(child)
-
-          wrapper.namespace :ns1, &block
-        end
-
-        it 'allows explicit path' do
-          expect(Class).to receive(:new)
-            .with(Namespace).and_return(child)
-
-          expect(child).to receive(:path=).with('/ns1/ns2').and_call_original
-          expect(child).to receive(:symbol=).with(:ns1)
-
-          expect(DSL::NamespaceWrapper).to receive(:new)
-            .with(child)
-            .and_return(namespace_wrapper)
-
-          expect(namespace_wrapper).to receive(:define){|&b| expect(b).to eq block }
-
-          expect(namespace).to receive(:add_child).with(child)
-
-          wrapper.namespace :ns1, '/ns1/ns2', &block
-        end
+        it_should_behave_like 'child definition', Namespace, :namespace, :namespaces
       end
     end
 
