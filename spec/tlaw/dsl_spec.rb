@@ -104,6 +104,16 @@ module TLAW
           }
           its(:'param_set.names') { is_expected.to include(:bar, :baz) }
         end
+
+        context 'update existing' do
+          before {
+            wrapper.send definer, :ep1, '/foo/{bar}{/baz}'
+            wrapper.send definer, :ep1 do
+              param :quux
+            end
+          }
+          its(:'param_set.names') { is_expected.to include(:bar, :baz, :quux) }
+        end
       end
 
       describe '#endpoint' do
@@ -112,6 +122,14 @@ module TLAW
 
       describe '#namespace' do
         it_should_behave_like 'child definition', Namespace, :namespace, :namespaces
+      end
+
+      context 'update existing: when different types' do
+        before {
+          wrapper.endpoint :ep1
+        }
+
+        specify { expect { wrapper.namespace :ep1 }.to raise_error(ArgumentError, /can't redefine it/) }
       end
     end
 

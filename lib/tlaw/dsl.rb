@@ -57,31 +57,47 @@ module TLAW
     class EndpointWrapper < BaseWrapper
     end
 
-    # rubocop:disable Metrics/ParameterLists
     # @private
     class NamespaceWrapper < BaseWrapper
       def endpoint(name, path = nil, **opts, &block)
-        define_child(name, path, Endpoint, EndpointWrapper, **opts, &block)
+        update_existing(Endpoint, name, path, **opts, &block) ||
+          add_child(Endpoint, name, path: path || "/#{name}", **opts, &block)
       end
 
       def namespace(name, path = nil, &block)
-        define_child(name, path, Namespace, NamespaceWrapper, &block)
+        update_existing(Namespace, name, path, &block) ||
+          add_child(Namespace, name, path: path || "/#{name}", &block)
       end
 
       private
 
-      def define_child(name, path, child_class, wrapper_class, **opts, &block)
+      WRAPPERS = {
+        Endpoint => EndpointWrapper,
+        Namespace => NamespaceWrapper
+      }.freeze
+
+      def update_existing(child_class, name, path, **opts, &block)
+        existing = @object.children[name] or return nil
+        existing < child_class or
+          fail ArgumentError, "#{name} is already defined as #{child_class == Endpoint ? 'namespace' : 'endpoint'}, you can't redefine it as #{child_class}"
+
+        !path && opts.empty? or
+          fail ArgumentError, "#{child_class} is already defined, you can't change its path or options"
+
+        WRAPPERS[child_class].new(existing).define(&block) if block
+      end
+
+      def add_child(child_class, name, **opts, &block)
         @object.add_child(
-          child_class.inherit(@object, path: path || "/#{name}", symbol: name, **opts)
+          child_class.inherit(@object, symbol: name, **opts)
           .tap { |c| c.setup_parents(@object) }
           .tap(&:params_from_path!)
           .tap { |c|
-            wrapper_class.new(c).define(&block) if block
+            WRAPPERS[child_class].new(c).define(&block) if block
           }
         )
       end
     end
-    # rubocop:enable Metrics/ParameterLists
 
     # @private
     class APIWrapper < NamespaceWrapper

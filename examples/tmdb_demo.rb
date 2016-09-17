@@ -82,21 +82,32 @@ pp tmdb.movies[118340].images['posters'].last
 #  "vote_count"=>0,
 #  "width"=>1000}
 
-# # Hmm, maybe we need some path post-processing?.. How about adding it
-# # right now? Assuming our API is already described by someone else...
-# tmdb.class.define do
-#   namespace :movies do
-#     namespace :[] do
-#       endpoint :images do
-#         post_process_items 'posters' do
-#           post_process('file_path') { |p| 'https://image.tmdb.org/t/p/original/' + p }
-#         end
-#       end
-#     end
-#   end
-# end
+# Hmm, maybe we need some path post-processing?.. How about adding it
+# right now? Assuming our API is already described by someone else...
+tmdb.class.define do
+  namespace :movies do
+    namespace :[] do
+      endpoint :images do
+        post_process_items 'posters' do
+          post_process('file_path') { |p| 'https://image.tmdb.org/t/p/original' + p }
+        end
+      end
+    end
+  end
+end
+
+pp tmdb.movies[118340].images['posters'].last
+# Ah, much better!
 #
-# pp tmdb.movies[118340].images['posters'].last
+# {"aspect_ratio"=>0.666666666666667,
+#  "file_path"=>
+#   "https://image.tmdb.org/t/p/original/6YUodKKkqIIDx6Hk7ZkaVOxnWND.jpg",
+#  "height"=>1500,
+#  "iso_639_1"=>"ru",
+#  "vote_average"=>0.0,
+#  "vote_count"=>0,
+#  "width"=>1000}
+
 
 # Note, that despite not adding a bit of documentation, you still have
 # your API wrapper discoverable:
