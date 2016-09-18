@@ -1,4 +1,5 @@
 module TLAW
+  # @private
   # FIXME: everything is awfully dirty here
   class ResponseProcessor
     class Base

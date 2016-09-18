@@ -1,4 +1,13 @@
 module TLAW
+  # Represents set of param current API endpoint or namespace have.
+  # You'll never instantiate it directly, just look at {DSL#param} for
+  # param creation. But probably you could make use of knowledge of this
+  # class' API when deep investigating what's going on, like:
+  #
+  # ```ruby
+  # params = api.namespaces[:my_namespace].endpoints[:my_endpoint].param_set
+  # p [params.count, params.names, params.describe]
+  # ```
   class ParamSet
     attr_accessor :parent
 

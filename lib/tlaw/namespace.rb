@@ -1,4 +1,16 @@
 module TLAW
+  # Namespace is basically a container for {Endpoint}s. It allows to
+  # nest Ruby calls (like `api.namespace1.namespace2.real_call(params)`),
+  # optionally providing some parameters while nesting, like
+  # `worldbank.countries('uk').population(2016)`.
+  #
+  # By default, namespaces nesting also means URL nesting (e.g.
+  # `base_url/namespace1/namespace2/endpoint`), but that could be altered
+  # on namespace definition, see {DSL} module for details.
+  #
+  #
+  #
+  #
   class Namespace < APIObject
     class << self
       # @private
