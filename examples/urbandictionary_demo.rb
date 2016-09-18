@@ -26,7 +26,8 @@ require_relative 'demo_base'
 # * https://github.com/jimmycuadra/lita-urban-dictionary
 # * https://github.com/cinchrb/cinch-urbandictionary
 #
-# Here is our version (17 codelines, including namespacing and bit of docs):
+# Here is our version (17 codelines, including namespacing and bit of
+# docs, API definition itself takes like 7 lines only):
 #
 module TLAW
   module Examples
