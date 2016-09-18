@@ -360,7 +360,8 @@ it shows how docs could be useful at runtime.
 * Full-featured API wrappers:
   * OpenWeatherMap: [source API docs](http://openweathermap.org/api),
     [wrapper](https://github.com/molybdenum-99/tlaw/blob/master/examples/open_weather_map.rb),
-    extensively documented [demo code](https://github.com/molybdenum-99/tlaw/blob/master/examples/open_weather_map_demo.rb);
+    extensively commented & explained
+    [demo code](https://github.com/molybdenum-99/tlaw/blob/master/examples/open_weather_map_demo.rb);
   * ForecastIO: [API docs](https://developer.forecast.io/docs/v2),
     [wrapper](https://github.com/molybdenum-99/tlaw/blob/master/examples/forecast_io.rb),
     [demo code](https://github.com/molybdenum-99/tlaw/blob/master/examples/forecast_io_demo.rb);
