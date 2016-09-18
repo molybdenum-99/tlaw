@@ -1,5 +1,5 @@
 module TLAW
-  describe APIObject do
+  describe APIPath do
     describe '.define_method_on' do
       let(:object) {
         Class.new(described_class) {

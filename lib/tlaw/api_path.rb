@@ -1,7 +1,7 @@
 require 'forwardable'
 
 module TLAW
-  class APIObject
+  class APIPath
     class << self
       # @private
       attr_accessor :base_url, :path, :xml, :docs_link

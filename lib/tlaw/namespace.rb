@@ -11,7 +11,7 @@ module TLAW
   #
   #
   #
-  class Namespace < APIObject
+  class Namespace < APIPath
     class << self
       # @private
       def base_url=(url)

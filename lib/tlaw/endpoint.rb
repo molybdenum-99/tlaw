@@ -17,7 +17,7 @@ module TLAW
   # * and then, containing namespace obtains `.<current_endpoint_name>()`
   #   method, which is (almost) everything you need to know.
   #
-  class Endpoint < APIObject
+  class Endpoint < APIPath
     class << self
       # Inspects endpoint class prettily.
       #

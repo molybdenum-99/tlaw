@@ -12,7 +12,7 @@ module TLAW
 
         describe '.add_child' do
           let(:child) {
-            Class.new(APIObject).tap { |c|
+            Class.new(APIPath).tap { |c|
               c.symbol = :some_endpoint
               c.path = '/ep'
             }
