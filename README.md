@@ -60,7 +60,7 @@ options:
 
 1. Study and use (or invent and build) some custom hand-made Wrapper
   Library™ with ton of very custom design decisions (should responses
-  be just hashes, or [Hashie](https://github.com/intridea/hashie)s, or
+  be just hashes, or [Hashie](https://github.com/intridea/hashie), or
   real classes for each kind of response? What are the inputs? Where should
   api key go, to global param?); or
 2. Just "go commando" (sorry for the bad pun): construct URLs yourself,
@@ -125,11 +125,8 @@ class Example < TLAW::API
 end
 ```
 
-Links to definition DSL:
-* param
-* endpoint
-* namespace
-* API itself
+See [DSL module docs](http://www.rubydoc.info/gems/tlaw/TLAW/DSL) for
+full description of all features (there are few, yet very powerful).
 
 ### Response processing
 
@@ -306,6 +303,9 @@ post_process('daily') {
 }
 post_process('auxiliary_value') { nil } # Nil's will be thrown away completely
 ```
+
+See full post-processing features descriptions in
+[DSL module docs](http://www.rubydoc.info/gems/tlaw/TLAW/DSL).
 
 #### All at once
 

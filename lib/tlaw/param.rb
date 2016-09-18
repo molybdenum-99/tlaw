@@ -89,16 +89,9 @@ module TLAW
 
     def make_formatter
       options[:format].derp { |f|
-        case f
-        when Proc
-          f
-        when ->(ff) { ff.respond_to?(:to_proc) }
-          f.to_proc
-        when nil
-          ->(v) { v }
-        else
-          fail ArgumentError, "#{self}: unsupporter formatter #{f}"
-        end
+        return ->(v) { v } unless f
+        return f.to_proc if f.respond_to?(:to_proc)
+        fail ArgumentError, "#{self}: unsupporter formatter #{f}"
       }
     end
 

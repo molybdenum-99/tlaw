@@ -45,7 +45,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'webmock', '>= 2.1'
 
   # Documenting
-  s.add_development_dependency 'yard'
+  s.add_development_dependency 'yard', '>= 0.9.5'
 
   # Used in examples/
   s.add_development_dependency 'dotenv'
