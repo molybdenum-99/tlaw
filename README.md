@@ -149,9 +149,9 @@ Source API responds like:
   "meta": {
     "code": "OK",
   },
-  "weahter": {
+  "weather": {
     "temp": 10,
-    "precipation": 138
+    "precipitation": 138
   },
   "location": {
     "lat": 123,
@@ -167,8 +167,8 @@ this way:
 ```json
 {
   "meta.code": "OK",
-  "weahter.temp": 10,
-  "weahter.precipation": 138,
+  "weather.temp": 10,
+  "weather.precipitation": 138,
   "location.lat": 123,
   "location.lon": 456
   ...
