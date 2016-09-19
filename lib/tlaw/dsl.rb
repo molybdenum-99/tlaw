@@ -293,7 +293,7 @@ module TLAW
     #   Sets post-processors for response.
     #
     #   There are also {#post_process_replace} (for replacing entire
-    #   response with something else) and {#post_process_item} (for
+    #   response with something else) and {#post_process_items} (for
     #   post-processing each item of sub-array).
     #
     #   Notes:

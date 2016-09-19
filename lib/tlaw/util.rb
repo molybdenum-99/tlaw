@@ -22,7 +22,7 @@ module TLAW
     # # It has params:...
     # ```
     #
-    # TLAW uses it when responds to {APIObject#describe}.
+    # TLAW uses it when responds to {APIPath.describe}.
     #
     class Description < String
       alias_method :inspect, :to_s
