@@ -8,8 +8,25 @@ module TLAW
   # `base_url/namespace1/namespace2/endpoint`), but that could be altered
   # on namespace definition, see {DSL} module for details.
   #
+  # Typically, as with {Endpoint}, you never create namespace instances
+  # or subclasses by yourself: you use {DSL} for their definition and
+  # then call `.<namespace_name>` method on parent namespace (or API instance):
   #
+  # ```ruby
+  # class SampleAPI < TLAW::API
+  #   # namespace definition:
+  #   namespace :my_ns do
+  #     endpoint :weather
+  #   end
+  # end
   #
+  # # usage:
+  # api = SampleAPI.new
+  #
+  # api.namespaces[:my_ns] # => class SampleAPI::MyNS, subclass of namespace
+  # api.my_ns # => short-living instance of SampleAPI::MyNS
+  # api.my_ns.weather # => real call to API
+  # ```
   #
   class Namespace < APIPath
     class << self
@@ -22,10 +39,16 @@ module TLAW
         end
       end
 
+      # Lists all current namespace's nested namespaces as a hash.
+      #
+      # @return [Hash{Symbol => Namespace}]
       def namespaces
         children.select { |_k, v| v < Namespace }
       end
 
+      # Lists all current namespace's endpoints as a hash.
+      #
+      # @return [Hash{Symbol => Endpoint}]
       def endpoints
         children.select { |_k, v| v < Endpoint }
       end
@@ -57,10 +80,16 @@ module TLAW
         child.define_method_on(self)
       end
 
+      # @private
       def children
         @children ||= {}
       end
 
+      # Detailed namespace documentation.
+      #
+      # See {APIPath.describe} for explanations.
+      #
+      # @return [Util::Description]
       def describe(definition = nil)
         super + describe_children
       end

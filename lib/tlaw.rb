@@ -14,6 +14,40 @@ class Object
   end
 end
 
+# TLAW is a framework for creating API wrappers for get-only APIs (like
+# weather, geonames and so on) or subsets of APIs (like getting data from
+# Twitter).
+#
+# Short example:
+#
+# ```ruby
+# # Definition:
+# class OpenWeatherMap < TLAW::API
+#   param :appid, required: true
+#
+#   namespace :current, '/weather' do
+#     endpoint :city, '?q={city}{,country_code}' do
+#       param :city, required: true
+#     end
+#   end
+# end
+#
+# # Usage:
+# api = OpenWeatherMap.new(appid: '<yourappid>')
+# api.current.weather('Kharkiv')
+# # => {"weather.main"=>"Clear",
+# #  "weather.description"=>"clear sky",
+# #  "main.temp"=>8,
+# #  "main.pressure"=>1016,
+# #  "main.humidity"=>81,
+# #  "dt"=>2016-09-19 08:30:00 +0300,
+# #  ...}
+#
+# ```
+#
+# Refer to [README](./file/README.md) for reasoning about why you need it and links to
+# more detailed demos, or start reading YARD docs from {API} and {DSL}
+# modules.
 module TLAW
 end
 

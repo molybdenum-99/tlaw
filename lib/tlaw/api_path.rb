@@ -1,6 +1,9 @@
 require 'forwardable'
 
 module TLAW
+  # Base class for all API pathes: entire API, namespaces and endpoints.
+  # Allows to define params and post-processors on any level.
+  #
   class APIPath
     class << self
       # @private
@@ -41,6 +44,7 @@ module TLAW
         )
       end
 
+      # @private
       def inherit(namespace, **attrs)
         Class.new(self).tap do |subclass|
           attrs.each { |a, v| subclass.send("#{a}=", v) }
@@ -48,12 +52,14 @@ module TLAW
         end
       end
 
+      # @private
       def params_from_path!
         Addressable::Template.new(path).keys.each do |key|
           param_set.add key.to_sym, keyword: false
         end
       end
 
+      # @private
       def setup_parents(parent)
         param_set.parent = parent.param_set
         response_processor.parent = parent.response_processor
@@ -65,10 +71,12 @@ module TLAW
         @path ||= "/#{sym}"
       end
 
+      # @return [ParamSet]
       def param_set
         @param_set ||= ParamSet.new
       end
 
+      # @private
       def response_processor
         @response_processor ||= ResponseProcessor.new
       end
@@ -78,7 +86,12 @@ module TLAW
         "#{symbol}(#{param_set.to_code})"
       end
 
-      # @private
+      # Redefined on descendants, it just allows you to do `api.namespace.describe`
+      # or `api.namespace1.namespace2.endpoints[:my_endpoint].describe`
+      # and have reasonable useful description printed.
+      #
+      # @return [Util::Description] It is just description string but with
+      #   redefined `#inspect` to be pretty-printed in console.
       def describe(definition = nil)
         Util::Description.new(
           ".#{definition || to_method_definition}" +
