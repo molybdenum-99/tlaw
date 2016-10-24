@@ -1,6 +1,7 @@
 require 'open-uri'
 require 'json'
-require 'addressable'
+require 'addressable/uri'
+require 'addressable/template'
 
 # Let no one know! But they in Ruby committee just too long to add
 # something like this to the language.
