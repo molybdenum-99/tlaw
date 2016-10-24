@@ -29,7 +29,7 @@ Gem::Specification.new do |s|
   s.required_ruby_version = '>= 2.1.0'
 
   s.add_runtime_dependency 'faraday'
-  s.add_runtime_dependency 'addressable', '~> 2.4.0'
+  s.add_runtime_dependency 'addressable'
   s.add_runtime_dependency 'crack'
 
   # Managing everything
