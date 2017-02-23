@@ -74,49 +74,51 @@ which produces solid, fast and reliable wrappers.
 
 ```ruby
 class Example < TLAW::API
-  base 'http://api.example.com'
+  define do
+    base 'http://api.example.com'
 
-  param :api_key, required: true # this would be necessary for API instance creation
-  # So, the API instance would be e = Example.new(api_key: '123')
-  # ...and parameter ?api_key=123 would be added to any request
+    param :api_key, required: true # this would be necessary for API instance creation
+    # So, the API instance would be e = Example.new(api_key: '123')
+    # ...and parameter ?api_key=123 would be added to any request
 
-  endpoint :foo # The simplest endpoint, will query "http://api.example.com/foo"
-  # And then you just do e.foo and obtain result
+    endpoint :foo # The simplest endpoint, will query "http://api.example.com/foo"
+    # And then you just do e.foo and obtain result
 
-  endpoint :bar, '/baz.json' # Path to query rewritten, will query "http://api.example.com/baz.json"
-  # Method is still e.bar, though.
+    endpoint :bar, '/baz.json' # Path to query rewritten, will query "http://api.example.com/baz.json"
+    # Method is still e.bar, though.
 
-  # Now, for params definition:
-  endpont :movie do
-    param :id
-  end
-  # Method call would be movie(id: '123')
-  # Generated URL would be "http://api.example.com/movie?id=123"
+    # Now, for params definition:
+    endpont :movie do
+      param :id
+    end
+    # Method call would be movie(id: '123')
+    # Generated URL would be "http://api.example.com/movie?id=123"
 
-  # When param is part of the path, you can use RFC 6570
-  # URL template standard:
-  endpoint :movie, '/movies/{id}'
-  # That would generate method which is called like movie('123')
-  # ...and call to "http://api.example.com/movies/123"
+    # When param is part of the path, you can use RFC 6570
+    # URL template standard:
+    endpoint :movie, '/movies/{id}'
+    # That would generate method which is called like movie('123')
+    # ...and call to "http://api.example.com/movies/123"
 
-  # Now, we can stack endpoints in namespaces
-  namespace :foo do # adds /foo to path
-    namespace :bar, '/baz' do # optional path parameter works
-      endpoint :blah # URL for call would be "http://api.example.com/foo/baz/blah"
-      # And method call would be like e.foo.bar.blah(parameters)
+    # Now, we can stack endpoints in namespaces
+    namespace :foo do # adds /foo to path
+      namespace :bar, '/baz' do # optional path parameter works
+        endpoint :blah # URL for call would be "http://api.example.com/foo/baz/blah"
+        # And method call would be like e.foo.bar.blah(parameters)
+      end
+
+      # URL normalization works, so you can stack in namespaces even
+      # things not related to them in source API, "redesigning" API on
+      # the fly.
+      endpoint :books, '/../books.json' # Real URL would be "http://api.example.com/books"
+      # Yet method call is still namespaced like e.foo.books
     end
 
-    # URL normalization works, so you can stack in namespaces even
-    # things not related to them in source API, "redesigning" API on
-    # the fly.
-    endpoint :books, '/../books.json' # Real URL would be "http://api.example.com/books"
-    # Yet method call is still namespaced like e.foo.books
-  end
-
-  # Namespaces can have their own input parameters
-  namespace :foo, '/foo/{id}' do
-    endpoint :bar # URL would be "http://api.example.com/foo/123/bar
-    # method call would be e.foo(123).bar
+    # Namespaces can have their own input parameters
+    namespace :foo, '/foo/{id}' do
+      endpoint :bar # URL would be "http://api.example.com/foo/123/bar
+      # method call would be e.foo(123).bar
+    end
   end
 
   # ...and everything works in all possible and useful ways, just check

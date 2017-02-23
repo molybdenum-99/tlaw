@@ -58,6 +58,48 @@ weather = TLAW::Examples::ForecastIO
   .new(api_key: ENV['FORECAST_IO'], units: :si)
 
 res = weather.forecast(40.7127, -74.0059, extended_hourly: true)
+pp res
+# {"latitude"=>40.7127,
+#  "longitude"=>-74.0059,
+#  "timezone"=>"America/New_York",
+#  "offset"=>-5,
+#  "currently.time"=>2017-02-23 19:06:50 +0200,
+#  "currently.summary"=>"Overcast",
+#  "currently.icon"=>"cloudy",
+#  "currently.nearestStormDistance"=>362,
+#  "currently.nearestStormBearing"=>179,
+#  "currently.precipIntensity"=>0,
+#  "currently.precipProbability"=>0,
+#  "currently.temperature"=>12.57,
+#  "currently.apparentTemperature"=>12.57,
+#  "currently.dewPoint"=>10.42,
+#  "currently.humidity"=>0.87,
+#  "currently.windSpeed"=>2.03,
+#  "currently.windBearing"=>188,
+#  "currently.visibility"=>9.69,
+#  "currently.cloudCover"=>0.95,
+#  "currently.pressure"=>1012.11,
+#  "currently.ozone"=>330.56,
+#  "minutely.summary"=>"Overcast for the hour.",
+#  "minutely.icon"=>"cloudy",
+#  "minutely.data"=>
+#   #<TLAW::DataTable[time, precipIntensity, precipProbability] x 61>,
+#  "hourly.summary"=>"Light rain starting this evening.",
+#  "hourly.icon"=>"rain",
+#  "hourly.data"=>
+#   #<TLAW::DataTable[time, summary, icon, precipIntensity, precipProbability, temperature, apparentTemperature, dewPoint, humidity, windSpeed, windBearing, visibility, cloudCover, pressure, ozone, precipType] x 169>,
+#  "daily.summary"=>
+#   "Light rain throughout the week, with temperatures falling to 12°C on Thursday.",
+#  "daily.icon"=>"rain",
+#  "daily.data"=>
+#   #<TLAW::DataTable[time, summary, icon, sunriseTime, sunsetTime, moonPhase, precipIntensity, precipIntensityMax, precipIntensityMaxTime, precipProbability, precipType, temperatureMin, temperatureMinTime, temperatureMax, temperatureMaxTime, apparentTemperatureMin, apparentTemperatureMinTime, apparentTemperatureMax, apparentTemperatureMaxTime, dewPoint, humidity, windSpeed, windBearing, visibility, cloudCover, pressure, ozone] x 8>,
+#  "flags.sources"=> ["darksky",  "lamp",  "gfs",  "cmc",  "nam",  "rap",  "rtma",  "sref",  "fnmoc",  "isd",  "madis",  "nearest-precip",  "nwspa"],
+#  "flags.darksky-stations"=>["KDIX", "KOKX"],
+#  "flags.lamp-stations"=> ["KBLM",  "KCDW",  "KEWR",  "KFRG",  "KHPN",  "KJFK",  "KLGA",  "KMMU",  "KNYC",  "KSMQ",  "KTEB"],
+#  "flags.isd-stations"=> ["725020-14734",  "725025-94741",  "725030-14732",  "725033-94728",  "725060-99999",  "744860-94789",  "744976-99999",  "997271-99999",  "997272-99999",  "997743-99999",  "999999-14732",  "999999-14734",  "999999-14786",  "999999-94706",  "999999-94728",  "999999-94741"],
+#  "flags.madis-stations"=> ["AU015",  "BATN6",  "C1099",  "C9714",  "D0486",  "D3216",  "D5729",  "D9152",  "E0405",  "E1296",  "E2876",  "KLGA",  "KNYC",  "KTEB",  "NJ12",  "ROBN4"],
+#  "flags.units"=>"si"}
+
 pp res['minutely.data'].first
 # {"time"=>2016-09-12 21:20:00 +0300,
 #  "precipIntensity"=>0,
