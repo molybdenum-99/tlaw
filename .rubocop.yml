@@ -6,6 +6,9 @@ AllCops:
     - 'samples/**/*'
     - 'spec/**/*'
     - 'tmp/**/*'
+    - 'Rakefile'
+    - '*.gemspec'
+    - 'Gemfile'
   DisplayCopNames: true
 
 # My personal style
