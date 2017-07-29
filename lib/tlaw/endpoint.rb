@@ -1,4 +1,5 @@
 require 'faraday'
+require 'faraday_middleware'
 require 'addressable/template'
 require 'crack'
 
@@ -77,7 +78,10 @@ module TLAW
     def initialize(**parent_params)
       super
 
-      @client = Faraday.new
+      @client = Faraday.new do |faraday|
+        faraday.use FaradayMiddleware::FollowRedirects
+        faraday.adapter Faraday.default_adapter
+      end
       @url_template = self.class.construct_template
     end
 
@@ -111,6 +115,7 @@ module TLAW
     end
 
     def guard_errors!(response)
+      # TODO: follow redirects
       return response if (200...400).cover?(response.status)
 
       body = JSON.parse(response.body) rescue nil

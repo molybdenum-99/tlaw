@@ -29,6 +29,7 @@ Gem::Specification.new do |s|
   s.required_ruby_version = '>= 2.1.0'
 
   s.add_runtime_dependency 'faraday'
+  s.add_runtime_dependency 'faraday_middleware'
   s.add_runtime_dependency 'addressable'
   s.add_runtime_dependency 'crack'
 
@@ -38,6 +39,7 @@ Gem::Specification.new do |s|
 
   # Testing
   s.add_development_dependency 'rubocop', '>= 0.40'
+  s.add_development_dependency 'rubocop-rspec'
   s.add_development_dependency 'rspec', '>= 3.5'
   s.add_development_dependency 'rspec-its', '~> 1'
   s.add_development_dependency 'simplecov', '~> 0.9'

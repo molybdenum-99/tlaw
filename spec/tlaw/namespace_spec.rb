@@ -60,7 +60,8 @@ module TLAW
 
       context '.to_code' do
         subject { namespace_class.to_code }
-        it { is_expected.to eq(%Q{
+
+        it { is_expected.to eq(%{
           |def some_ns(apikey: nil)
           |  child(:some_ns, Namespace, {apikey: apikey})
           |end
@@ -74,7 +75,7 @@ module TLAW
 
         subject { namespace_class.describe }
 
-        it { is_expected.to eq(%Q{
+        it { is_expected.to eq(%{
           |.some_ns(apikey: nil)
           |  It's namespace, you know?..
           |  It is ok.
@@ -119,26 +120,26 @@ module TLAW
       }
       let(:initial_params) { {} }
 
-      subject(:namespace) { namespace_class.new(initial_params)  }
+      subject(:namespace) { namespace_class.new(initial_params) }
 
       describe '#<endpoint>' do
         let(:endpoint) { instance_double(endpoint_class) }
 
-        it 'calls proper endpoint' do
-          expect(endpoint_class).to receive(:new).and_return(endpoint)
-          expect(endpoint).to receive(:call).with(foo: 'bar')
-          namespace.some_ep(foo: 'bar')
+        subject { namespace.some_ep(foo: 'bar') }
+
+        its_call do
+          is_expected
+            .to send_message(endpoint_class, :new).returning(endpoint)
+            .and send_message(endpoint, :call).with(foo: 'bar')
         end
 
         context 'initial params' do
           let(:initial_params) { {apikey: 'foo'} }
 
-          it 'adds them to call' do
-            expect(endpoint_class).to receive(:new)
-              .with(apikey: 'foo')
-              .and_return(endpoint)
-            expect(endpoint).to receive(:call).with(foo: 'bar')
-            namespace.some_ep(foo: 'bar')
+          its_call do
+            is_expected
+              .to send_message(endpoint_class, :new).with(apikey: 'foo').returning(endpoint)
+              .and send_message(endpoint, :call).with(foo: 'bar')
           end
         end
       end
@@ -160,12 +161,13 @@ module TLAW
 
         describe '#describe' do # this describe just describes the describe. Problems, officer?
           let(:initial_params) { {apikey: 'foo'} }
+
           before {
             namespace_class.description = "It's namespace, you know?..\nIt is ok."
           }
           subject { namespace.describe.to_s }
 
-          it { is_expected.to eq(%Q{
+          it { is_expected.to eq(%{
             |.some_ns(apikey: "foo")
             |  It's namespace, you know?..
             |  It is ok.

@@ -27,11 +27,13 @@ module TLAW
 
       context 'for regular symbols' do
         let(:symbol) { :my_dear_baby_13 }
+
         it { is_expected.to eq 'MyDearBaby13' }
       end
 
       context '[]' do
         let(:symbol) { :[] }
+
         it { is_expected.to eq 'Element' }
       end
     end

@@ -2,6 +2,9 @@ require 'rspec/its'
 require 'faker'
 require 'webmock/rspec'
 # require 'byebug'
+require 'saharspec/its_call'
+require 'saharspec/its_map'
+require 'saharspec/send_message'
 
 require 'simplecov'
 require 'coveralls'
@@ -9,11 +12,10 @@ require 'coveralls'
 Coveralls.wear!
 
 SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter.new(
-  [SimpleCov::Formatter::HTMLFormatter,
-  Coveralls::SimpleCov::Formatter]
+  [SimpleCov::Formatter::HTMLFormatter, Coveralls::SimpleCov::Formatter]
 )
 
-$:.unshift 'lib'
+$LOAD_PATH.unshift 'lib'
 
 require 'tlaw'
 
@@ -34,14 +36,15 @@ RSpec::Matchers.define :get_webmock do |url|
   end
 
   chain :and_return do |response|
-    @response = case response
-    when String
-      {body: response}
-    when Hash
-      response
-    else
-      fail "Expected string or Hash of params, got #{response.inspect}"
-    end
+    @response =
+      case response
+      when String
+        {body: response}
+      when Hash
+        response
+      else
+        fail "Expected string or Hash of params, got #{response.inspect}"
+      end
   end
 
   supports_block_expectations
@@ -56,15 +59,21 @@ class String
   # "test
   # me"
   def unindent
-    gsub(/\n\s+?\|/, "\n")    # for all lines looking like "<spaces>|" -- remove this.
-    .gsub(/\|\n/, "\n")       # allow to write trailing space not removed by editor
-    .gsub(/\A\n|\n\s+\Z/, '') # remove empty strings before and after
+    gsub(/\n\s+?\|/, "\n")      # for all lines looking like "<spaces>|" -- remove this.
+      .gsub(/\|\n/, "\n")       # allow to write trailing space not removed by editor
+      .gsub(/\A\n|\n\s+\Z/, '') # remove empty strings before and after
   end
 end
 
-class TLAW::Util::Description
+class TLAW::Util::Description # rubocop:disable Style/ClassAndModuleChildren
   # to make it easily comparable with strings expected.
   def inspect
     to_s.inspect
+  end
+end
+
+RSpec::Matchers.define :not_have_key do |key|
+  match do |actual|
+    expect(actual.key?(key)).to be_falsey
   end
 end

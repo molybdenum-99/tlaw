@@ -1,10 +1,12 @@
+inherit_from: .rubocop_todo.yml
+require: rubocop-rspec
+
 AllCops:
   Include:
     - 'lib/**/*'
   Exclude:
     - 'examples/**/*'
     - 'samples/**/*'
-    - 'spec/**/*'
     - 'tmp/**/*'
     - 'Rakefile'
     - '*.gemspec'
@@ -17,7 +19,7 @@ AllCops:
 Style/MultilineBlockChain:
   Enabled: false
 
-Style/SpaceInsideHashLiteralBraces:
+Layout/SpaceInsideHashLiteralBraces:
   EnforcedStyle: no_space
 
 Style/Alias:
@@ -36,6 +38,10 @@ Style/AndOr:
 # My style can't be described by any existing setting :(
 Style/BlockDelimiters:
   Enabled: false
+
+Style/PercentLiteralDelimiters:
+  PreferredDelimiters:
+    default: "{}"
 
 # That's just how things are here
 # -------------------------------
@@ -66,13 +72,6 @@ Style/Documentation:
 Style/Lambda:
   Exclude:
     - 'lib/tlaw/response_processor.rb'
-
-# Useful for temp. commented-out parts, remove before release!
-Style/LeadingCommentSpace:
-  Enabled: false
-
-Style/CommentIndentation:
-  Enabled: false
 
 # Those are just useless
 # ----------------------

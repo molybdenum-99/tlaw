@@ -1,6 +1,6 @@
 module TLAW
   describe DSL do
-    let(:block) { ->(*){} }
+    let(:block) { ->(*) {} }
 
     describe DSL::APIWrapper do
       let!(:api) { Class.new(API) }
@@ -26,9 +26,10 @@ module TLAW
       }
 
       describe '#define' do
-        let(:block) { ->{} }
+        let(:block) { -> {} }
+
         it 'calls definition API' do
-          expect(wrapper).to receive(:instance_eval){|&b| expect(b).to eq block }
+          expect(wrapper).to receive(:instance_eval) { |&b| expect(b).to eq block }
           wrapper.define(&block)
         end
       end
@@ -42,7 +43,7 @@ module TLAW
         it 'deindents description' do
           expect(namespace).to receive(:description=)
             .with("It is pretty cool.\nAnd concise, see.\n\nMultispace!")
-          wrapper.description %Q{
+          wrapper.description %{
             It is pretty cool.
             And concise, see.
 
@@ -117,11 +118,11 @@ module TLAW
       end
 
       describe '#endpoint' do
-        it_should_behave_like 'child definition', Endpoint, :endpoint, :endpoints
+        it_behaves_like 'child definition', Endpoint, :endpoint, :endpoints
       end
 
       describe '#namespace' do
-        it_should_behave_like 'child definition', Namespace, :namespace, :namespaces
+        it_behaves_like 'child definition', Namespace, :namespace, :namespaces
       end
 
       context 'update existing: when different types' do
@@ -138,10 +139,10 @@ module TLAW
       let(:wrapper) { described_class.new(endpoint) }
 
       describe '#define' do
-        let(:block) { ->{} }
+        let(:block) { -> {} }
 
         it 'calls definition API' do
-          expect(wrapper).to receive(:instance_eval){|&b| expect(b).to eq block }
+          expect(wrapper).to receive(:instance_eval) { |&b| expect(b).to eq block }
           wrapper.define(&block)
         end
       end
@@ -170,7 +171,7 @@ module TLAW
           expect(endpoint.response_processor)
             .to receive(:add_item_post_processor)
             .with('list', nil)
-          wrapper.post_process_items('list') { post_process { |h|  } }
+          wrapper.post_process_items('list') { post_process { |h| } }
         end
 
         it 'adds post processor with key' do
@@ -203,7 +204,7 @@ module TLAW
       expect(api.some_ns.endpoints[:some_ep].base_url)
         .to eq 'http://api.example.com/some_ns/some_ep'
 
-      expect(api.some_ns.method(:some_ep).parameters).to eq [[:key, :foo]]
+      expect(api.some_ns.method(:some_ep).parameters).to eq [%i[key foo]]
     end
   end
 end

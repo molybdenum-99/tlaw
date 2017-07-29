@@ -10,7 +10,7 @@ module TLAW
           },
           'list' => [
             {'weather' => {'temp' => 10}},
-            {'weather' => {'temp' => 15}},
+            {'weather' => {'temp' => 15}}
           ]
         }
       }
@@ -18,13 +18,13 @@ module TLAW
       subject { processor.send(:flatten, source) }
 
       it { is_expected.to eq(
-          'response.count' => 10,
-          'list' => [
-            {'weather.temp' => 10},
-            {'weather.temp' => 15},
-          ]
-      )}
-
+        'response.count' => 10,
+        'list' => [
+          {'weather.temp' => 10},
+          {'weather.temp' => 15}
+        ]
+      )
+      }
     end
 
     describe 'processors' do
@@ -42,7 +42,7 @@ module TLAW
         }
       }
 
-      subject { processor.send(:post_process, source) }
+      subject(:response) { processor.send(:post_process, source) }
 
       context 'global' do
         before {
@@ -68,25 +68,29 @@ module TLAW
         end
       end
 
-      context 'each element of array by key' do
-        before {
-          processor.add_item_post_processor('list') { |h| h['t'] = Time.at(h['t']) }
-        }
+      context 'each element' do
+        subject { response['list'] }
 
-        it { expect(subject['list'].map{|h| h['t']}).to all be_a(Time) }
-      end
+        context 'by key' do
+          before {
+            processor.add_item_post_processor('list') { |h| h['t'] = Time.at(h['t']) }
+          }
 
-      context 'each element -> key' do
-        before {
-          processor.add_item_post_processor('list', 't') { |v| Time.at(v) }
-        }
+          its_map(['t']) { are_expected.to all be_a(Time) }
+        end
 
-        it { expect(subject['list'].map{|h| h['t']}).to all be_a(Time) }
+        context 'element -> key' do
+          before {
+            processor.add_item_post_processor('list', 't') { |v| Time.at(v) }
+          }
 
-        context 'key is absent' do
-          let(:source) { {'list' => [{'i' => 1}, {'i' => 2}]} }
+          its_map(['t']) { are_expected.to all be_a(Time) }
 
-          it { expect(subject['list'].map{|h| h.has_key?('t')}).to all be_falsey  }
+          context 'key is absent' do
+            let(:source) { {'list' => [{'i' => 1}, {'i' => 2}]} }
+
+            it { is_expected.to all not_have_key('t') }
+          end
         end
       end
 
@@ -114,7 +118,7 @@ module TLAW
           'count' => 2,
           'list' => [
             {'i' => 1, 'val' => 'xxx'},
-            {'i' => 2, 'val' => 'yyy'},
+            {'i' => 2, 'val' => 'yyy'}
           ]
         }
       }
@@ -125,7 +129,6 @@ module TLAW
       its(:keys) { is_expected.to eq %w[i val] }
     end
 
-    describe 'all at once' do
-    end
+    describe 'all at once'
   end
 end

@@ -1,11 +1,12 @@
 module TLAW
   describe Endpoint do
     let(:url_template) { 'https://api.example.com' }
-    let(:endpoint_class) { Class.new(Endpoint).tap { |c| c.base_url = url_template } }
+    let(:endpoint_class) { Class.new(described_class).tap { |c| c.base_url = url_template } }
     let(:endpoint) { endpoint_class.new }
 
     context '.param_set' do
       subject { endpoint_class }
+
       its(:param_set) { is_expected.to be_a ParamSet }
     end
 
@@ -21,7 +22,7 @@ module TLAW
       context 'only query params' do
         before {
           endpoint_class.param_set.add(:q)
-          endpoint_class.param_set.add(:pagesize, type: :to_i, format: ->(v) { v*10 })
+          endpoint_class.param_set.add(:pagesize, type: :to_i, format: ->(v) { v * 10 })
         }
         let(:params) { {q: 'Kharkiv oblast', pagesize: 10} }
 
@@ -31,7 +32,7 @@ module TLAW
       context 'path & query params' do
         before {
           endpoint_class.param_set.add(:q)
-          endpoint_class.param_set.add(:pagesize, type: :to_i, format: ->(v) { v*10 })
+          endpoint_class.param_set.add(:pagesize, type: :to_i, format: ->(v) { v * 10 })
         }
         let(:params) { {q: 'Kharkiv', pagesize: 10} }
 
@@ -43,7 +44,7 @@ module TLAW
       context 'path with ?' do
         before {
           endpoint_class.param_set.add(:q)
-          endpoint_class.param_set.add(:pagesize, type: :to_i, format: ->(v) { v*10 })
+          endpoint_class.param_set.add(:pagesize, type: :to_i, format: ->(v) { v * 10 })
         }
         let(:params) { {q: 'Kharkiv', pagesize: 10} }
 
@@ -71,10 +72,11 @@ module TLAW
         let(:parent_param_set) {
           ParamSet.new.tap { |ps| ps.add(:api_key) }
         }
+        let(:endpoint) { endpoint_class.new(api_key: 'foo') }
+
         before {
           endpoint_class.param_set.parent = parent_param_set
         }
-        let(:endpoint) { endpoint_class.new(api_key: 'foo') }
 
         it 'calls web with params provided' do
           expect { endpoint.call(q: 'Why') }
@@ -122,7 +124,7 @@ module TLAW
         context 'exception while processing' do
           before {
             stub_request(:get, 'https://api.example.com?q=Why')
-              .to_return { raise JSON::ParserError, 'Unparseable!' }
+              .to_return { fail JSON::ParserError, 'Unparseable!' }
           }
 
           specify {
@@ -177,7 +179,7 @@ module TLAW
       describe '#describe' do
         subject { endpoint.describe.to_s }
 
-        it { is_expected.to eq(%Q{
+        it { is_expected.to eq(%{
           |.ep(arg3, arg1=nil, kv2:, kv1: nil)
           |  This is cool endpoint!
           |  It works.
