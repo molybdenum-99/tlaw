@@ -16,3 +16,91 @@ pp giphy.gifs.search('tardis')
 #
 
 pp giphy.gifs.search('tardis')['data'].first
+# =>
+# {"type"=>"gif",
+#  "id"=>"yp2qzMjcEQVB6",
+#  "slug"=>"tardis-doctor-who-deer-yp2qzMjcEQVB6",
+#  "url"=>"https://giphy.com/gifs/tardis-doctor-who-deer-yp2qzMjcEQVB6",
+#  "bitly_gif_url"=>"http://gph.is/XN3l6K",
+#  "bitly_url"=>"http://gph.is/XN3l6K",
+#  "embed_url"=>"https://giphy.com/embed/yp2qzMjcEQVB6",
+#  "username"=>"",
+#  "source"=>"http://doctorwhogifs.tumblr.com/post/38804044036",
+#  "rating"=>"y",
+#  "content_url"=>"",
+#  "source_tld"=>"doctorwhogifs.tumblr.com",
+#  "source_post_url"=>"http://doctorwhogifs.tumblr.com/post/38804044036",
+#  "is_indexable"=>0,
+#  "import_datetime"=>"2013-03-21 05:57:22",
+#  "trending_datetime"=>"1970-01-01 00:00:00",
+#  "images.fixed_height_still.url"=>
+#   "https://media0.giphy.com/media/yp2qzMjcEQVB6/200_s.gif",
+#  "images.fixed_height_still.width"=>346,
+#  "images.fixed_height_still.height"=>200,
+#  "images.original_still.url"=>
+#   "https://media2.giphy.com/media/yp2qzMjcEQVB6/giphy_s.gif",
+#  "images.original_still.width"=>360,
+#  "images.original_still.height"=>208,
+#  "images.fixed_width.url"=>
+#   "https://media1.giphy.com/media/yp2qzMjcEQVB6/200w.gif",
+#  "images.fixed_width.width"=>200,
+#  "images.fixed_width.height"=>116,
+#  "images.fixed_width.size"=>37396,
+#  "images.fixed_width.mp4"=>
+#   "https://media2.giphy.com/media/yp2qzMjcEQVB6/200w.mp4",
+#  "images.fixed_width.mp4_size"=>13349,
+#  "images.fixed_width.webp"=>
+#   "https://media2.giphy.com/media/yp2qzMjcEQVB6/200w.webp",
+#  "images.fixed_width.webp_size"=>61238,
+#  ...and so on, there are several types of images
+
+# Inspectability:
+
+TLAW::Examples::Giphy
+# => #<TLAW::Examples::Giphy: call-sequence: TLAW::Examples::Giphy.new(api_key:, lang: nil); namespaces: gifs, stickers; docs: .describe>
+
+giphy
+# => #<TLAW::Examples::Giphy.new(api_key: nil, lang: nil) namespaces: gifs, stickers; docs: .describe>
+
+giphy.describe
+# => TLAW::Examples::Giphy.new(api_key: nil, lang: nil)
+#  Wrapper for [Giphy](https://giphy.com/) GIF hosting service API.
+#
+#  Docs: https://developers.giphy.com/docs/
+#
+#  @param api_key For development, create it at your [dashboard](https://developers.giphy.com/dashboard/?create=true).
+#    Note that you'll need to request different key for production use.
+#  @param lang 2-letter ISO 639-1 language code.
+#    [Full list of supported languages](https://developers.giphy.com/docs/)
+#
+#  Namespaces:
+#
+#  .gifs()
+#    Fetch GIPHY GIFs.
+#
+#  .stickers()
+#    Fetch GIPHY stickers (GIFs with transparent background).
+
+giphy.namespaces[:gifs].describe
+# => .gifs()
+#  Fetch GIPHY GIFs.
+#
+#  Endpoints:
+#
+#  .search(query, limit: nil, offset: nil, rating: nil)
+#    Search all GIFs by word or phrase.
+#
+#  .trending(limit: nil, rating: nil)
+#    Fetch GIFs currently trending online. Hand curated by the GIPHY editorial team.
+#
+#  .translate(phrase)
+#    Translates phrase to GIFs "vocabulary".
+#
+#  .random(tag: nil, rating: nil)
+#    Returns a random GIF, optionally limited by tag.
+#
+#  .[](id)
+#    One GIF by unique id.
+#
+#  .multiple(ids)
+#    Sevaral GIFs by unique ids.
