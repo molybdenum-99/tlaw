@@ -33,12 +33,14 @@ module TLAW
           }
 
           subject { set[:param1] }
+
           it { is_expected.to be_a ArgumentParam }
         end
       end
 
       context 'when exists in parent param_set' do
         let(:parent) { described_class.new }
+
         before {
           set.parent = parent
           parent.add(:param1, keyword: false)
@@ -70,11 +72,11 @@ module TLAW
       end
 
       it 'checks required params existance' do
-        expect { set.process(param2: nil) }.to raise_error(ArgumentError, "Required parameter param2 is missing")
+        expect { set.process(param2: nil) }.to raise_error(ArgumentError, 'Required parameter param2 is missing')
       end
 
       it 'fails on unknown params' do
-        expect { set.process(param3: 'foo') }.to raise_error(ArgumentError, "Unknown parameters: param3")
+        expect { set.process(param3: 'foo') }.to raise_error(ArgumentError, 'Unknown parameters: param3')
       end
 
       context 'param renaming' do
@@ -90,6 +92,7 @@ module TLAW
 
       context 'parent scope' do
         let(:parent) { described_class.new }
+
         before {
           parent.add :param3
           set.parent = parent
@@ -122,7 +125,7 @@ module TLAW
         subject { set.describe }
 
         it { is_expected.to be_a Util::Description }
-        it { is_expected.to eq %Q{
+        it { is_expected.to eq %{
           |@param arg3 [#to_time]
           |@param arg1
           |@param arg2 (default = "foo")

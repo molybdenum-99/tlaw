@@ -1,0 +1,38 @@
+inherit_from: ../.rubocop.yml
+
+Style/UnneededPercentQ:
+  Enabled: false
+
+Metrics/BlockLength:
+  Enabled: false
+
+Metrics/ModuleLength:
+  Enabled: false
+
+Layout/MultilineBlockLayout:
+  Enabled: false
+
+RSpec/NestedGroups:
+  Max: 5
+
+RSpec/LeadingSubject:
+  Enabled: false
+
+RSpec/MessageSpies:
+  Enabled: false
+
+RSpec/EmptyExampleGroup:
+  CustomIncludeMethods: ['its_call', 'its_map']
+
+RSpec/ExampleLength:
+  Enabled: false
+
+Layout/MultilineMethodCallIndentation:
+  Enabled: false
+
+RSpec/MultipleExpectations:
+  Max: 3
+
+RSpec/VerifiedDoubles:
+  Exclude:
+    - 'tlaw/param_spec.rb'

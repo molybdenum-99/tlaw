@@ -23,15 +23,16 @@ module TLAW
       end
 
       def call(hash)
-        return hash unless hash.is_a?(Hash) && hash.key?(@key)
-
-        hash.merge(@key => @block.call(hash[@key]))
+        return hash unless hash.is_a?(Hash)
+        hash.keys.grep(@key).inject(hash) do |res, k|
+          res.merge(k => @block.call(hash[k]))
+        end
       end
     end
 
     class Replace < Base
       def call(hash)
-        hash.derp(&@block)
+        @block.call(hash)
       end
     end
 
@@ -42,10 +43,11 @@ module TLAW
       end
 
       def call(hash)
-        return hash unless hash.key?(@key)
-        return hash unless hash[@key].is_a?(Array)
-
-        hash.merge(@key => hash[@key].map(&@item_processor))
+        return hash unless hash.is_a?(Hash)
+        hash.keys.grep(@key).inject(hash) do |res, k|
+          next res unless hash[k].is_a?(Array)
+          res.merge(k => hash[k].map(&@item_processor))
+        end
       end
     end
 

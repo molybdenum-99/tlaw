@@ -30,7 +30,7 @@ module TLAW
     end
 
     def self.from_rows(column_names, rows)
-      new rows.map { |r| column_names.zip(r).to_h }
+      new(rows.map { |r| column_names.zip(r).to_h })
     end
 
     # Creates DataTable from array of hashes.

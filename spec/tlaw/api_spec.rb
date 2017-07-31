@@ -1,14 +1,15 @@
 module TLAW
   describe API do
     context '.define' do
-      let(:block) { ->{} }
+      let(:block) { -> {} }
       let(:wrapper) { instance_double('TLAW::DSL::APIWrapper') }
       let(:api_class) { Class.new(described_class) }
 
-      it 'works' do
-        expect(DSL::APIWrapper).to receive(:new).with(api_class).and_return(wrapper)
-        expect(wrapper).to receive(:define)
-        api_class.define(&block)
+      subject { api_class.define(&block) }
+
+      its_call do
+        is_expected.to send_message(DSL::APIWrapper, :new).with(api_class).returning(wrapper)
+          .and send_message(wrapper, :define)
       end
     end
 
@@ -44,7 +45,6 @@ module TLAW
 
         it { is_expected.to eq '#<Dummy.new(api_key: "123") namespaces: some_ns; endpoints: some_ep; docs: .describe>' }
       end
-
     end
   end
 end
