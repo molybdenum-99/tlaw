@@ -68,6 +68,9 @@ options:
 TLAW tries to close this gap: provide a base for _breath-easy_ API description
 which produces solid, fast and reliable wrappers.
 
+See also a [showcase blog post](http://zverok.github.io/blog/2017-07-31-giphy-tlaw.html) with on-the-fly
+API wrapper building for GIPHY.
+
 ## Usage
 
 ### URLs and params description
