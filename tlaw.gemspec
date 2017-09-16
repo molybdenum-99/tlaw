@@ -39,7 +39,7 @@ Gem::Specification.new do |s|
 
   # Testing
   s.add_development_dependency 'rubocop', '= 0.49.1'
-  s.add_development_dependency 'rubocop-rspec', '~> 1.15'
+  s.add_development_dependency 'rubocop-rspec', '= 1.15.1'
   s.add_development_dependency 'rspec', '>= 3.5'
   s.add_development_dependency 'rspec-its', '~> 1'
   s.add_development_dependency 'simplecov', '~> 0.9'

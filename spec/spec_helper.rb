@@ -74,6 +74,6 @@ end
 
 RSpec::Matchers.define :not_have_key do |key|
   match do |actual|
-    expect(actual.key?(key)).to be_falsey
+    expect(actual).not_to be_key(key)
   end
 end

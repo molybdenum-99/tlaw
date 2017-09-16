@@ -62,6 +62,13 @@ module TLAW
         endpoint_class.response_processor.add_post_processor('response.message', &:downcase)
       }
 
+      let(:deep_hash) {
+        {
+          response: {status: 200, message: 'OK'},
+          data: {field1: 'foo', field2: {bar: 1}}
+        }
+      }
+
       it 'calls web with params provided' do
         expect { endpoint.call(q: 'Why') }
           .to get_webmock('https://api.example.com?q=Why')
@@ -84,13 +91,6 @@ module TLAW
             .and_return({test: 'me'}.to_json)
         end
       end
-
-      let(:deep_hash) {
-        {
-          response: {status: 200, message: 'OK'},
-          data: {field1: 'foo', field2: {bar: 1}}
-        }
-      }
 
       it 'parses response & flatterns it' do
         stub_request(:get, 'https://api.example.com?q=Why')
