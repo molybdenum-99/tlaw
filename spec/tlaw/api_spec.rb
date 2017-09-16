@@ -2,7 +2,7 @@ module TLAW
   describe API do
     context '.define' do
       let(:block) { -> {} }
-      let(:wrapper) { instance_double('TLAW::DSL::APIWrapper') }
+      let(:wrapper) { instance_double('TLAW::DSL::APIWrapper', define: nil) }
       let(:api_class) { Class.new(described_class) }
 
       subject { api_class.define(&block) }

@@ -123,7 +123,7 @@ module TLAW
       subject(:namespace) { namespace_class.new(initial_params) }
 
       describe '#<endpoint>' do
-        let(:endpoint) { instance_double(endpoint_class) }
+        let(:endpoint) { instance_double(endpoint_class, call: nil) }
 
         subject { namespace.some_ep(foo: 'bar') }
 
