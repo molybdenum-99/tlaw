@@ -22,7 +22,7 @@ RSpec/MessageSpies:
   Enabled: false
 
 RSpec/EmptyExampleGroup:
-  CustomIncludeMethods: ['its_call', 'its_map']
+  CustomIncludeMethods: ['its_call', 'its_map', 'its_block']
 
 RSpec/ExampleLength:
   Enabled: false
@@ -36,3 +36,7 @@ RSpec/MultipleExpectations:
 RSpec/VerifiedDoubles:
   Exclude:
     - 'tlaw/param_spec.rb'
+
+# TODO:
+RSpec/ContextWording:
+  Enabled: false

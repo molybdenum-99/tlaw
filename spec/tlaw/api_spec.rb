@@ -7,7 +7,7 @@ module TLAW
 
       subject { api_class.define(&block) }
 
-      its_call do
+      its_block do
         is_expected.to send_message(DSL::APIWrapper, :new).with(api_class).returning(wrapper)
           .and send_message(wrapper, :define)
       end

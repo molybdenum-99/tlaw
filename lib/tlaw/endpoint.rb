@@ -101,7 +101,7 @@ module TLAW
              .derp { |response| self.class.parse(response.body) }
     rescue API::Error
       raise # Not catching in the next block
-    rescue => e
+    rescue StandardError => e
       raise unless url
       raise API::Error, "#{e.class} at #{url}: #{e.message}"
     end

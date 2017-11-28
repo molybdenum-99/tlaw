@@ -54,7 +54,7 @@ module TLAW
 
       # @private
       def params_from_path!
-        Addressable::Template.new(path).keys.each do |key|
+        Addressable::Template.new(path).keys.each do |key| # rubocop:disable Performance/HashEachMethods
           param_set.add key.to_sym, keyword: false
         end
       end

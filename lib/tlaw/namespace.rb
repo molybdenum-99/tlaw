@@ -34,7 +34,7 @@ module TLAW
       def base_url=(url)
         @base_url = url
 
-        children.values.each do |c|
+        children.each_value do |c|
           c.base_url = base_url + c.path if c.path && !c.base_url
         end
       end

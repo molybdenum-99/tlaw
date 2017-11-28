@@ -4,5 +4,5 @@ gemspec
 
 group :test do
   gem 'coveralls', require: false
-  gem 'saharspec', github: 'zverok/saharspec'
+  gem 'saharspec', '= 0.0.4'
 end

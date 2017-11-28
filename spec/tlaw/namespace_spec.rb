@@ -1,38 +1,6 @@
 module TLAW
   describe Namespace do
     context 'class' do
-      context 'definition' do
-        subject(:namespace) {
-          Class.new(described_class).tap { |c|
-            c.base_url = 'https://example.com/ns'
-          }
-        }
-
-        its(:param_set) { is_expected.to be_a ParamSet }
-
-        describe '.add_child' do
-          let(:child) {
-            Class.new(APIPath).tap { |c|
-              c.symbol = :some_endpoint
-              c.path = '/ep'
-            }
-          }
-
-          before {
-            expect(child).to receive(:define_method_on).with(namespace)
-            namespace.add_child(child)
-          }
-
-          its(:children) { is_expected.to include(some_endpoint: child) }
-
-          context 'updates child' do
-            subject { child }
-
-            its(:base_url) { is_expected.to eq 'https://example.com/ns/ep' }
-          end
-        end
-      end
-
       let(:endpoint_class) {
         Class.new(Endpoint).tap { |c|
           c.symbol = :some_ep
@@ -57,6 +25,38 @@ module TLAW
           c.param_set.add :apikey
         }
       }
+
+      context 'definition' do
+        subject(:namespace) {
+          Class.new(described_class).tap { |c|
+            c.base_url = 'https://example.com/ns'
+          }
+        }
+
+        its(:param_set) { is_expected.to be_a ParamSet }
+
+        describe '.add_child' do
+          let(:child) {
+            Class.new(APIPath).tap { |c|
+              c.symbol = :some_endpoint
+              c.path = '/ep'
+            }
+          }
+
+          before {
+            allow(child).to receive(:define_method_on).with(namespace)
+            namespace.add_child(child)
+          }
+
+          its(:children) { is_expected.to include(some_endpoint: child) }
+
+          context 'updates child' do
+            subject { child }
+
+            its(:base_url) { is_expected.to eq 'https://example.com/ns/ep' }
+          end
+        end
+      end
 
       context '.to_code' do
         subject { namespace_class.to_code }
@@ -127,7 +127,7 @@ module TLAW
 
         subject { namespace.some_ep(foo: 'bar') }
 
-        its_call do
+        its_block do
           is_expected
             .to send_message(endpoint_class, :new).returning(endpoint)
             .and send_message(endpoint, :call).with(foo: 'bar')
@@ -136,7 +136,7 @@ module TLAW
         context 'initial params' do
           let(:initial_params) { {apikey: 'foo'} }
 
-          its_call do
+          its_block do
             is_expected
               .to send_message(endpoint_class, :new).with(apikey: 'foo').returning(endpoint)
               .and send_message(endpoint, :call).with(foo: 'bar')

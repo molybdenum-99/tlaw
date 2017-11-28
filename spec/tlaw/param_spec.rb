@@ -36,7 +36,7 @@ module TLAW
         context 'when not' do
           let(:value) { double }
 
-          its_call { is_expected.to raise_error Param::Nonconvertible }
+          its_block { is_expected.to raise_error Param::Nonconvertible }
         end
       end
 
@@ -54,7 +54,7 @@ module TLAW
         context 'when non-coercible' do
           let(:value) { 'test' }
 
-          its_call { is_expected.to raise_error Param::Nonconvertible }
+          its_block { is_expected.to raise_error Param::Nonconvertible }
         end
       end
 
@@ -70,7 +70,7 @@ module TLAW
         context 'when not' do
           let(:value) { 'foo' }
 
-          its_call { is_expected.to raise_error Param::Nonconvertible }
+          its_block { is_expected.to raise_error Param::Nonconvertible }
         end
       end
     end
