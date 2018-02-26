@@ -44,8 +44,7 @@ end
 require_relative 'tlaw/util'
 require_relative 'tlaw/data_table'
 
-require_relative 'tlaw/param'
-require_relative 'tlaw/param_set'
+require_relative 'tlaw/params'
 
 require_relative 'tlaw/api_path'
 require_relative 'tlaw/endpoint'

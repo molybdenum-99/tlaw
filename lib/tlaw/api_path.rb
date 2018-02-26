@@ -1,3 +1,4 @@
+require_relative 'params/set'
 require 'forwardable'
 
 module TLAW
@@ -71,9 +72,9 @@ module TLAW
         @path ||= "/#{sym}"
       end
 
-      # @return [ParamSet]
+      # @return [Params::Set]
       def param_set
-        @param_set ||= ParamSet.new
+        @param_set ||= Params::Set.new
       end
 
       # @private
