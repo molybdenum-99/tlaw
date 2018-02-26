@@ -3,14 +3,12 @@ require './lib/tlaw/version'
 Gem::Specification.new do |s|
   s.name     = 'tlaw'
   s.version  = TLAW::VERSION
-  s.authors  = ['Victor Shepelev']
-  s.email    = 'zverok.offline@gmail.com'
+  s.authors  = ['Victor Shepelev', 'Joel Van Horn']
+  s.email    = %w[zverok.offline@gmail.com joel@joelvanhorn.com]
   s.homepage = 'https://github.com/molybdenum-99/tlaw'
 
-  s.summary = 'Here would be summary'
-  s.description = <<-EOF
-    And here would be description.
-  EOF
+  s.summary = 'The Last API Wrapper: Pragmatic API wrapper framework'
+  s.description = %q{TLAW is the last (and only) API wrapper framework you'll ever need for accessing APIs in a consistent way (think weather, search, economical indicators, geonames and so on).}
   s.licenses = ['MIT']
 
   s.files = `git ls-files`.split($RS).reject do |file|
@@ -24,7 +22,8 @@ Gem::Specification.new do |s|
     |\.travis.yml
     )$/x
   end
-  s.require_paths = ["lib"]
+
+  s.require_paths = ['lib']
 
   s.required_ruby_version = '>= 2.1.0'
 
