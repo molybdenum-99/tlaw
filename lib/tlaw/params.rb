@@ -1,4 +1,5 @@
 module TLAW
+  # TODO: Add docs
   module Params
     # This error is thrown when some value could not be converted to what
     # this parameter inspects. For example:
@@ -21,10 +22,10 @@ module TLAW
     def self.make(name, **options)
       # NB: Sic. :keyword is nil (not provided) should still
       #     make a keyword argument.
-      if options[:keyword] != false
-        Keyword.new(name, **options)
-      else
+      if options[:keyword] == false
         Argument.new(name, **options)
+      else
+        Keyword.new(name, **options)
       end
     end
   end
