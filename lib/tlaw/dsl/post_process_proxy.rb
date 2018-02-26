@@ -5,7 +5,7 @@ module TLAW
         @parent_key = parent_key
         @parent = parent
       end
-    
+
       def post_process(key = nil, &block)
         @parent.add_item_post_processor(@parent_key, key, &block)
       end

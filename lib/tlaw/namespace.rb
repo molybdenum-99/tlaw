@@ -139,21 +139,23 @@ module TLAW
     end
 
     def describe
-      self.class
-          .describe("#{symbol}(#{param_set.to_hash_code(@parent_params)})")
+      self.class.describe("#{symbol}(#{param_set.to_hash_code(@parent_params)})")
     end
 
     private
 
     def child(symbol, expected_class, **params)
       children[symbol]
-        .tap { |child_class|
-          child_class && child_class < expected_class or
-            fail ArgumentError,
-                 "Unregistered #{expected_class.name.downcase}: #{symbol}"
-        }.derp { |child_class|
+        .tap do |child_class|
+          child_class && child_class < expected_class ||
+            fail(
+              ArgumentError,
+              "Unregistered #{expected_class.name.downcase}: #{symbol}"
+            )
+        end
+        .yield_self do |child_class|
           child_class.new(@parent_params.merge(params))
-        }
+        end
     end
   end
 end

@@ -1,19 +1,8 @@
+require_relative 'backports'
 require 'open-uri'
 require 'json'
 require 'addressable/uri'
 require 'addressable/template'
-
-# Let no one know! But they in Ruby committee just too long to add
-# something like this to the language.
-#
-# See also https://bugs.ruby-lang.org/issues/12760
-#
-# @private
-class Object
-  def derp
-    yield self
-  end
-end
 
 # TLAW is a framework for creating API wrappers for get-only APIs (like
 # weather, geonames and so on) or subsets of APIs (like getting data from

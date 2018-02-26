@@ -79,15 +79,15 @@ module TLAW
 
     def describe
       [
-        '@param', name,
+        '@param',
+        name,
         ("[#{doc_type}]" if doc_type),
         description,
-        if @options[:enum]
-          "\n  Possible values: #{type.values.map(&:inspect).join(', ')}"
-        end,
+        ("\n  Possible values: #{type.values.map(&:inspect).join(', ')}" if @options[:enum]),
         ("(default = #{default.inspect})" if default)
-      ].compact.join(' ')
-        .derp(&Util::Description.method(:new))
+      ].compact
+        .join(' ')
+        .yield_self(&Util::Description.method(:new))
     end
 
     private
@@ -108,11 +108,12 @@ module TLAW
     end
 
     def make_formatter
-      options[:format].derp { |f|
+      options[:format].yield_self do |f|
         return ->(v) { v } unless f
-        return f.to_proc if f.respond_to?(:to_proc)
+        return f.to_proc   if f.respond_to?(:to_proc)
+
         fail ArgumentError, "#{self}: unsupporter formatter #{f}"
-      }
+      end
     end
 
     def default_to_code
