@@ -4,9 +4,9 @@
 [![Build Status](https://travis-ci.org/molybdenum-99/tlaw.svg?branch=master)](https://travis-ci.org/molybdenum-99/tlaw)
 [![Coverage Status](https://coveralls.io/repos/molybdenum-99/tlaw/badge.svg?branch=master)](https://coveralls.io/r/molybdenum-99/tlaw?branch=master)
 
-**TLAW** (pronounce it like "tea+love"... or whatever) is the last (and
-only) API wrapper framework for _get-only APIes_<sup>[*](#get-only-api)</sup>
-(think weather, search, economical indicators, geonames and so on).
+**TLAW** (pronounce it like "tea+love"... or whatever) is the last (and only)
+API wrapper framework you'll ever need for accessing _GET-only APIs_<sup>[*](#get-only-api)</sup>
+in a consistent way (think weather, search, economical indicators, geonames and so on).
 
 ## Table Of Contents
 

@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.homepage = 'https://github.com/molybdenum-99/tlaw'
 
   s.summary = 'The Last API Wrapper: Pragmatic API wrapper framework'
-  s.description = %q{TLAW is the last (and only) API wrapper framework you'll ever need for accessing APIs in a consistent way (think weather, search, economical indicators, geonames and so on).}
+  s.description = %q{TLAW is the last (and only) API wrapper framework you'll ever need for accessing GET-only APIs in a consistent way (think weather, search, economical indicators, geonames and so on).}
   s.licenses = ['MIT']
 
   s.files = `git ls-files`.split($RS).reject do |file|
