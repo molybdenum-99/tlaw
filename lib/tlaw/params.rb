@@ -17,6 +17,16 @@ module TLAW
     # ```
     #
     Nonconvertible = Class.new(ArgumentError)
+
+    def self.make(name, **options)
+      # NB: Sic. :keyword is nil (not provided) should still
+      #     make a keyword argument.
+      if options[:keyword] != false
+        Keyword.new(name, **options)
+      else
+        Argument.new(name, **options)
+      end
+    end
   end
 end
 

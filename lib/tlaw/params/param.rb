@@ -7,16 +7,6 @@ module TLAW
     # for parameters definition.
     #
     class Param
-      def self.make(name, **options)
-        # NB: Sic. :keyword is nil (not provided) should still
-        #     make a keyword argument.
-        if options[:keyword] != false
-          Keyword.new(name, **options)
-        else
-          Argument.new(name, **options)
-        end
-      end
-
       attr_reader :name, :type, :options
 
       def initialize(name, **options)
@@ -41,7 +31,7 @@ module TLAW
       end
 
       def merge(**new_options)
-        Param.make(name, @options.merge(new_options))
+        Params.make(name, @options.merge(new_options))
       end
 
       def field

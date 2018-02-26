@@ -1,20 +1,6 @@
 module TLAW
   module Params
     describe Param do
-      describe '.make' do
-        context 'default' do
-          subject { described_class.make(:foo) }
-
-            it { is_expected.to be_a Keyword }
-        end
-
-        context 'non-keyword' do
-          subject { described_class.make(:bar, keyword: false) }
-
-            it { is_expected.to be_a Argument }
-        end
-      end
-
       describe '#convert' do
         subject { param.convert(value) }
 
@@ -117,12 +103,12 @@ module TLAW
       end
 
       describe '#merge' do
-        let(:param) { described_class.make(:p, required: true) }
+        let(:param) { Params.make(:p, required: true) }
 
         subject { param.merge(default: 5) }
 
         its(:name) { is_expected.to eq :p }
-          it { is_expected.to be_a Keyword }
+        it { is_expected.to be_a Keyword }
         it { is_expected.to be_required }
         its(:default) { is_expected.to eq 5 }
         its(:object_id) { is_expected.not_to eq param.object_id }
@@ -130,12 +116,12 @@ module TLAW
         context 'when non-keyword param' do
           subject { param.merge(default: 5, keyword: false) }
 
-            it { is_expected.to be_a Argument }
+          it { is_expected.to be_a Argument }
 
           context 'with class change' do
             subject { param.merge(default: 5, keyword: true) }
 
-              it { is_expected.to be_a Keyword }
+            it { is_expected.to be_a Keyword }
           end
         end
       end
@@ -144,37 +130,37 @@ module TLAW
         subject { param.to_code }
 
         context 'keyword - required' do
-          let(:param) { described_class.make(:p, required: true) }
+          let(:param) { Params.make(:p, required: true) }
 
           it { is_expected.to eq 'p:' }
         end
 
         context 'keyword - optional' do
-          let(:param) { described_class.make(:p) }
+          let(:param) { Params.make(:p) }
 
           it { is_expected.to eq 'p: nil' }
         end
 
         context 'keyword - with default' do
-          let(:param) { described_class.make(:p, default: 'foo') }
+          let(:param) { Params.make(:p, default: 'foo') }
 
           it { is_expected.to eq 'p: "foo"' }
         end
 
         context 'argument - required' do
-          let(:param) { described_class.make(:p, keyword: false, required: true) }
+          let(:param) { Params.make(:p, keyword: false, required: true) }
 
           it { is_expected.to eq 'p' }
         end
 
         context 'argument - optional' do
-          let(:param) { described_class.make(:p, keyword: false) }
+          let(:param) { Params.make(:p, keyword: false) }
 
           it { is_expected.to eq 'p=nil' }
         end
 
         context 'argument - with default' do
-          let(:param) { described_class.make(:p, keyword: false, default: 'foo') }
+          let(:param) { Params.make(:p, keyword: false, default: 'foo') }
 
           it { is_expected.to eq 'p="foo"' }
         end
