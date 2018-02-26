@@ -14,7 +14,7 @@ module TLAW
         @options = options
         @type = Type.parse(options)
         @options[:desc] ||= @options[:description]
-        @options[:desc].gsub!(/\n( *)/, "\n  ") if @options[:desc]
+        @options[:desc]&.gsub!(/\n( *)/, "\n  ")
         @formatter = make_formatter
       end
 
