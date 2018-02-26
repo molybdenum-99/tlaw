@@ -1,4 +1,4 @@
-require_relative 'backports'
+require 'backports/2.5.0/kernel/yield_self'
 require 'open-uri'
 require 'json'
 require 'addressable/uri'
