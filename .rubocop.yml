@@ -85,3 +85,10 @@ Style/CommentAnnotation:
 Performance/RedundantBlockCall:
   Enabled: false
 
+# Broken cops
+# -----------
+
+# As of 0.52.1, it suggest to remove empty line inside _multiline string argument_.
+# See https://github.com/bbatsov/rubocop/issues/5339
+Layout/EmptyLinesAroundArguments:
+  Enabled: false
