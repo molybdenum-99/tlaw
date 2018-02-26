@@ -6,7 +6,7 @@ module TLAW
     # converting. You'll never instantiate it directly, just see {DSL#param}
     # for parameters definition.
     #
-    class Param
+    class Base
       attr_reader :name, :type, :options
 
       def initialize(name, **options)

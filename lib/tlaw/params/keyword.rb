@@ -1,8 +1,8 @@
-require_relative 'param'
+require_relative 'base'
 
 module TLAW
   module Params
-    class Keyword < Param
+    class Keyword < Base
       def keyword?
         true
       end

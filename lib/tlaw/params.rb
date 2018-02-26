@@ -31,7 +31,7 @@ module TLAW
 end
 
 require_relative 'params/argument'
+require_relative 'params/base'
 require_relative 'params/keyword'
-require_relative 'params/param'
 require_relative 'params/set'
 require_relative 'params/type'

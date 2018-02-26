@@ -1,8 +1,8 @@
-require_relative 'param'
+require_relative 'base'
 
 module TLAW
   module Params
-    class Argument < Param
+    class Argument < Base
       def to_code
         if required?
           name.to_s

@@ -9,7 +9,7 @@ module TLAW
 
           subject { set[:param1] }
 
-          it { is_expected.to be_a Param }
+          it { is_expected.to be_a Base }
           its(:name) { is_expected.to eq :param1 }
           its(:'type.type') { is_expected.to eq Integer }
         end
@@ -22,7 +22,7 @@ module TLAW
 
           subject { set[:param1] }
 
-          it { is_expected.to be_a Param }
+          it { is_expected.to be_a Base }
           its(:name) { is_expected.to eq :param1 }
           its(:'type.type') { is_expected.to eq Integer }
           it { is_expected.to be_required }

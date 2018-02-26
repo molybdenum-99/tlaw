@@ -1,6 +1,6 @@
 module TLAW
   module Params
-    describe Param do
+    describe Base do
       describe '#convert' do
         subject { param.convert(value) }
 
