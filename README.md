@@ -302,7 +302,7 @@ post_process_items('foo') {
 
 # More realistic examples:
 post_process('meta.count', &:to_i)
-post_process('daily') {
+post_process_items('daily') {
   post_process('date', &Date.method(:parse))
 }
 post_process('auxiliary_value') { nil } # Nil's will be thrown away completely
@@ -314,9 +314,9 @@ See full post-processing features descriptions in
 #### All at once
 
 All described response processing steps are performed in this order:
+
 * parsing and initial flattening of JSON (or XML) hash;
-* applying post-processors (and flatten the response after _each_ of
-  them);
+* applying post-processors (and flatten the response after _each_ of them);
 * make `DataTable`s from arrays of hashes.
 
 ### Documentability
