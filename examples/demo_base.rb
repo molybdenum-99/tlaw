@@ -1,6 +1,6 @@
 require 'pp'
 
-$:.unshift 'lib'
+$:.unshift '../lib'
 require 'tlaw'
 
 begin
