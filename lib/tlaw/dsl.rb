@@ -289,11 +289,11 @@ module TLAW
     #     ...and so on. See also {#param} for understanding what you
     #     can change here.
 
-    # @!method process(key = nil, &block)
+    # @!method post_process(key = nil, &block)
     #   Sets post-processors for response.
     #
-    #   There are also {#process_replace} (for replacing entire
-    #   response with something else) and {#process_items} (for
+    #   There are also {#post_process_replace} (for replacing entire
+    #   response with something else) and {#post_process_items} (for
     #   post-processing each item of sub-array).
     #
     #   Notes:
@@ -310,20 +310,20 @@ module TLAW
     #     response hash will immediately have
     #     `{"key.count" => 1, "key.continue" => false}`.
     #
-    #   @overload process(&block)
+    #   @overload post_process(&block)
     #     Sets post-processor for whole response. Note, that in this case
     #     _return_ value of block is ignored, it is expected that your
     #     block will receive response and modify it inplace, like this:
     #
     #     ```ruby
-    #     process do |response|
+    #     post_process do |response|
     #       response['coord'] = Geo::Coord.new(response['lat'], response['lng'])
     #     end
     #     ```
     #     If you need to replace entire response with something else,
-    #     see {#process_replace}
+    #     see {#post_process_replace}
     #
-    #   @overload process(key, &block)
+    #   @overload post_process(key, &block)
     #     Sets post-processor for one response key. Post-processor is
     #     called only if key exists in the response, and value by this
     #     key is replaced with post-processor's response.
@@ -333,19 +333,19 @@ module TLAW
     #     Usage:
     #
     #     ```ruby
-    #     process('date') { |val| Date.parse(val) }
+    #     post_process('date') { |val| Date.parse(val) }
     #     # or, btw, just
-    #     process('date', &Date.method(:parse))
+    #     post_process('date', &Date.method(:parse))
     #     ```
     #
     #     @param key [String]
 
-    # @!method process_items(key, &block)
+    # @!method post_process_items(key, &block)
     #   Sets post-processors for each items of array, being at `key` (if
     #   the key is present in response, and if its value is array of
     #   hashes).
     #
-    #   Inside `block` you can use {#process} method as described
+    #   Inside `block` you can use {#post_process} method as described
     #   above (but all of its actions will be related only to current
     #   item of array).
     #
@@ -365,19 +365,19 @@ module TLAW
     #   ...you can define postprocessing like this:
     #
     #   ```ruby
-    #   process_items 'data' do
-    #     process 'timestamp', &Date.method(:parse)
-    #     process 'value', &:to_i
-    #     process('dummy'){nil} # will be removed
+    #   post_process_items 'data' do
+    #     post_process 'timestamp', &Date.method(:parse)
+    #     post_process 'value', &:to_i
+    #     post_process('dummy'){nil} # will be removed
     #   end
     #   ```
     #
-    #   See also {#process} for some generic explanation of post-processing.
+    #   See also {#post_process} for some generic explanation of post-processing.
     #
     #   @param key [String]
 
-    # @!method process_replace(&block)
-    #   Just like {#process} for entire response, but _replaces_
+    # @!method post_process_replace(&block)
+    #   Just like {#post_process} for entire response, but _replaces_
     #   it with what block returns.
     #
     #   Real-life usage: WorldBank API typically returns responses this
@@ -393,12 +393,12 @@ module TLAW
     #   two keys in hash. We can easily fix this:
     #
     #   ```ruby
-    #   process_replace do |response|
+    #   post_process_replace do |response|
     #     {meta: response.first, data: response.last}
     #   end
     #   ```
     #
-    #   See also {#process} for some generic explanation of post-processing.
+    #   See also {#post_process} for some generic explanation of post-processing.
   end
 end
 
