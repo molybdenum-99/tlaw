@@ -123,8 +123,10 @@ module TLAW
       end
 
       def children_description(children)
-        children.values.map(&:describe_short)
-          .map { |cd| cd.indent('  ') }.join("\n\n")
+        children.values
+                .map(&:describe_short)
+                .map { |cd| cd.indent('  ') }
+                .join("\n\n")
       end
     end
 

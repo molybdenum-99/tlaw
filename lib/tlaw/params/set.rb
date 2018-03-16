@@ -18,7 +18,7 @@ module TLAW
 
       def add(name, **opts)
         # Not updating parent param, just make sure it exists
-        return if @parent && @parent.all_params[name]
+        return if @parent&.all_params && @parent.all_params[name]
 
         @params[name] =
           if @params[name]
@@ -103,10 +103,11 @@ module TLAW
       end
 
       def ordered
-        @params.values
-              .partition(&:keyword?).reverse.map { |args|
-                args.partition(&:required?)
-              }.flatten
+        @params
+          .values
+          .partition(&:keyword?).reverse.map { |args|
+            args.partition(&:required?)
+          }.flatten
       end
     end
   end
