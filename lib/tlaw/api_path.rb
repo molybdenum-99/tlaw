@@ -55,7 +55,7 @@ module TLAW
 
       # @private
       def params_from_path!
-        Addressable::Template.new(path).keys.each do |key| # rubocop:disable Performance/HashEachMethods
+        Addressable::Template.new(path).keys.each do |key|
           param_set.add key.to_sym, keyword: false
         end
       end
@@ -68,8 +68,8 @@ module TLAW
 
       # @private
       def symbol=(sym)
-        @symbol = sym
         @path ||= "/#{sym}"
+        @symbol = sym
       end
 
       # @return [Params::Set]

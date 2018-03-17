@@ -109,8 +109,8 @@ module TLAW
     end
 
     # @private
-    def pretty_print(pp)
-      pp.text("#<#{self.class.name}[#{keys.join(', ')}] x #{size}>")
+    def pretty_print(printer)
+      printer.text("#<#{self.class.name}[#{keys.join(', ')}] x #{size}>")
     end
   end
 end
