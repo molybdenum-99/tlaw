@@ -1,5 +1,5 @@
 module TLAW
-  # TODO: Add docs
+  # See `Params::Base` for more info.
   module Params
     # This error is thrown when some value could not be converted to what
     # this parameter inspects. For example:
