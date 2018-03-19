@@ -1,3 +1,4 @@
+require_relative 'params/set'
 require 'forwardable'
 
 module TLAW
@@ -54,7 +55,7 @@ module TLAW
 
       # @private
       def params_from_path!
-        Addressable::Template.new(path).keys.each do |key| # rubocop:disable Performance/HashEachMethods
+        Addressable::Template.new(path).keys.each do |key|
           param_set.add key.to_sym, keyword: false
         end
       end
@@ -67,13 +68,13 @@ module TLAW
 
       # @private
       def symbol=(sym)
-        @symbol = sym
         @path ||= "/#{sym}"
+        @symbol = sym
       end
 
-      # @return [ParamSet]
+      # @return [Params::Set]
       def param_set
-        @param_set ||= ParamSet.new
+        @param_set ||= Params::Set.new
       end
 
       # @private

@@ -123,8 +123,10 @@ module TLAW
       end
 
       def children_description(children)
-        children.values.map(&:describe_short)
-                .map { |cd| cd.indent('  ') }.join("\n\n")
+        children.values
+                .map(&:describe_short)
+                .map { |cd| cd.indent('  ') }
+                .join("\n\n")
       end
     end
 
@@ -139,21 +141,19 @@ module TLAW
     end
 
     def describe
-      self.class
-          .describe("#{symbol}(#{param_set.to_hash_code(@parent_params)})")
+      self.class.describe("#{symbol}(#{param_set.to_hash_code(@parent_params)})")
     end
 
     private
 
     def child(symbol, expected_class, **params)
       children[symbol]
-        .tap { |child_class|
+        .tap do |child_class|
           child_class && child_class < expected_class or
             fail ArgumentError,
                  "Unregistered #{expected_class.name.downcase}: #{symbol}"
-        }.derp { |child_class|
-          child_class.new(@parent_params.merge(params))
-        }
+        end
+        .new(@parent_params.merge(params))
     end
   end
 end

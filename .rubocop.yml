@@ -2,6 +2,7 @@ inherit_from: .rubocop_todo.yml
 require: rubocop-rspec
 
 AllCops:
+  TargetRubyVersion: 2.3.0
   Include:
     - 'lib/**/*'
   Exclude:
@@ -12,6 +13,10 @@ AllCops:
     - '*.gemspec'
     - 'Gemfile'
   DisplayCopNames: true
+
+# Ruby 2.3+
+FrozenStringLiteralComment:
+  Enabled: false
 
 # My personal style
 # -----------------

@@ -33,7 +33,7 @@ module TLAW
           }
         }
 
-        its(:param_set) { is_expected.to be_a ParamSet }
+        its(:param_set) { is_expected.to be_a Params::Set }
 
         describe '.add_child' do
           let(:child) {

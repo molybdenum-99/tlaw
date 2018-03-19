@@ -71,7 +71,9 @@ module TLAW
     end
 
     def process(hash)
-      flatten(hash).derp(&method(:post_process)).derp(&method(:datablize))
+      flatten(hash)
+        .yield_self(&method(:post_process))
+        .yield_self(&method(:datablize))
     end
 
     def all_post_processors
@@ -92,20 +94,20 @@ module TLAW
     end
 
     def flatten_hash(hash)
-      hash.flat_map { |k, v|
+      hash.flat_map do |k, v|
         v = flatten(v)
         if v.is_a?(Hash)
           v.map { |k1, v1| ["#{k}.#{k1}", v1] }
         else
           [[k, v]]
         end
-      }.reject { |_, v| v.nil? }.to_h
+      end.reject { |_, v| v.nil? }.to_h
     end
 
     def post_process(hash)
-      all_post_processors.inject(hash) { |res, processor|
-        processor.call(res).derp(&method(:flatten))
-      }
+      all_post_processors.inject(hash) do |res, processor|
+        processor.call(res).yield_self(&method(:flatten))
+      end
     end
 
     def datablize(value)

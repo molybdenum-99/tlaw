@@ -1,7 +1,7 @@
-require 'pp'
+$:.unshift File.expand_path('../../lib', __FILE__)
 
-$:.unshift 'lib'
 require 'tlaw'
+require 'pp'
 
 begin
   require 'dotenv'

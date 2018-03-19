@@ -4,9 +4,9 @@
 [![Build Status](https://travis-ci.org/molybdenum-99/tlaw.svg?branch=master)](https://travis-ci.org/molybdenum-99/tlaw)
 [![Coverage Status](https://coveralls.io/repos/molybdenum-99/tlaw/badge.svg?branch=master)](https://coveralls.io/r/molybdenum-99/tlaw?branch=master)
 
-**TLAW** (pronounce it like "tea+love"... or whatever) is the last (and
-only) API wrapper framework for _get-only APIes_<sup>[*](#get-only-api)</sup>
-(think weather, search, economical indicators, geonames and so on).
+**TLAW** (pronounce it like "tea+love"... or whatever) is the last (and only)
+API wrapper framework you'll ever need for accessing _GET-only APIs_<sup>[*](#get-only-api)</sup>
+in a consistent way (think weather, search, economical indicators, geonames and so on).
 
 ## Table Of Contents
 
@@ -302,7 +302,7 @@ post_process_items('foo') {
 
 # More realistic examples:
 post_process('meta.count', &:to_i)
-post_process('daily') {
+post_process_items('daily') {
   post_process('date', &Date.method(:parse))
 }
 post_process('auxiliary_value') { nil } # Nil's will be thrown away completely
@@ -314,9 +314,9 @@ See full post-processing features descriptions in
 #### All at once
 
 All described response processing steps are performed in this order:
+
 * parsing and initial flattening of JSON (or XML) hash;
-* applying post-processors (and flatten the response after _each_ of
-  them);
+* applying post-processors (and flatten the response after _each_ of them);
 * make `DataTable`s from arrays of hashes.
 
 ### Documentability

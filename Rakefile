@@ -3,7 +3,7 @@ require 'rubygems/tasks'
 Gem::Tasks.new
 
 namespace :doc do
-  desc "Prints TOC for README.md (doesn't inserts it automatically!)"
+  desc "Prints TOC for README.md (doesn't insert it automatically!)"
   task :toc do
     # NB: really dumb. Yet better than any Solution I can find :(
     # Grabbing it from project to project.

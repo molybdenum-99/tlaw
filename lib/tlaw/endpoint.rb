@@ -57,7 +57,7 @@ module TLAW
           Crack::XML.parse(body)
         else
           JSON.parse(body)
-        end.derp { |response| response_processor.process(response) }
+        end.yield_self { |response| response_processor.process(response) }
       end
 
       private
@@ -96,9 +96,10 @@ module TLAW
     def call(**params)
       url = construct_url(**full_params(params))
 
-      @client.get(url)
-             .tap { |response| guard_errors!(response) }
-             .derp { |response| self.class.parse(response.body) }
+      @client.get(url).yield_self do |response|
+        guard_errors!(response)
+        self.class.parse(response.body)
+      end
     rescue API::Error
       raise # Not catching in the next block
     rescue StandardError => e
@@ -130,8 +131,10 @@ module TLAW
       url_params = self.class.param_set.process(**params)
       @url_template
         .expand(url_params).normalize.to_s
-        .split('?', 2).derp { |url, param| [url.gsub('%2F', '/'), param] }
-        .compact.join('?')
+        .split('?', 2)
+        .yield_self { |url, param| [url.gsub('%2F', '/'), param] }
+        .compact
+        .join('?')
     end
   end
 end

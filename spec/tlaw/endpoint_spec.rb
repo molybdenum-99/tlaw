@@ -7,7 +7,7 @@ module TLAW
     context '.param_set' do
       subject { endpoint_class }
 
-      its(:param_set) { is_expected.to be_a ParamSet }
+      its(:param_set) { is_expected.to be_a Params::Set }
     end
 
     describe '#construct_url' do
@@ -77,7 +77,7 @@ module TLAW
 
       context 'parent params' do
         let(:parent_param_set) {
-          ParamSet.new.tap { |ps| ps.add(:api_key) }
+          Params::Set.new.tap { |ps| ps.add(:api_key) }
         }
         let(:endpoint) { endpoint_class.new(api_key: 'foo') }
 
