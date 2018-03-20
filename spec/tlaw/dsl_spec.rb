@@ -154,31 +154,27 @@ module TLAW
         end
       end
 
-      describe '#post_process' do
+      describe '#transform' do
         it 'adds post processor without key' do
-          expect(endpoint.response_processor).to receive(:add_post_processor).with(nil)
-          wrapper.post_process { |h| }
+          expect(endpoint.response_processor.processors).to receive(:<<).with(DSL::Transforms::Base)
+          wrapper.transform { |h| }
         end
 
         it 'adds post processor with key' do
-          expect(endpoint.response_processor).to receive(:add_post_processor).with('count')
-          wrapper.post_process('count') { |h| }
+          expect(endpoint.response_processor.processors).to receive(:<<).with(DSL::Transforms::Key)
+          wrapper.transform('count') { |h| }
         end
       end
 
-      describe '#post_process_each' do
+      describe '#transform_items' do
         it 'adds post processor without key' do
-          expect(endpoint.response_processor)
-            .to receive(:add_item_post_processor)
-            .with('list', nil)
-          wrapper.post_process_items('list') { post_process { |h| } }
+          expect(endpoint.response_processor.processors).to receive(:concat).with([DSL::Transforms::Items])
+          wrapper.transform_items('list') { transform { |h| } }
         end
 
         it 'adds post processor with key' do
-          expect(endpoint.response_processor)
-            .to receive(:add_item_post_processor)
-            .with('list', 'dt')
-          wrapper.post_process_items('list') { post_process('dt') { |h| } }
+          expect(endpoint.response_processor.processors).to receive(:concat).with([DSL::Transforms::Items])
+          wrapper.transform_items('list') { transform('dt') { |h| } }
         end
       end
     end

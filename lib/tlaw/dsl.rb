@@ -22,11 +22,20 @@ module TLAW
   module DSL
     # @!method base(url)
     #   Allows to set entire API base URL, all endpoints and namespaces
-    #   pathes are calculated relative to it.
+    #   paths are calculated relative to it.
     #
     #   **Works for:** API
     #
     #   @param url [String]
+
+    # @!method response_processor(processor)
+    #   Allows to specify a custom response processor, such as basic XML/JSON
+    #   processing without flattining into a DataTable. The processor is
+    #   inherited by nested namespaces and endpoints.
+    #
+    #   **Works for:** API, namespace, endpoint
+    #
+    #   @param processor [TLAW::Processors::Base]
 
     # @!method desc(text)
     #   Allows to set description string for your API object. It can
@@ -289,41 +298,61 @@ module TLAW
     #     ...and so on. See also {#param} for understanding what you
     #     can change here.
 
-    # @!method post_process(key = nil, &block)
+    # @!method transform(key = nil, replace: false, &block)
     #   Sets post-processors for response.
     #
-    #   There are also {#post_process_replace} (for replacing entire
-    #   response with something else) and {#post_process_items} (for
-    #   post-processing each item of sub-array).
+    #   There are also the `replace` option (for replacing entire
+    #   response with something else), set to `false` by default.
+    #   Alternatively, {#transform_items} is a separate method for
+    #   post-processing each item of sub-array.
     #
     #   Notes:
     #
     #   * you can set any number of post-processors of any kind, and they
-    #     will be applied in exactly the same order they are set;
+    #     will be applied in exactly the same order they are defined;
     #   * you can set post-processors in parent namespace (or for entire
     #     API), in this case post-processors of _outer_ namespace are
-    #     always applied before inner ones. That allow you to define some
-    #     generic parsing/rewriting on API level, then more specific
-    #     key postprocessors on endpoints;
+    #     always applied before inner ones. That allows you to define some
+    #     generic parsing/rewriting at the API level, then more specific
+    #     key post-processors on endpoints;
     #   * hashes are flattened again after _each_ post-processor, so if
     #     for some `key` you'll return `{count: 1, continue: false}`,
-    #     response hash will immediately have
+    #     the response hash will immediately have
     #     `{"key.count" => 1, "key.continue" => false}`.
     #
-    #   @overload post_process(&block)
+    #   @overload transform(replace: false, &block)
     #     Sets post-processor for whole response. Note, that in this case
     #     _return_ value of block is ignored, it is expected that your
     #     block will receive response and modify it inplace, like this:
     #
     #     ```ruby
-    #     post_process do |response|
+    #     transform do |response|
     #       response['coord'] = Geo::Coord.new(response['lat'], response['lng'])
     #     end
     #     ```
-    #     If you need to replace entire response with something else,
-    #     see {#post_process_replace}
     #
-    #   @overload post_process(key, &block)
+    #     If you need to replace entire response with something else,
+    #     set the `replace` option to `true`.
+    #
+    #     Real-life usage: WorldBank API typically returns responses this
+    #     way:
+    #
+    #     ```json
+    #     [
+    #        {"count": 100, "page": 1},
+    #        {"some_data_variable": [{}, {}, {}]}
+    #     ]
+    #     ```
+    #     ...e.g. metadata and real response as two items in array, not
+    #     two keys in hash. We can easily fix this:
+    #
+    #     ```ruby
+    #     transform(replace: true) do |response|
+    #       {meta: response.first, data: response.last}
+    #     end
+    #     ```
+    #
+    #   @overload transform(key, &block)
     #     Sets post-processor for one response key. Post-processor is
     #     called only if key exists in the response, and value by this
     #     key is replaced with post-processor's response.
@@ -333,19 +362,19 @@ module TLAW
     #     Usage:
     #
     #     ```ruby
-    #     post_process('date') { |val| Date.parse(val) }
+    #     transform('date') { |val| Date.parse(val) }
     #     # or, btw, just
-    #     post_process('date', &Date.method(:parse))
+    #     transform('date', &Date.method(:parse))
     #     ```
     #
     #     @param key [String]
 
-    # @!method post_process_items(key, &block)
+    # @!method transform_items(key, &block)
     #   Sets post-processors for each items of array, being at `key` (if
     #   the key is present in response, and if its value is array of
     #   hashes).
     #
-    #   Inside `block` you can use {#post_process} method as described
+    #   Inside `block` you can use {#transform} method as described
     #   above (but all of its actions will be related only to current
     #   item of array).
     #
@@ -365,40 +394,16 @@ module TLAW
     #   ...you can define postprocessing like this:
     #
     #   ```ruby
-    #   post_process_items 'data' do
-    #     post_process 'timestamp', &Date.method(:parse)
-    #     post_process 'value', &:to_i
-    #     post_process('dummy'){nil} # will be removed
+    #   transform_items 'data' do
+    #     transform 'timestamp', &Date.method(:parse)
+    #     transform 'value', &:to_i
+    #     transform('dummy'){nil} # will be removed
     #   end
     #   ```
     #
-    #   See also {#post_process} for some generic explanation of post-processing.
+    #   See also {#transform} for some generic explanation of post-processing.
     #
     #   @param key [String]
-
-    # @!method post_process_replace(&block)
-    #   Just like {#post_process} for entire response, but _replaces_
-    #   it with what block returns.
-    #
-    #   Real-life usage: WorldBank API typically returns responses this
-    #   way:
-    #
-    #   ```json
-    #   [
-    #      {"count": 100, "page": 1},
-    #      {"some_data_variable": [{}, {}, {}]}
-    #   ]
-    #   ```
-    #   ...e.g. metadata and real response as two items in array, not
-    #   two keys in hash. We can easily fix this:
-    #
-    #   ```ruby
-    #   post_process_replace do |response|
-    #     {meta: response.first, data: response.last}
-    #   end
-    #   ```
-    #
-    #   See also {#post_process} for some generic explanation of post-processing.
   end
 end
 
@@ -406,4 +411,4 @@ require_relative 'dsl/api_wrapper'
 require_relative 'dsl/base_wrapper'
 require_relative 'dsl/endpoint_wrapper'
 require_relative 'dsl/namespace_wrapper'
-require_relative 'dsl/post_process_proxy'
+require_relative 'dsl/transforms'
