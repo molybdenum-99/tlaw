@@ -12,6 +12,7 @@ AllCops:
     - 'Rakefile'
     - '*.gemspec'
     - 'Gemfile'
+    - '**/*.orig'
   DisplayCopNames: true
 
 # Ruby 2.3+
