@@ -1,7 +1,6 @@
 require 'faraday'
 require 'faraday_middleware'
 require 'addressable/template'
-require 'crack'
 
 module TLAW
   # This class does all the hard work: actually calling some HTTP API
@@ -48,16 +47,13 @@ module TLAW
                 joiner = base_url.include?('?') ? '&' : '?'
                 "#{base_url}{#{joiner}#{query_string_params.join(',')}}"
               end
+
         Addressable::Template.new(tpl)
       end
 
       # @private
-      def parse(body)
-        if xml
-          Crack::XML.parse(body)
-        else
-          JSON.parse(body)
-        end.yield_self { |response| response_processor.process(response) }
+      def process_response(response)
+        response_processor.call(response)
       end
 
       private
@@ -82,6 +78,7 @@ module TLAW
         faraday.use FaradayMiddleware::FollowRedirects
         faraday.adapter Faraday.default_adapter
       end
+
       @url_template = self.class.construct_template
     end
 
@@ -96,10 +93,7 @@ module TLAW
     def call(**params)
       url = construct_url(**full_params(params))
 
-      @client.get(url).yield_self do |response|
-        guard_errors!(response)
-        self.class.parse(response.body)
-      end
+      self.class.process_response @client.get(url)
     rescue API::Error
       raise # Not catching in the next block
     rescue StandardError => e
@@ -113,18 +107,6 @@ module TLAW
 
     def full_params(**params)
       @parent_params.merge(params.reject { |_, v| v.nil? })
-    end
-
-    def guard_errors!(response)
-      # TODO: follow redirects
-      return response if (200...400).cover?(response.status)
-
-      body = JSON.parse(response.body) rescue nil
-      message = body && (body['message'] || body['error'])
-
-      fail API::Error,
-           "HTTP #{response.status} at #{response.env[:url]}" +
-           (message ? ': ' + message : '')
     end
 
     def construct_url(**params)

@@ -1,6 +1,5 @@
 require 'backports/2.5.0/kernel/yield_self'
 require 'open-uri'
-require 'json'
 require 'addressable/uri'
 require 'addressable/template'
 

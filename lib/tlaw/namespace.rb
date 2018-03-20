@@ -1,3 +1,5 @@
+require_relative 'endpoint'
+
 module TLAW
   # Namespace is basically a container for {Endpoint}s. It allows to
   # nest Ruby calls (like `api.namespace1.namespace2.real_call(params)`),
@@ -68,7 +70,7 @@ module TLAW
 
       # @private
       def inspect_docs
-        inspect_namespaces + inspect_endpoints + ' docs: .describe>'
+        "#{inspect_namespaces}#{inspect_endpoints} docs: .describe>"
       end
 
       # @private
@@ -98,11 +100,13 @@ module TLAW
 
       def inspect_namespaces
         return '' if namespaces.empty?
+
         " namespaces: #{namespaces.keys.join(', ')};"
       end
 
       def inspect_endpoints
         return '' if endpoints.empty?
+
         " endpoints: #{endpoints.keys.join(', ')};"
       end
 
