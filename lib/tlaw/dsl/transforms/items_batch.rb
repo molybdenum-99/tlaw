@@ -5,9 +5,9 @@ module TLAW
     module Transforms
       class ItemsBatch
         def self.batch(key, &block)
-          batcher = new(key)
-          batcher.instance_eval(&block)
-          batcher.processors
+          new(key)
+            .tap { |batcher| batcher.instance_eval(&block) }
+            .processors
         end
 
         attr_reader :processors

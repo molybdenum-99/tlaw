@@ -45,10 +45,6 @@ module TLAW
       def transform_items(key, &block)
         @object.response_processor.processors.concat Transforms::ItemsBatch.batch(key, &block)
       end
-
-      def process_replace(&block)
-        transform(replace: true, &block)
-      end
     end
   end
 end
