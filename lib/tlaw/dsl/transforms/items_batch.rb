@@ -20,9 +20,6 @@ module TLAW
         def transform(key = nil, &block)
           tap { @processors << Items.new(@parent_key, key, &block) }
         end
-
-        # Backwards-compatibility
-        alias_method :process, :transform
       end
     end
   end
