@@ -12,6 +12,7 @@ AllCops:
     - 'Rakefile'
     - '*.gemspec'
     - 'Gemfile'
+    - '**/*.orig'
   DisplayCopNames: true
 
 # Ruby 2.3+
@@ -74,9 +75,9 @@ Metrics/LineLength:
 Style/Documentation:
   Enabled: false
 
-Style/Lambda:
-  Exclude:
-    - 'lib/tlaw/response_processor.rb'
+# Style/Lambda:
+#   Exclude:
+#     - 'lib/tlaw/processors/response_processor.rb'
 
 # Those are just useless
 # ----------------------

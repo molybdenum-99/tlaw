@@ -4,7 +4,7 @@
 
 * Codebase modernized and rubocopped;
 * Support for redirects;
-* Support for pattern-based (regexp) postprocessors.
+* Support for pattern-based (regexp) post-processors.
 
 # 0.0.1 (2016-09-19)
 

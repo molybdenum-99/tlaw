@@ -1,14 +1,16 @@
 require_relative 'params/set'
+require_relative 'processors/data_table_response_processor'
 require 'forwardable'
 
 module TLAW
-  # Base class for all API pathes: entire API, namespaces and endpoints.
+  # Base class for all API paths: entire API, namespaces and endpoints.
   # Allows to define params and post-processors on any level.
   #
   class APIPath
     class << self
       # @private
-      attr_accessor :base_url, :path, :xml, :docs_link
+      attr_accessor :base_url, :path, :docs_link
+      attr_writer :response_processor
 
       # @private
       def symbol
@@ -40,14 +42,16 @@ module TLAW
         return unless @description || @docs_link
 
         Util::Description.new(
-          [@description, ("Docs: #{@docs_link}" if @docs_link)]
-            .compact.join("\n\n")
+          [@description, @docs_link && "Docs: #{@docs_link}"].compact.join("\n\n")
         )
       end
 
       # @private
       def inherit(namespace, **attrs)
         Class.new(self).tap do |subclass|
+          # Inherit response processor
+          attrs[:response_processor] ||= namespace.response_processor.class.new
+
           attrs.each { |a, v| subclass.send("#{a}=", v) }
           namespace.const_set(subclass.class_name, subclass)
         end
@@ -79,7 +83,7 @@ module TLAW
 
       # @private
       def response_processor
-        @response_processor ||= ResponseProcessor.new
+        @response_processor ||= Processors::DataTableResponseProcessor.new
       end
 
       # @private

@@ -3,6 +3,7 @@ module TLAW
     let(:url_template) { 'https://api.example.com' }
     let(:endpoint_class) { Class.new(described_class).tap { |c| c.base_url = url_template } }
     let(:endpoint) { endpoint_class.new }
+    let(:wrapper) { DSL::EndpointWrapper.new(endpoint_class) }
 
     context '.param_set' do
       subject { endpoint_class }
@@ -59,7 +60,7 @@ module TLAW
     describe '#call' do
       before {
         endpoint_class.param_set.add(:q)
-        endpoint_class.response_processor.add_post_processor('response.message', &:downcase)
+        wrapper.transform('response.message', &:downcase)
       }
 
       let(:deep_hash) {

@@ -1,6 +1,5 @@
 require 'backports/2.5.0/kernel/yield_self'
 require 'open-uri'
-require 'json'
 require 'addressable/uri'
 require 'addressable/template'
 
@@ -51,6 +50,6 @@ require_relative 'tlaw/endpoint'
 require_relative 'tlaw/namespace'
 require_relative 'tlaw/api'
 
-require_relative 'tlaw/response_processor'
+require_relative 'tlaw/processors'
 
 require_relative 'tlaw/dsl'

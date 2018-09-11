@@ -214,52 +214,52 @@ module TLAW
             param :lng, :to_f, required: true, desc: 'Longitude'
           end
 
-          post_process { |e|
+          transform { |e|
             e['city.coord'] = Geo::Coord.new(e['city.coord.lat'], e['city.coord.lon']) \
               if e['city.coord.lat'] && e['city.coord.lon']
           }
-          post_process('city.coord.lat') { nil }
-          post_process('city.coord.lon') { nil }
+          transform('city.coord.lat') { nil }
+          transform('city.coord.lon') { nil }
         end
 
         # OpenWeatherMap reports most of logical errors with HTTP code
         # 200 and responses like {cod: "500", message: "Error message"}
-        post_process { |h|
+        transform { |h|
           !h.key?('cod') || (200..400).cover?(h['cod'].to_i) or
             fail "#{h['cod']}: #{h['message']}"
         }
 
-        WEATHER_POST_PROCESSOR = lambda do |*|
+        WEATHER_PROCESSOR = lambda do |*|
           # Most of the time there is exactly one weather item...
           # ...but sometimes there are two. So, flatterning them looks
           # more reasonable than having DataTable of 1-2 rows.
-          post_process { |h|
+          transform { |h|
             h['weather2'] = h['weather'].last if h['weather'] && h['weather'].count > 1
           }
-          post_process('weather', &:first)
+          transform('weather', &:first)
 
-          post_process('dt', &Time.method(:at))
-          post_process('dt_txt') { nil } # TODO: we need cleaner way to say "remove this"
-          post_process('sys.sunrise', &Time.method(:at))
-          post_process('sys.sunset', &Time.method(:at))
+          transform('dt', &Time.method(:at))
+          transform('dt_txt') { nil } # TODO: we need cleaner way to say "remove this"
+          transform('sys.sunrise', &Time.method(:at))
+          transform('sys.sunset', &Time.method(:at))
 
           # https://github.com/zverok/geo_coord promo here!
-          post_process { |e|
+          transform { |e|
             e['coord'] = Geo::Coord.new(e['coord.lat'], e['coord.lon']) if e['coord.lat'] && e['coord.lon']
           }
-          post_process('coord.lat') { nil }
-          post_process('coord.lon') { nil }
+          transform('coord.lat') { nil }
+          transform('coord.lon') { nil }
 
           # See http://openweathermap.org/weather-conditions#How-to-get-icon-URL
-          post_process('weather.icon') { |i| "http://openweathermap.org/img/w/#{i}.png" }
+          transform('weather.icon') { |i| "http://openweathermap.org/img/w/#{i}.png" }
         end
 
         # For endpoints returning weather in one place
-        instance_eval(&WEATHER_POST_PROCESSOR)
+        instance_eval(&WEATHER_PROCESSOR)
 
         # For endpoints returning list of weathers (forecast or several
         # cities).
-        post_process_items('list', &WEATHER_POST_PROCESSOR)
+        transform_items('list', &WEATHER_PROCESSOR)
       end
     end
   end

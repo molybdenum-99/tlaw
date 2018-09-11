@@ -105,9 +105,10 @@ module TLAW
       def ordered
         @params
           .values
-          .partition(&:keyword?).reverse.map { |args|
-            args.partition(&:required?)
-          }.flatten
+          .partition(&:keyword?)
+          .reverse
+          .map { |args| args.partition(&:required?) }
+          .flatten
       end
     end
   end

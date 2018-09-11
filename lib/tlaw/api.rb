@@ -1,3 +1,6 @@
+require_relative 'namespace'
+require_relative 'dsl/api_wrapper'
+
 module TLAW
   # API is just a top-level {Namespace}.
   #

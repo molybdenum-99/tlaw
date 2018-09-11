@@ -1,4 +1,4 @@
-require_relative 'post_process_proxy'
+require_relative 'transforms'
 
 module TLAW
   module DSL
@@ -30,18 +30,20 @@ module TLAW
         @object.param_set.add(name, **opts.merge(type: type))
       end
 
-      def post_process(key = nil, &block)
-        @object.response_processor.add_post_processor(key, &block)
+      def response_processor(processor)
+        @object.response_processor = processor
       end
 
-      def post_process_replace(&block)
-        @object.response_processor.add_replacer(&block)
+      def transform(key = nil, replace: false, &block)
+        @object.response_processor.processors << Transforms.build(key, replace: replace, &block)
       end
 
-      def post_process_items(key, &block)
-        PostProcessProxy
-          .new(key, @object.response_processor)
-          .instance_eval(&block)
+      def transform_item(key, subkey = nil, &block)
+        @object.response_processor.processors << Transforms::Items.new(key, subkey, &block)
+      end
+
+      def transform_items(key, &block)
+        @object.response_processor.processors.concat Transforms::ItemsBatch.batch(key, &block)
       end
     end
   end
