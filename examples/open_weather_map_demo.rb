@@ -131,7 +131,7 @@ p weather
 p weather.current
 # => #<current() endpoints: city, city_id, location, zip, group; docs: .describe>
 
-# Saem.
+# Same.
 
 pp weather.current.city('Kharkiv')
 # {"weather.id"=>800,
