@@ -8,11 +8,13 @@ module TLAW
   module DSL
     class NamespaceWrapper < BaseWrapper
       def endpoint(name, path = nil, **opts, &block)
+        name = name.to_sym
         update_existing(Endpoint, name, path, **opts, &block) ||
           add_child(Endpoint, name, path: path || "/#{name}", **opts, &block)
       end
 
       def namespace(name, path = nil, &block)
+        name = name.to_sym
         update_existing(Namespace, name, path, &block) ||
           add_child(Namespace, name, path: path || "/#{name}", &block)
       end

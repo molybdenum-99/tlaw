@@ -115,6 +115,12 @@ module TLAW
           }
           its(:'param_set.names') { is_expected.to include(:bar, :baz, :quux) }
         end
+
+        context 'given a string name' do
+          before { wrapper.send(definer, 'ep1') }
+
+          its(:symbol) { is_expected.to eq :ep1 }
+        end
       end
 
       describe '#endpoint' do
