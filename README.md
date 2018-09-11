@@ -91,7 +91,7 @@ class Example < TLAW::API
     # Method is still e.bar, though.
 
     # Now, for params definition:
-    endpont :movie do
+    endpoint :movie do
       param :id
     end
     # Method call would be movie(id: '123')
