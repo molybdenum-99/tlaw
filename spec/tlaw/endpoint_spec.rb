@@ -173,7 +173,7 @@ module TLAW
       describe '#inspect' do
         subject { endpoint.inspect }
 
-        it { is_expected.to eq '#<SomeEndpoint: call-sequence: ep(arg3, arg1=nil, kv2:, kv1: nil); docs: .describe>' }
+        it { is_expected.to eq 'SomeEndpoint(call-sequence: ep(arg3, arg1=nil, kv2:, kv1: nil); docs: .describe)' }
       end
 
       describe '#describe' do

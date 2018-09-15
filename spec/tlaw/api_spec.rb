@@ -37,7 +37,7 @@ module TLAW
       context '.inspect' do
         subject { api_class.inspect }
 
-        it { is_expected.to eq '#<Dummy: call-sequence: Dummy.new(api_key:); namespaces: some_ns; endpoints: some_ep; docs: .describe>' }
+        it { is_expected.to eq 'Dummy(call-sequence: Dummy.new(api_key:); namespaces: some_ns; endpoints: some_ep; docs: .describe)' }
       end
 
       context '#inspect' do
