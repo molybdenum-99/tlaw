@@ -29,8 +29,8 @@ module TLAW
       # # => <SomeApi::SomeNamespace::MyEndpoint call-sequence: my_endpoint(param1, param2: nil), docs: .describe>
       # ```
       def inspect
-        "#<#{name || '(unnamed endpoint class)'}:" \
-        " call-sequence: #{symbol}(#{param_set.to_code}); docs: .describe>"
+        "#{name || '(unnamed endpoint class)'}(" \
+        "call-sequence: #{symbol}(#{param_set.to_code}); docs: .describe)"
       end
 
       # @private

@@ -61,14 +61,14 @@ module TLAW
       end
 
       def inspect
-        "#<#{name || '(unnamed namespace class)'}: " \
+        "#{name || '(unnamed namespace class)'}(" \
         "call-sequence: #{symbol}(#{param_set.to_code});" +
-          inspect_docs
+          inspect_docs + ')'
       end
 
       # @private
       def inspect_docs
-        inspect_namespaces + inspect_endpoints + ' docs: .describe>'
+        inspect_namespaces + inspect_endpoints + ' docs: .describe'
       end
 
       # @private
@@ -137,7 +137,7 @@ module TLAW
 
     def inspect
       "#<#{symbol}(#{param_set.to_hash_code(@parent_params)})" +
-        self.class.inspect_docs
+        self.class.inspect_docs + '>'
     end
 
     def describe

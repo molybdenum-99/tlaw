@@ -150,7 +150,7 @@ module TLAW
         describe '.inspect' do
           subject { namespace_class.inspect }
 
-          it { is_expected.to eq '#<SomeNamespace: call-sequence: some_ns(apikey: nil); namespaces: child_ns; endpoints: some_ep; docs: .describe>' }
+          it { is_expected.to eq 'SomeNamespace(call-sequence: some_ns(apikey: nil); namespaces: child_ns; endpoints: some_ep; docs: .describe)' }
         end
 
         describe '#inspect' do
