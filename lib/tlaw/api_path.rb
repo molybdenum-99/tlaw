@@ -11,11 +11,7 @@ module TLAW
       attr_accessor :base_url, :path, :xml, :docs_link
 
       # @private
-      def symbol
-        # FIXME: the second part is necessary only for describes,
-        #   and probably should not be here.
-        @symbol || (name && "#{name}.new")
-      end
+      attr_reader :symbol
 
       # @private
       CLASS_NAMES = {

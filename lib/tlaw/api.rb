@@ -53,6 +53,11 @@ module TLAW
       def describe(*)
         super.sub(/\A./, '')
       end
+
+      # @private
+      def name_to_call
+        "#{name || '(unnamed API class)'}.new"
+      end
     end
   end
 end

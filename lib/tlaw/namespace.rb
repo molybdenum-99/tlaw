@@ -62,9 +62,12 @@ module TLAW
 
       def inspect
         "#{name || '(unnamed namespace class)'}(" \
-        "call-sequence: #{symbol}(#{param_set.to_code});" +
+        "call-sequence: #{name_to_call}(#{param_set.to_code});" +
           inspect_docs + ')'
       end
+
+      # @private
+      alias_method :name_to_call, :symbol
 
       # @private
       def inspect_docs
@@ -131,12 +134,12 @@ module TLAW
     end
 
     def_delegators :object_class,
-                   :symbol,
+                   :symbol, :name_to_call,
                    :children, :namespaces, :endpoints,
                    :param_set, :describe_short
 
     def inspect
-      "#<#{symbol}(#{param_set.to_hash_code(@parent_params)})" +
+      "#<#{name_to_call}(#{param_set.to_hash_code(@parent_params)})" +
         self.class.inspect_docs + '>'
     end
 
