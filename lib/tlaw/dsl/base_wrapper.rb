@@ -27,7 +27,7 @@ module TLAW
       end
 
       def param(name, type = nil, **opts)
-        @object.param_set.add(name, **opts.merge(type: type))
+        @object.param_set.add(name, **opts, type: type)
       end
 
       def post_process(key = nil, &block)

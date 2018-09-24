@@ -156,7 +156,7 @@ module TLAW
             fail ArgumentError,
                  "Unregistered #{expected_class.name.downcase}: #{symbol}"
         end
-        .new(@parent_params.merge(params))
+        .new(**@parent_params, **params)
     end
   end
 end
