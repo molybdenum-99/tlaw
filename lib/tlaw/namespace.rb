@@ -56,7 +56,7 @@ module TLAW
       # @private
       def to_code
         "def #{to_method_definition}\n" \
-        "  child(:#{symbol}, Namespace, {#{param_set.to_hash_code}})\n" \
+        "  child(:#{symbol}, Namespace, #{param_set.to_hash_code})\n" \
         'end'
       end
 

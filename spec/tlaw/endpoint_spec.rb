@@ -152,7 +152,7 @@ module TLAW
 
       it { is_expected
         .to  include('def ep(arg3, arg1=nil, arg2="foo", kv2:, kv1: nil, kv3: 14)')
-        .and include('.call({kv1: kv1, kv2: kv2, kv3: kv3, arg1: arg1, arg2: arg2, arg3: arg3})')
+        .and include('.call(kv1: kv1, kv2: kv2, kv3: kv3, arg1: arg1, arg2: arg2, arg3: arg3)')
       }
     end
 

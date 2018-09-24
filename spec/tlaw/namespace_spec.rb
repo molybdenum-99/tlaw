@@ -63,7 +63,7 @@ module TLAW
 
         it { is_expected.to eq(%{
           |def some_ns(apikey: nil)
-          |  child(:some_ns, Namespace, {apikey: apikey})
+          |  child(:some_ns, Namespace, apikey: apikey)
           |end
         }.unindent)}
       end
