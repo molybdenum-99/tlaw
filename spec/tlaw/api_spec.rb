@@ -1,9 +1,26 @@
 module TLAW
   describe API do
+    let(:api_class) {
+      Class.new(API) do
+        define do
+          base 'http://api.example.com'
+
+          param :api_key, required: true
+
+          endpoint :some_ep do
+            param :foo
+          end
+
+          namespace :some_ns do
+            endpoint :other_ep
+          end
+        end
+      end
+    }
+
     context '.define' do
       let(:block) { -> {} }
       let(:wrapper) { instance_double('TLAW::DSL::APIWrapper', define: nil) }
-      let(:api_class) { Class.new(described_class) }
 
       subject { api_class.define(&block) }
 
@@ -14,22 +31,6 @@ module TLAW
     end
 
     context 'documentation' do
-      let(:api_class) {
-        Class.new(API) do
-          define do
-            base 'http://api.example.com'
-
-            param :api_key, required: true
-
-            endpoint :some_ep do
-              param :foo
-            end
-
-            namespace :some_ns do
-            end
-          end
-        end
-      }
       let(:api) { api_class.new(api_key: '123') }
 
       before { allow(api_class).to receive(:name).and_return('Dummy') }
