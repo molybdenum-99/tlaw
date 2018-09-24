@@ -13,7 +13,7 @@ module TLAW
     describe '#construct_url' do
       let(:params) { {} }
 
-      subject(:url) { endpoint.__send__(:construct_url, params) }
+      subject(:url) { endpoint.__send__(:construct_url, **params) }
 
       context 'no params' do
         it { is_expected.to eq 'https://api.example.com/' }

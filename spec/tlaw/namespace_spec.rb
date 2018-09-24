@@ -120,7 +120,7 @@ module TLAW
       }
       let(:initial_params) { {} }
 
-      subject(:namespace) { namespace_class.new(initial_params) }
+      subject(:namespace) { namespace_class.new(**initial_params) }
 
       describe '#<endpoint>' do
         let(:endpoint) { instance_double(endpoint_class, call: nil) }
