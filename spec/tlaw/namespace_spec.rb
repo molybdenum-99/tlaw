@@ -9,10 +9,26 @@ module TLAW
         }
       }
 
+      let(:child_endpoint_class) {
+        Class.new(Endpoint).tap { |c|
+          c.symbol = :child_ep
+          c.path = '/child_ep'
+        }
+      }
+
+      let(:grand_child_class) {
+        Class.new(described_class).tap { |c|
+          c.symbol = :grand_child_ns
+          c.path = '/ns3'
+        }
+      }
+
       let(:child_class) {
         Class.new(described_class).tap { |c|
           c.symbol = :child_ns
           c.path = '/ns2'
+          c.add_child child_endpoint_class
+          c.add_child grand_child_class
         }
       }
 
@@ -90,6 +106,32 @@ module TLAW
           |
           |  .some_ep(foo: nil)
         }.unindent)}
+      end
+
+      context '.traverse' do
+        subject { ->(*args) { namespace_class.traverse(*args).to_a } }
+
+        it { is_expected.to ret [
+          endpoint_class,
+          child_class,
+          child_endpoint_class,
+          grand_child_class
+        ]
+        }
+
+        its_call(:endpoints) { is_expected.to ret [
+          endpoint_class,
+          child_endpoint_class
+        ]
+        }
+
+        its_call(:namespaces) { is_expected.to ret [
+          child_class,
+          grand_child_class
+        ]
+        }
+
+        its_call(:garbage) { is_expected.to raise_error KeyError }
       end
     end
 
