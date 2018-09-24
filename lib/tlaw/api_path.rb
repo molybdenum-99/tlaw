@@ -11,7 +11,7 @@ module TLAW
       attr_accessor :base_url, :path, :xml, :docs_link
 
       # @private
-      attr_reader :symbol
+      attr_reader :symbol, :parent
 
       # @private
       CLASS_NAMES = {
@@ -57,9 +57,10 @@ module TLAW
       end
 
       # @private
-      def setup_parents(parent)
+      def parent=(parent)
         param_set.parent = parent.param_set
         response_processor.parent = parent.response_processor
+        @parent = parent
       end
 
       # @private
