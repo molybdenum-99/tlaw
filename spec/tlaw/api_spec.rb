@@ -75,5 +75,33 @@ module TLAW
         it { is_expected.to eq api_class::SomeNs }
       end
     end
+
+    describe '.parents' do
+      subject { klass.parents }
+
+      describe 'for a top level class' do
+        let(:klass) { api_class }
+
+        it { is_expected.to eq [] }
+      end
+
+      describe 'for a sub namespace' do
+        let(:klass) { api_class::SomeNs }
+
+        it { is_expected.to eq [api_class] }
+      end
+
+      describe 'for a sub endpoint' do
+        let(:klass) { api_class::SomeEp }
+
+        it { is_expected.to eq [api_class] }
+      end
+
+      describe 'for a sub sub endpoint' do
+        let(:klass) { api_class::SomeNs::OtherEp }
+
+        it { is_expected.to eq [api_class::SomeNs, api_class] }
+      end
+    end
   end
 end

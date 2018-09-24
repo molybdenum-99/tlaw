@@ -145,11 +145,15 @@ module TLAW
       end
 
       describe '#<namespace>' do
-        subject { namespace.child_ns }
+        let(:child_instance) { namespace.child_ns }
+
+        subject { child_instance }
 
         its(:class) { is_expected.to eq child_class }
 
         its(:parent) { is_expected.to eq namespace }
+
+        its(:parents) { is_expected.to eq [namespace] }
       end
 
       context 'documentation' do

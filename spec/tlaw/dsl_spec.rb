@@ -78,6 +78,7 @@ module TLAW
           its(:path) { is_expected.to eq '/ep1' }
           its(:name) { is_expected.to eq 'Ns::Ep1' }
           its(:parent) { is_expected.to eq Ns }
+          its(:parents) { is_expected.to eq [Ns] }
           its(:base_url) { is_expected.to eq 'https://api.example.com/ep1' }
           its(:'param_set.parent') { is_expected.to eq namespace.param_set }
           its(:'response_processor.parent') { is_expected.to eq namespace.response_processor }

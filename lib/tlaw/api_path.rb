@@ -1,4 +1,5 @@
 require_relative 'params/set'
+require_relative 'has_parent'
 require 'forwardable'
 
 module TLAW
@@ -7,11 +8,12 @@ module TLAW
   #
   class APIPath
     class << self
+      include HasParent
       # @private
       attr_accessor :base_url, :path, :xml, :docs_link
 
       # @private
-      attr_reader :symbol, :parent
+      attr_reader :symbol
 
       # @private
       CLASS_NAMES = {
@@ -120,7 +122,7 @@ module TLAW
       end
     end
 
-    attr_reader :parent
+    include HasParent
 
     extend Forwardable
 
