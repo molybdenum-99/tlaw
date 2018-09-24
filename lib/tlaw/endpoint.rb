@@ -75,7 +75,7 @@ module TLAW
     #
     # Params defined in parent namespace are passed here.
     #
-    def initialize(**parent_params)
+    def initialize(parent = nil, **parent_params)
       super
 
       @client = Faraday.new do |faraday|

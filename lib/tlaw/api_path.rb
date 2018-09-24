@@ -120,9 +120,12 @@ module TLAW
       end
     end
 
+    attr_reader :parent
+
     extend Forwardable
 
-    def initialize(**parent_params)
+    def initialize(parent = nil, **parent_params)
+      @parent = parent
       @parent_params = parent_params
     end
 

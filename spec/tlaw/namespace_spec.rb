@@ -138,10 +138,18 @@ module TLAW
 
           its_block do
             is_expected
-              .to send_message(endpoint_class, :new).with(apikey: 'foo').returning(endpoint)
+              .to send_message(endpoint_class, :new).with(namespace, apikey: 'foo').returning(endpoint)
               .and send_message(endpoint, :call).with(foo: 'bar')
           end
         end
+      end
+
+      describe '#<namespace>' do
+        subject { namespace.child_ns }
+
+        its(:class) { is_expected.to eq child_class }
+
+        its(:parent) { is_expected.to eq namespace }
       end
 
       context 'documentation' do
