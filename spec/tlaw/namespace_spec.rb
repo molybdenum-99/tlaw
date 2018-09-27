@@ -63,7 +63,7 @@ module TLAW
 
         it { is_expected.to eq(%{
           |def some_ns(apikey: nil)
-          |  child(:some_ns, Namespace, {apikey: apikey})
+          |  child(:some_ns, Namespace, apikey: apikey)
           |end
         }.unindent)}
       end
@@ -120,7 +120,7 @@ module TLAW
       }
       let(:initial_params) { {} }
 
-      subject(:namespace) { namespace_class.new(initial_params) }
+      subject(:namespace) { namespace_class.new(**initial_params) }
 
       describe '#<endpoint>' do
         let(:endpoint) { instance_double(endpoint_class, call: nil) }

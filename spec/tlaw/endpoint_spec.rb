@@ -13,7 +13,7 @@ module TLAW
     describe '#construct_url' do
       let(:params) { {} }
 
-      subject(:url) { endpoint.__send__(:construct_url, params) }
+      subject(:url) { endpoint.__send__(:construct_url, **params) }
 
       context 'no params' do
         it { is_expected.to eq 'https://api.example.com/' }
@@ -152,7 +152,7 @@ module TLAW
 
       it { is_expected
         .to  include('def ep(arg3, arg1=nil, arg2="foo", kv2:, kv1: nil, kv3: 14)')
-        .and include('.call({kv1: kv1, kv2: kv2, kv3: kv3, arg1: arg1, arg2: arg2, arg3: arg3})')
+        .and include('.call(kv1: kv1, kv2: kv2, kv3: kv3, arg1: arg1, arg2: arg2, arg3: arg3)')
       }
     end
 

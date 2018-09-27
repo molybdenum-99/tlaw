@@ -31,7 +31,7 @@ module TLAW
       end
 
       def merge(**new_options)
-        Params.make(name, @options.merge(new_options))
+        Params.make(name, **@options, **new_options)
       end
 
       def field

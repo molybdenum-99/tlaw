@@ -56,7 +56,7 @@ module TLAW
       # @private
       def to_code
         "def #{to_method_definition}\n" \
-        "  child(:#{symbol}, Namespace, {#{param_set.to_hash_code}})\n" \
+        "  child(:#{symbol}, Namespace, #{param_set.to_hash_code})\n" \
         'end'
       end
 
@@ -156,7 +156,7 @@ module TLAW
             fail ArgumentError,
                  "Unregistered #{expected_class.name.downcase}: #{symbol}"
         end
-        .new(@parent_params.merge(params))
+        .new(**@parent_params, **params)
     end
   end
 end
