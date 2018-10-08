@@ -6,7 +6,7 @@ module TLAW
     # class' API when deep investigating what's going on, like:
     #
     # ```ruby
-    # params = api.namespaces[:my_namespace].endpoints[:my_endpoint].param_set
+    # params = api.namespace(:my_namespace).endpoint(:my_endpoint).param_set
     # p [params.count, params.names, params.describe]
     # ```
     class Set

@@ -25,7 +25,7 @@ module TLAW
       # Example:
       #
       # ```ruby
-      # some_api.some_namespace.endpoints[:my_endpoint]
+      # some_api.some_namespace.endpoint(:my_endpoint)
       # # => <SomeApi::SomeNamespace::MyEndpoint call-sequence: my_endpoint(param1, param2: nil), docs: .describe>
       # ```
       def inspect

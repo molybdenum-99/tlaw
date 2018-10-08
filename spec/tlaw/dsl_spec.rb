@@ -65,7 +65,7 @@ module TLAW
           Ns.send(:remove_const, :Ep1)
         }
 
-        subject { namespace.send(getter)[:ep1] }
+        subject { namespace.send(getter, :ep1) }
 
         context 'default' do
           before {
@@ -126,11 +126,11 @@ module TLAW
       end
 
       describe '#endpoint' do
-        it_behaves_like 'child definition', Endpoint, :endpoint, :endpoints
+        it_behaves_like 'child definition', Endpoint, :endpoint, :endpoint
       end
 
       describe '#namespace' do
-        it_behaves_like 'child definition', Namespace, :namespace, :namespaces
+        it_behaves_like 'child definition', Namespace, :namespace, :namespace
       end
 
       context 'update existing: when different types' do
@@ -209,7 +209,7 @@ module TLAW
     let(:api) { api_class.new }
 
     it 'produces reasonable outcome' do
-      expect(api.some_ns.endpoints[:some_ep].base_url)
+      expect(api.some_ns.endpoint(:some_ep).base_url)
         .to eq 'http://api.example.com/some_ns/some_ep'
 
       expect(api.some_ns.method(:some_ep).parameters).to eq [%i[key foo]]

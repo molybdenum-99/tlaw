@@ -81,7 +81,7 @@ giphy.describe
 #  .stickers()
 #    Fetch GIPHY stickers (GIFs with transparent background).
 
-giphy.namespaces[:gifs].describe
+giphy.namespace(:gifs).describe
 # => .gifs()
 #  Fetch GIPHY GIFs.
 #

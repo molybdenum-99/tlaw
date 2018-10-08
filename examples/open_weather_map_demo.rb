@@ -53,11 +53,11 @@ p TLAW::Examples::OpenWeatherMap.describe
 # and it is just printed the most convenient way.
 
 # Let's look closer to some of those namespaces:
-p TLAW::Examples::OpenWeatherMap.namespaces[:current]
+p TLAW::Examples::OpenWeatherMap.namespace(:current)
 # => #<TLAW::Examples::OpenWeatherMap::Current: call-sequence: current(); endpoints: city, city_id, location, zip, group; docs: .describe>
 
 # .describe, anyone?
-p TLAW::Examples::OpenWeatherMap.namespaces[:current].describe
+p TLAW::Examples::OpenWeatherMap.namespace(:current).describe
 # .current()
 #   Allows to obtain current weather at one place, designated
 #   by city, location or zip code.
@@ -87,11 +87,11 @@ p TLAW::Examples::OpenWeatherMap.namespaces[:current].describe
 
 # And further:
 p TLAW::Examples::OpenWeatherMap
-  .namespaces[:current].endpoints[:city]
+  .namespace(:current).endpoint(:city)
 # => #<TLAW::Examples::OpenWeatherMap::Current::City: call-sequence: city(city, country_code=nil); docs: .describe>
 
 p TLAW::Examples::OpenWeatherMap
-  .namespaces[:current].endpoints[:city].describe
+  .namespace(:current).endpoint(:city).describe
 # .city(city, country_code=nil)
 #   Current weather by city name (with optional country code
 #   specification).
