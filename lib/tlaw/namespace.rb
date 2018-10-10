@@ -62,7 +62,7 @@ module TLAW
 
       def inspect
         "#{name || '(unnamed namespace class)'}(" \
-        "call-sequence: #{name_to_call}(#{param_set.to_code});" +
+        "call-sequence: #{to_method_definition};" +
           inspect_docs + ')'
       end
 
