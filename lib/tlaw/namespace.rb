@@ -67,9 +67,6 @@ module TLAW
       end
 
       # @private
-      alias_method :name_to_call, :symbol
-
-      # @private
       def inspect_docs
         inspect_namespaces + inspect_endpoints + ' docs: .describe'
       end
