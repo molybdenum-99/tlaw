@@ -84,7 +84,7 @@ module TLAW
           |
           |  Namespaces:
           |
-          |  .child_ns()
+          |  .child_ns
           |
           |  Endpoints:
           |
@@ -176,7 +176,7 @@ module TLAW
             |
             |  Namespaces:
             |
-            |  .child_ns()
+            |  .child_ns
             |
             |  Endpoints:
             |

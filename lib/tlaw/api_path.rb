@@ -80,7 +80,12 @@ module TLAW
 
       # @private
       def to_method_definition
-        "#{name_to_call}(#{param_set.to_code})"
+        params = param_set.to_code
+        if params.empty?
+          name_to_call.to_s
+        else
+          "#{name_to_call}(#{params})"
+        end
       end
 
       # @private
