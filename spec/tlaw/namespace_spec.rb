@@ -9,10 +9,26 @@ module TLAW
         }
       }
 
+      let(:child_endpoint_class) {
+        Class.new(Endpoint).tap { |c|
+          c.symbol = :child_ep
+          c.path = '/child_ep'
+        }
+      }
+
+      let(:grand_child_class) {
+        Class.new(described_class).tap { |c|
+          c.symbol = :grand_child_ns
+          c.path = '/ns3'
+        }
+      }
+
       let(:child_class) {
         Class.new(described_class).tap { |c|
           c.symbol = :child_ns
           c.path = '/ns2'
+          c.add_child child_endpoint_class
+          c.add_child grand_child_class
         }
       }
 
@@ -91,6 +107,32 @@ module TLAW
           |  .some_ep(foo: nil)
         }.unindent)}
       end
+
+      context '.traverse' do
+        subject { ->(*args) { namespace_class.traverse(*args).to_a } }
+
+        it { is_expected.to ret [
+          endpoint_class,
+          child_class,
+          child_endpoint_class,
+          grand_child_class
+        ]
+        }
+
+        its_call(:endpoints) { is_expected.to ret [
+          endpoint_class,
+          child_endpoint_class
+        ]
+        }
+
+        its_call(:namespaces) { is_expected.to ret [
+          child_class,
+          grand_child_class
+        ]
+        }
+
+        its_call(:garbage) { is_expected.to raise_error KeyError }
+      end
     end
 
     context 'instance' do
@@ -138,10 +180,22 @@ module TLAW
 
           its_block do
             is_expected
-              .to send_message(endpoint_class, :new).with(apikey: 'foo').returning(endpoint)
+              .to send_message(endpoint_class, :new).with(namespace, apikey: 'foo').returning(endpoint)
               .and send_message(endpoint, :call).with(foo: 'bar')
           end
         end
+      end
+
+      describe '#<namespace>' do
+        let(:child_instance) { namespace.child_ns }
+
+        subject { child_instance }
+
+        its(:class) { is_expected.to eq child_class }
+
+        its(:parent) { is_expected.to eq namespace }
+
+        its(:parents) { is_expected.to eq [namespace] }
       end
 
       context 'documentation' do

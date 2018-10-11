@@ -40,7 +40,7 @@ module TLAW
       def add_child(child_class, name, **opts, &block)
         @object.add_child(
           child_class.inherit(@object, symbol: name, **opts)
-          .tap { |c| c.setup_parents(@object) }
+          .tap { |c| c.parent = @object }
           .tap(&:params_from_path!)
           .tap { |c|
             WRAPPERS[child_class].new(c).define(&block) if block

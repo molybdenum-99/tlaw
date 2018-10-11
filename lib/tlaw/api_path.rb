@@ -1,4 +1,5 @@
 require_relative 'params/set'
+require_relative 'has_parent'
 require 'forwardable'
 
 module TLAW
@@ -7,6 +8,7 @@ module TLAW
   #
   class APIPath
     class << self
+      include HasParent
       # @private
       attr_accessor :base_url, :path, :xml, :docs_link
 
@@ -57,9 +59,10 @@ module TLAW
       end
 
       # @private
-      def setup_parents(parent)
+      def parent=(parent)
         param_set.parent = parent.param_set
         response_processor.parent = parent.response_processor
+        @parent = parent
       end
 
       # @private
@@ -127,9 +130,12 @@ module TLAW
       end
     end
 
+    include HasParent
+
     extend Forwardable
 
-    def initialize(**parent_params)
+    def initialize(parent = nil, **parent_params)
+      @parent = parent
       @parent_params = parent_params
     end
 

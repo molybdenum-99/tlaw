@@ -39,6 +39,22 @@ module TLAW
         end
       end
 
+      RESTRICTION = {
+        endpoints: Endpoint,
+        namespaces: Namespace,
+        nil => APIPath
+      }.freeze
+
+      def traverse(restrict_to = nil, &block)
+        return to_enum(:traverse, restrict_to) unless block_given?
+        klass = RESTRICTION.fetch(restrict_to)
+        children.each do |_, child|
+          yield child if child < klass
+          child.traverse(restrict_to, &block) if child.respond_to?(:traverse)
+        end
+        self
+      end
+
       # Lists all current namespace's nested namespaces as a hash.
       #
       # @return [Hash{Symbol => Namespace}]
@@ -153,7 +169,7 @@ module TLAW
             fail ArgumentError,
                  "Unregistered #{expected_class.name.downcase}: #{symbol}"
         end
-        .new(**@parent_params, **params)
+        .new(self, **@parent_params, **params)
     end
   end
 end
