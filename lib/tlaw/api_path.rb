@@ -80,8 +80,16 @@ module TLAW
 
       # @private
       def to_method_definition
-        "#{symbol}(#{param_set.to_code})"
+        params = param_set.to_code
+        if params.empty?
+          name_to_call.to_s
+        else
+          "#{name_to_call}(#{params})"
+        end
       end
+
+      # @private
+      alias_method :name_to_call, :symbol
 
       # Redefined on descendants, it just allows you to do `api.namespace.describe`
       # or `api.namespace1.namespace2.endpoints[:my_endpoint].describe`

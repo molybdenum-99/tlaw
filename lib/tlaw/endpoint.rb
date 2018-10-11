@@ -30,7 +30,7 @@ module TLAW
       # ```
       def inspect
         "#{name || '(unnamed endpoint class)'}(" \
-        "call-sequence: #{symbol}(#{param_set.to_code}); docs: .describe)"
+        "call-sequence: #{to_method_definition}; docs: .describe)"
       end
 
       # @private
