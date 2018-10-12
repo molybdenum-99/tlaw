@@ -90,6 +90,9 @@ Style/CommentAnnotation:
 Performance/RedundantBlockCall:
   Enabled: false
 
+Metrics/ClassLength:
+  Enabled: false
+
 # Broken cops
 # -----------
 
