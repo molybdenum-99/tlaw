@@ -48,4 +48,4 @@ q = Quandl.new(api_key: ENV['QUANDL'])
 
 #pp q.databases.search('ukraine')['databases'].first
 pp q.databases['WIKI'].datasets['AAPL', code: 'WIKI']['dataset.data']['Date'].min
-#pp q.databases['WIKI'].datasets.endpoints[:[]].construct_template
+#pp q.databases['WIKI'].datasets.endpoint(:[]).construct_template

@@ -64,7 +64,9 @@ module TLAW
             namespace.add_child(child)
           }
 
-          its(:children) { is_expected.to include(some_endpoint: child) }
+          its(:child_index) { is_expected.to include(some_endpoint: child) }
+
+          its(:children) { is_expected.to include(child) }
 
           context 'updates child' do
             subject { child }

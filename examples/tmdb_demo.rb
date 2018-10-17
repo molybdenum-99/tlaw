@@ -121,7 +121,7 @@ p tmdb.movies.describe
 #
 #   .[](id)
 
-p tmdb.movies.namespaces[:[]].describe
+p tmdb.movies.namespace(:[]).describe
 # .[](id)
 #   @param id
 #

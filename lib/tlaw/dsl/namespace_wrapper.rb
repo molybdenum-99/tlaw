@@ -27,7 +27,7 @@ module TLAW
       }.freeze
 
       def update_existing(child_class, name, path, **opts, &block)
-        existing = @object.children[name] or return nil
+        existing = @object.child_index[name] or return nil
         existing < child_class or
           fail ArgumentError, "#{name} is already defined as #{child_class == Endpoint ? 'namespace' : 'endpoint'}, you can't redefine it as #{child_class}"
 

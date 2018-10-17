@@ -23,7 +23,8 @@ module TLAW
   # # usage:
   # api = SampleAPI.new
   #
-  # api.namespaces[:my_ns] # => class SampleAPI::MyNS, subclass of namespace
+  # api.namespaces # => [SampleAPI::MyNS], subclass of namespace
+  # api.namespace(:my_ns) # => SampleAPI::MyNS
   # api.my_ns # => short-living instance of SampleAPI::MyNS
   # api.my_ns.weather # => real call to API
   # ```
@@ -34,7 +35,7 @@ module TLAW
       def base_url=(url)
         @base_url = url
 
-        children.each_value do |c|
+        children.each do |c|
           c.base_url = base_url + c.path if c.path && !c.base_url
         end
       end
@@ -48,25 +49,50 @@ module TLAW
       def traverse(restrict_to = nil, &block)
         return to_enum(:traverse, restrict_to) unless block_given?
         klass = RESTRICTION.fetch(restrict_to)
-        children.each do |_, child|
+        children.each do |child|
           yield child if child < klass
           child.traverse(restrict_to, &block) if child.respond_to?(:traverse)
         end
         self
       end
 
-      # Lists all current namespace's nested namespaces as a hash.
+      # Returns the namespace's child of the requested name.
       #
-      # @return [Hash{Symbol => Namespace}]
-      def namespaces
-        children.select { |_k, v| v < Namespace }
+      # @return [Array<Endpoint>]
+      def child(name, restrict_to: nil)
+        child_index.fetch(name).tap do |ep|
+          fail ArgumentError, "#{name} is not an #{restrict_to}" unless ep < (restrict_to || Object)
+        end
       end
 
-      # Lists all current namespace's endpoints as a hash.
+      # Lists all current namespace's nested namespaces.
       #
-      # @return [Hash{Symbol => Endpoint}]
+      # @return [Namespace, ...]
+      def namespaces
+        children.grep(Namespace.singleton_class)
+      end
+
+      # Returns the namespace's endpoint of the requested name.
+      #
+      # @param name
+      # @return [Array<Endpoint>]
+      def namespace(name)
+        child(name, restrict_to: Namespace)
+      end
+
+      # Lists all current namespace's endpoints.
+      #
+      # @return [Array<Endpoint>]
       def endpoints
-        children.select { |_k, v| v < Endpoint }
+        children.grep(Endpoint.singleton_class)
+      end
+
+      # Returns the namespace's endpoint of the requested name.
+      #
+      # @param name
+      # @return [Array<Endpoint>]
+      def endpoint(name)
+        child(name, restrict_to: Endpoint)
       end
 
       # @private
@@ -89,7 +115,7 @@ module TLAW
 
       # @private
       def add_child(child)
-        children[child.symbol] = child
+        child_index[child.symbol] = child
 
         child.base_url = base_url + child.path if !child.base_url && base_url
 
@@ -98,7 +124,12 @@ module TLAW
 
       # @private
       def children
-        @children ||= {}
+        child_index.values
+      end
+
+      # @private
+      def child_index
+        @child_index ||= {}
       end
 
       # Detailed namespace documentation.
@@ -114,12 +145,12 @@ module TLAW
 
       def inspect_namespaces
         return '' if namespaces.empty?
-        " namespaces: #{namespaces.keys.join(', ')};"
+        " namespaces: #{namespaces.map(&:symbol).join(', ')};"
       end
 
       def inspect_endpoints
         return '' if endpoints.empty?
-        " endpoints: #{endpoints.keys.join(', ')};"
+        " endpoints: #{endpoints.map(&:symbol).join(', ')};"
       end
 
       def describe_children
@@ -139,8 +170,7 @@ module TLAW
       end
 
       def children_description(children)
-        children.values
-                .map(&:describe_short)
+        children.map(&:describe_short)
                 .map { |cd| cd.indent('  ') }
                 .join("\n\n")
       end
@@ -148,7 +178,7 @@ module TLAW
 
     def_delegators :object_class,
                    :symbol, :name_to_call,
-                   :children, :namespaces, :endpoints,
+                   :child_index, :children, :namespaces, :endpoint, :endpoints,
                    :param_set, :describe_short
 
     def inspect
@@ -163,7 +193,7 @@ module TLAW
     private
 
     def child(symbol, expected_class, **params)
-      children[symbol]
+      child_index[symbol]
         .tap do |child_class|
           child_class && child_class < expected_class or
             fail ArgumentError,

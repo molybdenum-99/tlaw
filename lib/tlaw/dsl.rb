@@ -41,7 +41,7 @@ module TLAW
     #       }
     #
     #   # ...but when you are using it...
-    #   p my_api.endpoints[:endpoint].describe
+    #   p my_api.endpoint(:endpoint).describe
     #   # This is some endpoint.
     #   # And it works!
     #   # ....
@@ -62,7 +62,7 @@ module TLAW
     #   docs "http://docs.example.com/my/endpoint"
     #
     #   # ...and then somewhere...
-    #   p my_api.endpoints[:endpoint].describe
+    #   p my_api.endpoint(:endpoint).describe
     #   # That is my endpoint.
     #   #
     #   # Docs: http://docs.example.com/my/endpoint
