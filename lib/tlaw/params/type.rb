@@ -80,7 +80,7 @@ module TLAW
     # @private
     class EnumType < Type
       def initialize(enum)
-        @type =
+        super(
           case enum
           when Hash
             enum
@@ -89,6 +89,7 @@ module TLAW
           else
             fail ArgumentError, "Unparseable enum: #{enum.inspect}"
           end
+        )
       end
 
       def possible_values
