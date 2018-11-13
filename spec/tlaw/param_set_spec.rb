@@ -133,7 +133,7 @@ module TLAW
             |@param kv2 [#to_i]
             |@param kv1 [Time]
             |@param kv3
-            |  Possible values: 1, 2, 3, 4, 5 (default = 3)
+            |  Possible values: 1..5 (default = 3)
           }.unindent }
         end
       end

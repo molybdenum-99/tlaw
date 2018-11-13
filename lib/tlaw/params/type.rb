@@ -7,7 +7,7 @@ module TLAW
       def self.parse(type: nil, enum: nil, **)
         case type
         when nil
-          enum ? EnumType.new(enum) : Type.new(nil)
+          parse_enum(enum)
         when Class
           ClassType.new(type)
         when Symbol
@@ -16,6 +16,17 @@ module TLAW
           EnumType.new(type)
         else
           fail ArgumentError, "Undefined type #{type}"
+        end
+      end
+
+      def self.parse_enum(enum)
+        case enum
+        when Range
+          RangeType.new(enum)
+        when nil
+          Type.new(nil)
+        else
+          EnumType.new(enum)
         end
       end
 
@@ -99,6 +110,18 @@ module TLAW
 
       def _convert(value)
         type[value]
+      end
+    end
+
+    # @private
+    class RangeType < Type
+      def possible_values
+        type.inspect
+      end
+
+      def validation_error(value)
+        return 'is not an Integer' if type.begin.is_a?(Integer) && !value.is_a?(Integer)
+        "is not in #{possible_values}" unless type.cover?(value)
       end
     end
   end

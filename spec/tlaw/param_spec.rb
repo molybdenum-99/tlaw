@@ -45,7 +45,7 @@ module TLAW
           end
         end
 
-        context 'enum' do
+        context 'hash enum' do
           let(:param) { described_class.new(:p, enum: {true => 'yes', false => 'no'}) }
 
           context 'when included' do
@@ -56,6 +56,50 @@ module TLAW
 
           context 'when not' do
             let(:value) { 'foo' }
+
+            its_block { is_expected.to raise_error Nonconvertible }
+          end
+        end
+
+        context 'integer enum' do
+          let(:param) { described_class.new(:p, enum: 1..100) }
+
+          context 'when included' do
+            let(:value) { 42 }
+
+            it { is_expected.to eq 42 }
+          end
+
+          context 'when not an integer' do
+            let(:value) { 42.5 }
+
+            its_block { is_expected.to raise_error Nonconvertible }
+          end
+
+          context 'when not in range' do
+            let(:value) { 0 }
+
+            its_block { is_expected.to raise_error Nonconvertible }
+          end
+        end
+
+        context 'float enum' do
+          let(:param) { described_class.new(:p, enum: 0.0..1.0) }
+
+          context 'when included' do
+            let(:value) { 0.42 }
+
+            it { is_expected.to eq 0.42 }
+          end
+
+          context 'when is an integer in range' do
+            let(:value) { 0 }
+
+            it { is_expected.to eq 0 }
+          end
+
+          context 'when not in range' do
+            let(:value) { 2.0 }
 
             its_block { is_expected.to raise_error Nonconvertible }
           end
@@ -210,6 +254,12 @@ module TLAW
             let(:param) { described_class.new(:p, type: {true => 'foo', false => 'bar'}) }
 
             it { is_expected.to include('Possible values: true, false') }
+          end
+
+          context 'range' do
+            let(:param) { described_class.new(:p, enum: 1..100) }
+
+            it { is_expected.to include('Possible values: 1..100') }
           end
 
           context 'other enumerable' do

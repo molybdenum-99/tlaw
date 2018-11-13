@@ -24,7 +24,7 @@ class TMDB < TLAW::API
 
       endpoint :latest
       endpoint :now_playing do
-        param :page, :to_i, default: 1 # TODO: validate: 1..1000
+        param :page, enum: 1..1000, default: 1
       end
 
       endpoint :upcoming
