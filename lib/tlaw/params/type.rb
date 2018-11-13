@@ -92,14 +92,14 @@ module TLAW
       end
 
       def values
-        type.keys
+        type.keys.map(&:inspect).join(', ')
       end
 
       def validate(value)
         type.key?(value) or
           nonconvertible!(
             value,
-            "is not one of #{type.keys.map(&:inspect).join(', ')}"
+            "is not one of #{values}"
           )
       end
 

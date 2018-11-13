@@ -62,7 +62,7 @@ module TLAW
           name,
           ("[#{doc_type}]" if doc_type),
           description,
-          ("\n  Possible values: #{type.values.map(&:inspect).join(', ')}" if @options[:enum]),
+          ("\n  Possible values: #{type.values}" if @options[:enum]),
           ("(default = #{default.inspect})" if default)
         ].compact
           .join(' ')
