@@ -91,7 +91,7 @@ module TLAW
           end
       end
 
-      def values
+      def possible_values
         type.keys.map(&:inspect).join(', ')
       end
 
@@ -99,7 +99,7 @@ module TLAW
         type.key?(value) or
           nonconvertible!(
             value,
-            "is not one of #{values}"
+            "is not one of #{possible_values}"
           )
       end
 
