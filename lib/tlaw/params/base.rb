@@ -12,7 +12,7 @@ module TLAW
       def initialize(name, **options)
         @name = name
         @options = options
-        @type = Type.parse(options)
+        @type = Type.parse(**options)
         @options[:desc] ||= @options[:description]
         @options[:desc]&.gsub!(/\n( *)/, "\n  ")
         @formatter = make_formatter

@@ -4,12 +4,10 @@ module TLAW
     class Type
       attr_reader :type
 
-      def self.parse(options)
-        type = options[:type]
-
+      def self.parse(type: nil, enum: nil, **)
         case type
         when nil
-          options[:enum] ? EnumType.new(options[:enum]) : Type.new(nil)
+          enum ? EnumType.new(enum) : Type.new(nil)
         when Class
           ClassType.new(type)
         when Symbol
