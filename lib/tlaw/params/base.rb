@@ -62,7 +62,7 @@ module TLAW
           name,
           ("[#{doc_type}]" if doc_type),
           description,
-          ("\n  Possible values: #{type.possible_values}" if @options[:enum]),
+          ("\n  Possible values: #{type.possible_values}" if type.respond_to?(:possible_values)),
           ("(default = #{default.inspect})" if default)
         ].compact
           .join(' ')

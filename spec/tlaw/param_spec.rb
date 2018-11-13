@@ -206,6 +206,12 @@ module TLAW
             it { is_expected.to include('Possible values: true, false') }
           end
 
+          context 'hash via type' do
+            let(:param) { described_class.new(:p, type: {true => 'foo', false => 'bar'}) }
+
+            it { is_expected.to include('Possible values: true, false') }
+          end
+
           context 'other enumerable' do
             let(:param) { described_class.new(:p, enum: %w[foo bar]) }
 
