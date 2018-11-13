@@ -17,7 +17,7 @@ module TLAW
         when Hash
           EnumType.new(type)
         else
-          fail ArgumenError, "Undefined type #{type}"
+          fail ArgumentError, "Undefined type #{type}"
         end
       end
 

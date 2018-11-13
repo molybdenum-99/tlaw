@@ -166,6 +166,12 @@ module TLAW
         end
       end
 
+      describe '#type' do
+        it 'raises an ArgumentError on bad argument' do
+          expect { described_class.new(:p, type: 'hello') }.to raise_error(ArgumentError, 'Undefined type hello')
+        end
+      end
+
       describe '#describe' do
         subject { param.describe }
 
