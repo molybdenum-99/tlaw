@@ -28,28 +28,26 @@ module TLAW
       end
 
       def convert(value)
-        validate(value) && _convert(value)
+        if (err = validation_error(value))
+          fail Nonconvertible,
+               "#{self} can't convert  #{value.inspect}: #{err}"
+        end
+        _convert(value)
       end
 
-      def validate(_value)
-        true
+      def validation_error(_value)
+        nil
       end
 
       def _convert(value)
         value
       end
-
-      def nonconvertible!(value, reason)
-        fail Nonconvertible,
-             "#{self} can't convert  #{value.inspect}: #{reason}"
-      end
     end
 
     # @private
     class ClassType < Type
-      def validate(value)
-        value.is_a?(type) or
-          nonconvertible!(value, "not an instance of #{type}")
+      def validation_error(value)
+        "not an instance of #{type}" unless value.is_a?(type)
       end
 
       def _convert(value)
@@ -67,9 +65,8 @@ module TLAW
         value.send(type)
       end
 
-      def validate(value)
-        value.respond_to?(type) or
-          nonconvertible!(value, "not responding to #{type}")
+      def validation_error(value)
+        "not responding to #{type}" unless value.respond_to?(type)
       end
 
       def to_doc_type
@@ -96,12 +93,8 @@ module TLAW
         type.keys.map(&:inspect).join(', ')
       end
 
-      def validate(value)
-        type.key?(value) or
-          nonconvertible!(
-            value,
-            "is not one of #{possible_values}"
-          )
+      def validation_error(value)
+        "is not one of #{possible_values}" unless type.key?(value)
       end
 
       def _convert(value)
