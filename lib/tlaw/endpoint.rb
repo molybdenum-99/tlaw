@@ -29,35 +29,7 @@ module TLAW
       # # => <SomeApi::SomeNamespace::MyEndpoint call-sequence: my_endpoint(param1, param2: nil), docs: .describe>
       # ```
       def inspect
-        "#{name || '(unnamed endpoint class)'}(" \
-        "call-sequence: #{to_method_definition}; docs: .describe)"
-      end
-
-      # @private
-      def construct_template
-        tpl = if query_string_params.empty?
-                base_url
-              else
-                joiner = base_url.include?('?') ? '&' : '?'
-                "#{base_url}{#{joiner}#{query_string_params.join(',')}}"
-              end
-        Addressable::Template.new(tpl)
-      end
-
-      # @private
-      def parse(body)
-        if xml
-          Crack::XML.parse(body)
-        else
-          JSON.parse(body)
-        end.yield_self { |response| response_processor.process(response) }
-      end
-
-      private
-
-      def query_string_params
-        param_set.all_params.values.map(&:field).map(&:to_s) -
-          Addressable::Template.new(base_url).keys
+        Inspect.inspect_endpoint(self)
       end
     end
 
@@ -71,11 +43,7 @@ module TLAW
     def initialize(parent = nil, **parent_params)
       super
 
-      @client = Faraday.new do |faraday|
-        faraday.use FaradayMiddleware::FollowRedirects
-        faraday.adapter Faraday.default_adapter
-      end
-      @url_template = self.class.construct_template
+      @url_template = construct_template
     end
 
     # Does the real call to the API, with all params passed to this method
@@ -88,16 +56,7 @@ module TLAW
     #   body.
     def call(**params)
       url = construct_url(**full_params(params))
-
-      @client.get(url).yield_self do |response|
-        guard_errors!(response)
-        self.class.parse(response.body)
-      end
-    rescue API::Error
-      raise # Not catching in the next block
-    rescue StandardError => e
-      raise unless url
-      raise API::Error, "#{e.class} at #{url}: #{e.message}"
+      api.request(url, self.class.response_processor)
     end
 
     def_delegators :object_class, :inspect, :describe
@@ -108,26 +67,27 @@ module TLAW
       @parent_params.merge(params.reject { |_, v| v.nil? })
     end
 
-    def guard_errors!(response)
-      # TODO: follow redirects
-      return response if (200...400).cover?(response.status)
-
-      body = JSON.parse(response.body) rescue nil
-      message = body && (body['message'] || body['error'])
-
-      fail API::Error,
-           "HTTP #{response.status} at #{response.env[:url]}" +
-           (message ? ': ' + message : '')
+    def construct_template
+      url = self.class.base_url
+      params = self.class.param_set.all_params.values.map(&:field).map(&:to_s) -
+          Addressable::Template.new(url).keys
+      joiner = url.include?('?') ? '&' : '?'
+      tpl = params.empty? ? url : url + joiner + params.join(',')
+      Addressable::Template.new(tpl)
     end
 
     def construct_url(**params)
       url_params = self.class.param_set.process(**params)
       @url_template
         .expand(url_params).normalize.to_s
-        .split('?', 2)
-        .yield_self { |url, param| [url.gsub('%2F', '/'), param] }
-        .compact
-        .join('?')
+        .yield_self(&method(:fix_slash))
+    end
+
+    # Fix params substitution: if it was in path part, we shouldn't have escape "/"
+    def fix_slash(url)
+      url, query = url.split('?', 2)
+      url.gsub!('%2F', '/')
+      [url, query].compact.join('?')
     end
   end
 end

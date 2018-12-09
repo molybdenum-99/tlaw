@@ -151,6 +151,10 @@ module TLAW
 
     private
 
+    def api
+      is_a?(API) ? self : parent&.api
+    end
+
     def object_class
       self.class
     end

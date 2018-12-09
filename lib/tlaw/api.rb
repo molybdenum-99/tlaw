@@ -59,5 +59,48 @@ module TLAW
         "#{name || '(unnamed API class)'}.new"
       end
     end
+
+    def initialize(*args, &block)
+      super(*args)
+
+      @client = Faraday.new do |faraday|
+        faraday.use FaradayMiddleware::FollowRedirects
+        faraday.adapter Faraday.default_adapter
+        block.call(faraday) if block
+      end
+    end
+
+    def request(url, response_processor)
+      @client.get(url).yield_self do |response|
+        guard_errors!(response)
+        parse(response.body, response_processor)
+      end
+    rescue API::Error
+      raise # Not catching in the next block
+    rescue StandardError => e
+      raise unless url
+      raise API::Error, "#{e.class} at #{url}: #{e.message}"
+    end
+
+    def guard_errors!(response)
+      # TODO: follow redirects
+      return response if (200...400).cover?(response.status)
+
+      body = JSON.parse(response.body) rescue nil
+      message = body && (body['message'] || body['error'])
+
+      fail API::Error,
+           "HTTP #{response.status} at #{response.env[:url]}" +
+           (message ? ': ' + message : '')
+    end
+
+    def parse(body, response_processor)
+      # TODO: xml is part of "response processing chain"
+      if self.class.xml
+        Crack::XML.parse(body)
+      else
+        JSON.parse(body)
+      end.yield_self { |response| response_processor.process(response) }
+    end
   end
 end

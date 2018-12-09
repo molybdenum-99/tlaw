@@ -96,14 +96,7 @@ module TLAW
       end
 
       def inspect
-        "#{name || '(unnamed namespace class)'}(" \
-        "call-sequence: #{to_method_definition};" +
-          inspect_docs + ')'
-      end
-
-      # @private
-      def inspect_docs
-        inspect_namespaces + inspect_endpoints + ' docs: .describe'
+        Inspect.inspect_namespace(self)
       end
 
       def children=(children)
@@ -132,42 +125,8 @@ module TLAW
       # See {APIPath.describe} for explanations.
       #
       # @return [Util::Description]
-      def describe(definition = nil)
-        super + describe_children
-      end
-
-      private
-
-      def inspect_namespaces
-        return '' if namespaces.empty?
-        " namespaces: #{namespaces.map(&:symbol).join(', ')};"
-      end
-
-      def inspect_endpoints
-        return '' if endpoints.empty?
-        " endpoints: #{endpoints.map(&:symbol).join(', ')};"
-      end
-
-      def describe_children
-        describe_namespaces + describe_endpoints
-      end
-
-      def describe_namespaces
-        return '' if namespaces.empty?
-
-        "\n\n  Namespaces:\n\n" + children_description(namespaces)
-      end
-
-      def describe_endpoints
-        return '' if endpoints.empty?
-
-        "\n\n  Endpoints:\n\n" + children_description(endpoints)
-      end
-
-      def children_description(children)
-        children.map(&:describe_short)
-                .map { |cd| cd.indent('  ') }
-                .join("\n\n")
+      def describe
+        Inspect.describe_namespace(self)
       end
     end
 
@@ -177,12 +136,11 @@ module TLAW
                    :param_set, :describe_short
 
     def inspect
-      "#<#{name_to_call}(#{param_set.to_hash_code(@parent_params)})" +
-        self.class.inspect_docs + '>'
+      Inspect.inspect_namespace(self.class, @parent_params)
     end
 
     def describe
-      self.class.describe("#{symbol}(#{param_set.to_hash_code(@parent_params)})")
+      Inspect.describe_namespace(self.class, @parent_params)
     end
 
     private

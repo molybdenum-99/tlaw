@@ -56,19 +56,6 @@ module TLAW
         options[:desc]
       end
 
-      def describe
-        [
-          '@param',
-          name,
-          ("[#{doc_type}]" if doc_type),
-          description,
-          ("\n  Possible values: #{type.possible_values}" if type.respond_to?(:possible_values)),
-          ("(default = #{default.inspect})" if default)
-        ].compact
-          .join(' ')
-          .yield_self(&Util::Description.method(:new))
-      end
-
       private
 
       attr_reader :formatter
@@ -93,11 +80,6 @@ module TLAW
 
           fail ArgumentError, "#{self}: unsupporter formatter #{f}"
         end
-      end
-
-      def default_to_code
-        # FIXME: this `inspect` will fail with, say, Time
-        default.inspect
       end
     end
   end

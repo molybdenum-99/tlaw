@@ -30,7 +30,7 @@ module TLAW
       def param(name, type = nil, **opts)
         opts = opts.merge(type: type) if type
         @definition[:params] ||= {}
-        @definition[:params].merge!(name => opts) { |k, o, n| o.merge(n) }
+        @definition[:params].merge!(name => opts) { |_, o, n| o.merge(n) }
         self
       end
 

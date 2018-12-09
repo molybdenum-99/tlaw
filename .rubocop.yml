@@ -36,6 +36,12 @@ Style/SignalException:
 Style/RescueModifier:
   Enabled: false
 
+Style/FormatStringToken:
+  Enabled: false
+
+Style/FormatString:
+  EnforcedStyle: percent
+
 # see http://zverok.github.io/blog/2016-02-23-control-flow.html
 Style/AndOr:
   Enabled: false
