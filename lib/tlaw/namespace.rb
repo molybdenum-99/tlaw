@@ -113,6 +113,10 @@ module TLAW
         inspect_namespaces + inspect_endpoints + ' docs: .describe'
       end
 
+      def children=(children)
+        children.each(&method(:add_child))
+      end
+
       # @private
       def add_child(child)
         child_index[child.symbol] = child
