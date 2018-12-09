@@ -12,7 +12,7 @@ module TLAW
       def initialize(name, **options)
         @name = name
         @options = options
-        @type = Type.parse(options)
+        @type = Type.parse(**options)
         @options[:desc] ||= @options[:description]
         @options[:desc]&.gsub!(/\n( *)/, "\n  ")
         @formatter = make_formatter
@@ -62,7 +62,7 @@ module TLAW
           name,
           ("[#{doc_type}]" if doc_type),
           description,
-          ("\n  Possible values: #{type.values.map(&:inspect).join(', ')}" if @options[:enum]),
+          ("\n  Possible values: #{type.possible_values}" if type.respond_to?(:possible_values)),
           ("(default = #{default.inspect})" if default)
         ].compact
           .join(' ')

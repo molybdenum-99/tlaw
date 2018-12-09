@@ -166,6 +166,12 @@ module TLAW
         end
       end
 
+      describe '#type' do
+        it 'raises an ArgumentError on bad argument' do
+          expect { described_class.new(:p, type: 'hello') }.to raise_error(ArgumentError, 'Undefined type hello')
+        end
+      end
+
       describe '#describe' do
         subject { param.describe }
 
@@ -196,6 +202,12 @@ module TLAW
         context 'enum' do
           context 'hash' do
             let(:param) { described_class.new(:p, enum: {true => 'foo', false => 'bar'}) }
+
+            it { is_expected.to include('Possible values: true, false') }
+          end
+
+          context 'hash via type' do
+            let(:param) { described_class.new(:p, type: {true => 'foo', false => 'bar'}) }
 
             it { is_expected.to include('Possible values: true, false') }
           end
