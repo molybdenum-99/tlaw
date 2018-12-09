@@ -36,8 +36,34 @@ RSpec.describe TLAW::DSL::NamespaceBuilder do
   end
 
   describe '#finalize' do
-    # create class
-    # adds method to built object
-    # sets the constant(s)?..
+    let(:builder) {
+      described_class.new(name: :foo, path: '/bar/{baz}') do
+        description 'Good description'
+        param :foo, Integer
+        param :quux
+
+        endpoint :blah do
+          param :nice
+        end
+      end
+    }
+    subject { builder.finalize }
+
+    it { is_expected.to be < TLAW::Namespace }
+    its(:definition) {
+      is_expected.to match(
+        name: :foo,
+        path: '/bar/{baz}',
+        description: 'Good description',
+        params: {
+          baz: {keyword: false},
+          foo: {type: Integer},
+          quux: {}
+        },
+        children: contain_exactly(be.<(TLAW::Endpoint))
+      )
+    }
+
+    its(:instance_methods) { are_expected.to include(:blah) }
   end
 end

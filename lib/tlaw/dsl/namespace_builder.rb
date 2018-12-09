@@ -4,13 +4,15 @@ require_relative 'endpoint_builder'
 module TLAW
   module DSL
     class NamespaceBuilder < BaseBuilder
+      attr_reader :children
+
       def initialize(*)
+        @children = []
         super
-        @definition[:children] = []
       end
 
-      def children
-        @definition[:children]
+      def definition
+        super.merge(children: children)
       end
 
       def endpoint(name, path = nil, **opts, &block)

@@ -75,3 +75,40 @@ RSpec::Matchers.define :not_have_key do |key|
     expect(actual).not_to be_key(key)
   end
 end
+
+RSpec::Matchers.define :define_constant do |name|
+  match do |block|
+    if const_exists?(name)
+      @already_exists = true
+      break false
+    end
+    block.call
+    const_exists?(name)
+  end
+
+  description do
+    "expected block to create constant #{name}"
+  end
+
+  failure_message do
+    if @already_exists
+      "#{description}, but it is already existing"
+    else
+      last_found = @path[0...@modules.count - 1].join('::')
+      not_found = @path[@modules.count - 1] # FIXME: slice or something, I forgot :(
+      problem = @modules.last.respond_to?(:const_defined?) ? "does not define #{not_found}" : "is not a module"
+      "#{description}, but #{last_found} #{problem}"
+    end
+  end
+
+  supports_block_expectations
+
+  def const_exists?(name)
+    @path = name.split('::').drop_while(&:empty?)
+    @modules = @path.reduce([Kernel]) { |(*prevs, cur), name|
+      break [*prevs, cur] unless cur.respond_to?(:const_defined?) && cur.const_defined?(name)
+      [*prevs, cur, cur.const_get(name)]
+    }
+    @modules.count - 1 == @path.size
+  end
+end

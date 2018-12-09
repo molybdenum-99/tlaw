@@ -3,7 +3,8 @@ module TLAW
     class BaseBuilder
       attr_reader :definition
 
-      def initialize(name:, path: "/#{name}", **opts, &block)
+      def initialize(name:, path: nil, **opts, &block)
+        path ||= "/#{name}" # Not default arg, because we need to process explicitly passed path: nil, too
         @definition = {name: name, path: path, params: params_from_path(path)}
         instance_eval(&block) if block
       end
