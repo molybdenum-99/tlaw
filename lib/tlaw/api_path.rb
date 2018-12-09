@@ -51,6 +51,13 @@ module TLAW
         end
       end
 
+      attr_reader :definition
+
+      def setup!(definition)
+        @definition = definition.dup
+        definition.each{ |a, v| __send__("#{a}=", v) }
+      end
+
       # @private
       def params_from_path!
         Addressable::Template.new(path).keys.each do |key|
@@ -71,9 +78,17 @@ module TLAW
         @symbol = sym
       end
 
+      alias name= symbol=
+
       # @return [Params::Set]
       def param_set
         @param_set ||= Params::Set.new
+      end
+
+      def params=(params)
+        params.each do |name, **definition|
+          param_set.add(name, **definition)
+        end
       end
 
       # @private

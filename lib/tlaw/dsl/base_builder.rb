@@ -3,8 +3,9 @@ module TLAW
     class BaseBuilder
       attr_reader :definition
 
-      def initialize(name:, path: "/#{name}", **opts)
+      def initialize(name:, path: "/#{name}", **opts, &block)
         @definition = {name: name, path: path, params: params_from_path(path)}
+        instance_eval(&block) if block
       end
 
       def docs(link)
@@ -30,6 +31,10 @@ module TLAW
         @definition[:params] ||= {}
         @definition[:params].merge!(name => opts) { |k, o, n| o.merge(n) }
         self
+      end
+
+      def finalize
+        fail NotImplementedError, "#{self.class} doesn't implement #finalize"
       end
 
       private
