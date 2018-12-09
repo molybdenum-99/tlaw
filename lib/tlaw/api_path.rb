@@ -106,6 +106,8 @@ module TLAW
         end
       end
 
+      alias_method :call_sequence, :to_method_definition
+
       # @private
       alias_method :name_to_call, :symbol
 
@@ -129,13 +131,6 @@ module TLAW
           ".#{to_method_definition}" +
             (description ? "\n" + description_first_para.indent('  ') : '')
         )
-      end
-
-      # @private
-      def define_method_on(host)
-        file, line = method(:to_code).source_location
-        # line + 1 is where real definition, theoretically, starts
-        host.module_eval(to_code, file, line + 1)
       end
 
       private

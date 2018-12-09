@@ -95,13 +95,6 @@ module TLAW
         child(name, restrict_to: Endpoint)
       end
 
-      # @private
-      def to_code
-        "def #{to_method_definition}\n" \
-        "  child(:#{symbol}, Namespace, #{param_set.to_hash_code})\n" \
-        'end'
-      end
-
       def inspect
         "#{name || '(unnamed namespace class)'}(" \
         "call-sequence: #{to_method_definition};" +
@@ -122,8 +115,6 @@ module TLAW
         child_index[child.symbol] = child
 
         child.base_url = base_url + child.path if !child.base_url && base_url
-
-        child.define_method_on(self)
       end
 
       # @private

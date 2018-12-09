@@ -34,13 +34,6 @@ module TLAW
       end
 
       # @private
-      def to_code
-        "def #{to_method_definition}\n" \
-        "  child(:#{symbol}, Endpoint).call(#{param_set.to_hash_code})\n" \
-        'end'
-      end
-
-      # @private
       def construct_template
         tpl = if query_string_params.empty?
                 base_url
