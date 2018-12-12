@@ -1,4 +1,4 @@
-require_relative 'params/set'
+# require_relative 'params/set'
 require_relative 'has_parent'
 require 'forwardable'
 

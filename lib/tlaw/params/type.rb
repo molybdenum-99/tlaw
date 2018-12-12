@@ -1,5 +1,5 @@
 module TLAW
-  module Params
+  class Params
     # @private
     class Type
       attr_reader :type
@@ -8,6 +8,8 @@ module TLAW
         case type
         when nil
           new(nil)
+        when Type
+          type
         when Class
           ClassType.new(type)
         when Symbol

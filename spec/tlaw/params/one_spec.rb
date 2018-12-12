@@ -68,6 +68,7 @@ RSpec.describe TLAW::Params::Param do
     end
 
     context 'enum conversion' do
+      its_call(true, type: {true => 'gzip', false => nil}) { is_expected.to ret(x: 'gzip') }
     end
 
     context 'value formatting' do

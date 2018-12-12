@@ -1,4 +1,37 @@
 module TLAW
+  class Params
+    attr_reader :list
+
+    def initialize(*list)
+      @list = list
+    end
+
+    def call(**arguments)
+      (arguments.keys - list.map(&:name)).yield_self { |unknown|
+        unknown.empty? or fail ArgumentError, "Unknown arguments: #{unknown.join(', ')}"
+      }
+
+      (required.map(&:name) - arguments.keys).yield_self { |missing|
+        missing.empty? or fail ArgumentError, "Missing arguments: #{missing.join(', ')}"
+      }
+
+      list
+        .map { |par| [par, arguments[par.name]] }
+        .reject { |_, v| v.nil? }
+        .map { |par, arg| par.(arg) }
+        .inject(&:merge)
+    end
+
+    def required
+      list.select(&:required?)
+    end
+  end
+end
+
+require_relative 'params/type'
+require_relative 'params/param'
+
+__END__
   # See `Params::Base` for more info.
   module Params
     # This error is thrown when some value could not be converted to what

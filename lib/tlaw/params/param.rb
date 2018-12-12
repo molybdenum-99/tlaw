@@ -1,5 +1,5 @@
 module TLAW
-  module Params
+  class Params
     class Param
       attr_reader :name, :field, :type, :description, :default, :format
 
@@ -21,7 +21,7 @@ module TLAW
         @required = required
         @keyword = keyword
         @default = default
-        @format = format.to_proc
+        @format = format
       end
 
       def required?
@@ -34,9 +34,12 @@ module TLAW
 
       def call(value)
         # TODO: shouldn't to_s `nil`? Or should drop '' afterwards?..
+        # TODO: it had also to_url_part before, joining if the formatter returned array
         type.(value)
           .yield_self(&format)
           .yield_self { |val| {field => val.to_s} }
+      rescue TypeError => e
+        raise TypeError, "#{name}: #{e.message}"
       end
     end
   end
