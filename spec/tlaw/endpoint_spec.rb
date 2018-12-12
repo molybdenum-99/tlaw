@@ -1,5 +1,44 @@
 module TLAW
   describe Endpoint do
+    describe '.define' do
+      subject { described_class.define(**args) }
+      let(:args) {
+        {
+          symbol: :foo,
+          path: '/bar',
+          description: 'Test.',
+          docs: 'http://google.com',
+          params: [
+            Param.new(:a),
+            Param.new(b, keyword: false, required: true)
+          ]
+
+          {
+            a: {},
+            b: {keyword: false, required: true},
+            c: {type: Integer}
+          }
+        }
+      }
+      it { is_expected.to be_a(Class).and be.<(described_class) }
+      its(:definition) {
+        is_expected.to eq args
+      }
+      it {
+        is_expected.to have_attributes(
+          symbol: :foo,
+          path: '/bar',
+          description: 'Test.',
+          docs: 'http://google.com'
+        )
+      }
+    end
+
+    describe '#call'
+  end
+end
+
+__END__
     let(:url_template) { 'https://api.example.com' }
     let(:endpoint_class) { Class.new(described_class).tap { |c| c.base_url = url_template } }
     let(:endpoint) { endpoint_class.new }

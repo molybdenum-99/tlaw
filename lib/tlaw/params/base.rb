@@ -9,7 +9,13 @@ module TLAW
     class Base
       attr_reader :name, :type, :options
 
-      def initialize(name, **options)
+      def initialize(name,
+        description: nil, desc: description,
+        keyword: true, required: false,
+        default: nil, field: name,
+        format: :itself,
+        **options)
+
         @name = name
         @options = options
         @type = Type.parse(**options)

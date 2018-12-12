@@ -4,10 +4,10 @@ module TLAW
     class Type
       attr_reader :type
 
-      def self.parse(type: nil, enum: nil, **)
+      def self.coerce(type = nil)
         case type
         when nil
-          enum ? EnumType.new(enum) : Type.new(nil)
+          new(nil)
         when Class
           ClassType.new(type)
         when Symbol
@@ -27,11 +27,11 @@ module TLAW
         nil
       end
 
-      def convert(value)
-        if (err = validation_error(value))
-          fail Nonconvertible,
-               "#{self} can't convert  #{value.inspect}: #{err}"
-        end
+      def call(value)
+        validation_error(value)
+          &.yield_self { |msg|
+            fail TypeError, "expected #{msg}, got #{value.inspect}"
+          }
         _convert(value)
       end
 
@@ -47,7 +47,7 @@ module TLAW
     # @private
     class ClassType < Type
       def validation_error(value)
-        "not an instance of #{type}" unless value.is_a?(type)
+        "instance of #{type}" unless value.is_a?(type)
       end
 
       def _convert(value)
@@ -66,7 +66,7 @@ module TLAW
       end
 
       def validation_error(value)
-        "not responding to #{type}" unless value.respond_to?(type)
+        "object responding to ##{type}" unless value.respond_to?(type)
       end
 
       def to_doc_type
@@ -76,29 +76,16 @@ module TLAW
 
     # @private
     class EnumType < Type
-      def initialize(enum)
-        super(
-          case enum
-          when Hash
-            enum
-          when ->(e) { e.respond_to?(:map) }
-            enum.map { |n| [n, n] }.to_h
-          else
-            fail ArgumentError, "Unparseable enum: #{enum.inspect}"
-          end
-        )
-      end
-
       def possible_values
         type.keys.map(&:inspect).join(', ')
       end
 
       def validation_error(value)
-        "is not one of #{possible_values}" unless type.key?(value)
+        "one of #{possible_values}" unless type.key?(value)
       end
 
       def _convert(value)
-        type[value]
+        type.fetch(value)
       end
     end
   end
