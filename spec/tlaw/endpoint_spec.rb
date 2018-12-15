@@ -9,7 +9,9 @@ RSpec.describe TLAW::Endpoint do
   }
 
   let(:cls) {
-    described_class.define(parent: parent_class, symbol: :ep, path: '/foo', param_defs: param_defs)
+    described_class
+      .define(symbol: :ep, path: '/foo', param_defs: param_defs)
+      .tap { |cls| cls.parent = parent_class }
   }
   let(:param_defs) { [param(:a), param(:b)] }
   let(:parent) { instance_double('TLAW::ApiPath', prepared_params: parent_params, api: api) }
