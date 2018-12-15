@@ -9,13 +9,12 @@ module TLAW
   #
   class APIPath
     class << self
-      include HasParent
       # @private
-      attr_reader :symbol, :path, :url_template, :param_defs, :docs_link
+      attr_reader :symbol, :parent, :path, :param_defs, :docs_link
+      attr_writer :parent
 
-      def define(parent:, symbol:, path:, param_defs: [], description: nil, docs_link: nil)
+      def define(symbol:, path:, param_defs: [], description: nil, docs_link: nil)
         Class.new(self).tap do |subclass|
-          subclass.parent = parent
           subclass.symbol = symbol
           subclass.path = path
           subclass.param_defs = param_defs
@@ -30,6 +29,15 @@ module TLAW
 
       def required_param_defs
         param_defs.select(&:required?)
+      end
+
+      def url_template
+        parent&.url_template or fail RuntimeError, "Orphan path #{path}, can't determine full URL"
+        [parent.url_template, path].join
+      end
+
+      def parents
+        Util.parents(self)
       end
 
       # @private
@@ -49,12 +57,7 @@ module TLAW
 
       protected
 
-      attr_writer :symbol, :param_defs, :parent, :description, :xml, :docs_link
-
-      def path=(path)
-        @path = path
-        @url_template = [parent.url_template , path].join
-      end
+      attr_writer :symbol, :param_defs, :path, :description, :xml, :docs_link
     end
 
     include HasParent

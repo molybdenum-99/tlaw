@@ -42,6 +42,9 @@ Style/FormatStringToken:
 Style/FormatString:
   EnforcedStyle: percent
 
+Metrics/ParameterLists:
+  CountKeywordArgs: false
+
 # see http://zverok.github.io/blog/2016-02-23-control-flow.html
 Style/AndOr:
   Enabled: false

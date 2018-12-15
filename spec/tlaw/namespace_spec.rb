@@ -1,3 +1,19 @@
+RSpec.describe TLAW::Namespace do
+  describe '.define' do
+  end
+
+  describe '#child' do
+    let(:cls) {
+      described_class.define(
+        parent: parent_cls,
+        children: [
+        ]
+      )
+    }
+  end
+end
+
+__END__
 module TLAW
   describe Namespace do
     context 'class' do

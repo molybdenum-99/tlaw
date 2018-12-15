@@ -66,7 +66,7 @@ module TLAW
       @client = Faraday.new do |faraday|
         faraday.use FaradayMiddleware::FollowRedirects
         faraday.adapter Faraday.default_adapter
-        block.call(faraday) if block
+        block&.call(faraday)
       end
     end
 

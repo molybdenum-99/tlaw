@@ -1,6 +1,6 @@
 RSpec.describe TLAW::APIPath do
   def param(name, **arg)
-    TLAW::Params::Param.new(name: name, **arg)
+    TLAW::Param.new(name: name, **arg)
   end
 
   let(:parent_cls) {
@@ -9,11 +9,10 @@ RSpec.describe TLAW::APIPath do
   }
 
   describe '.define' do
-    subject { described_class.define(**args) }
+    subject(:cls) { described_class.define(**args) }
 
     let(:args) {
       {
-        parent: parent_cls,
         symbol: :foo,
         path: '/bar',
         description: 'Test.',
@@ -32,18 +31,32 @@ RSpec.describe TLAW::APIPath do
       is_expected.to have_attributes(
         symbol: :foo,
         path: '/bar',
-        url_template: 'http://example.com/{x}/bar',
         # description: 'Test.', -- hm...
         docs_link: 'http://google.com',
         param_defs: be_an(Array).and(have_attributes(size: 2)),
-        full_param_defs: be_an(Array).and(have_attributes(size: 4))
       )
     }
+
+    context 'without parent' do
+      it {
+        expect { cls.url_template }
+          .to raise_error RuntimeError, "Orphan path /bar, can't determine full URL"
+      }
+    end
+
+    context 'with parent' do
+      before { cls.parent = parent_cls }
+      it {
+        is_expected.to have_attributes(
+          url_template: 'http://example.com/{x}/bar',
+          full_param_defs: be_an(Array).and(have_attributes(size: 4))
+        )
+      }
+    end
   end
 
   let(:cls) {
     described_class.define(
-      parent: parent_cls,
       symbol: :bar,
       path: '/bar',
       param_defs: [
@@ -52,7 +65,7 @@ RSpec.describe TLAW::APIPath do
         param(:c, format: ->(t) { t.strftime('%Y-%m-%d') }),
         param(:d, type: {true => 't', false => 'f'})
       ]
-    )
+    ).tap { |res| res.parent = parent_cls }
   }
   let(:parent) { instance_double('TLAW::APIPath', prepared_params: {x: 'xxx'}) }
 

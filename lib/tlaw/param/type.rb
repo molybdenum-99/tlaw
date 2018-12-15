@@ -1,5 +1,5 @@
 module TLAW
-  class Params
+  class Param
     # @private
     class Type
       attr_reader :type
