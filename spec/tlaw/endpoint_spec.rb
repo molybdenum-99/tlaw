@@ -18,16 +18,18 @@ RSpec.describe TLAW::Endpoint do
 
   subject(:endpoint) { cls.new(parent, a: 1, b: 2) }
 
-  describe '#initialize' do
-    # params validation
-  end
-
   its(:url) { is_expected.to eq 'http://example.com/bar/foo' }
   its(:request_params) { are_expected.to eq(y: 'baz', a: '1', b: '2') }
 
-  # describe '#call' do
+  describe '#call' do
+    subject { endpoint.method(:call) }
 
-  # end
+    its_call {
+      is_expected
+        .to send_message(api, :request)
+        .with('http://example.com/bar/foo', y: 'baz', a: '1', b: '2')
+    }
+  end
 end
 
 __END__
