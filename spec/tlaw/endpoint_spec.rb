@@ -13,6 +13,17 @@ RSpec.describe TLAW::Endpoint do
       .define(symbol: :ep, path: '/foo', param_defs: param_defs)
       .tap { |cls| cls.parent = parent_class }
   }
+
+  describe 'formatting' do
+    subject { cls }
+    before {
+      allow(cls).to receive(:name).and_return('Endpoint')
+    }
+
+    its(:inspect) { is_expected.to eq 'Endpoint(call-sequence: ep(a: nil, b: nil); docs: .describe)' }
+  end
+
+
   let(:param_defs) { [param(:a), param(:b)] }
   let(:parent) { instance_double('TLAW::ApiPath', prepared_params: parent_params, api: api) }
   let(:api) { instance_double('TLAW::API', request: nil) }
@@ -22,6 +33,14 @@ RSpec.describe TLAW::Endpoint do
 
   its(:url) { is_expected.to eq 'http://example.com/bar/foo' }
   its(:request_params) { are_expected.to eq(y: 'baz', a: '1', b: '2') }
+
+  describe 'formatting' do
+    before {
+      allow(cls).to receive(:name).and_return('Endpoint')
+    }
+
+    its(:inspect) { is_expected.to eq '#<Endpoint(a: 1, b: 2); docs: .describe>' }
+  end
 
   describe '#call' do
     subject { endpoint.method(:call) }

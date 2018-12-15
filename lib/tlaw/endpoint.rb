@@ -31,6 +31,10 @@ module TLAW
       # def inspect
       #   Inspect.inspect_endpoint(self)
       # end
+
+      def inspect
+        Formatting::Inspect.endpoint_class(self)
+      end
     end
 
     attr_reader :url, :request_params
@@ -61,7 +65,11 @@ module TLAW
       api.request(url, **request_params) #, response_processor)
     end
 
-    def_delegators :self_class, :inspect, :describe
+    def inspect
+      Formatting::Inspect.endpoint(self)
+    end
+
+    def_delegators :self_class, :describe
 
     private
 
