@@ -4,7 +4,7 @@ module TLAW
   module DSL
     class EndpointBuilder < BaseBuilder
       def finalize
-        Class.new(Endpoint).tap { |cls| cls.setup!(definition) }
+        Endpoint.define(**definition)
       end
     end
   end

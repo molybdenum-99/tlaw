@@ -33,17 +33,20 @@ module TLAW
       end
     end
 
-    attr_reader :url_template
+    attr_reader :url, :request_params
 
     # Creates endpoint class (or  descendant) instance. Typically, you
     # never use it directly.
     #
     # Params defined in parent namespace are passed here.
     #
-    def initialize(parent = nil, **parent_params)
+    def initialize(parent, **params)
       super
 
-      @url_template = construct_template
+      template = Addressable::Template.new(url_template)
+
+      @url = template.expand(**prepared_params).to_s.yield_self(&method(:fix_slash))
+      @request_params = prepared_params.except(*template.keys.map(&:to_sym))
     end
 
     # Does the real call to the API, with all params passed to this method
@@ -54,36 +57,19 @@ module TLAW
     #
     # @return [Hash,Array] Parsed, flattened and post-processed response
     #   body.
-    def call(**params)
-      url = construct_url(**full_params(params))
-      api.request(url, self.class.response_processor)
+    def call
+      api.request(url, **request_params) #, response_processor)
     end
 
-    def_delegators :object_class, :inspect, :describe
+    def_delegators :self_class, :inspect, :describe
 
     private
 
-    def full_params(**params)
-      @parent_params.merge(params.reject { |_, v| v.nil? })
-    end
+    def_delegators :self_class, :url_template
 
-    def construct_template
-      url = self.class.base_url
-      params = self.class.param_set.all_params.values.map(&:field).map(&:to_s) -
-          Addressable::Template.new(url).keys
-      joiner = url.include?('?') ? '&' : '?'
-      tpl = params.empty? ? url : url + joiner + params.join(',')
-      Addressable::Template.new(tpl)
-    end
-
-    def construct_url(**params)
-      url_params = self.class.param_set.process(**params)
-      @url_template
-        .expand(url_params).normalize.to_s
-        .yield_self(&method(:fix_slash))
-    end
-
-    # Fix params substitution: if it was in path part, we shouldn't have escape "/"
+    # Fix params substitution: if it was in path part, we shouldn't have escaped "/"
+    # E.g. for template "http://google.com/{foo}/bar", and foo="some/path", Addressable would
+    # produce "http://google.com/some%2fpath/bar", but we want "http://google.com/some/path/bar"
     def fix_slash(url)
       url, query = url.split('?', 2)
       url.gsub!('%2F', '/')

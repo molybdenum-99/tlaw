@@ -1,41 +1,33 @@
-module TLAW
-  describe Endpoint do
-    describe '.define' do
-      subject { described_class.define(**args) }
-      let(:args) {
-        {
-          symbol: :foo,
-          path: '/bar',
-          description: 'Test.',
-          docs: 'http://google.com',
-          params: [
-            Param.new(:a),
-            Param.new(b, keyword: false, required: true)
-          ]
-
-          {
-            a: {},
-            b: {keyword: false, required: true},
-            c: {type: Integer}
-          }
-        }
-      }
-      it { is_expected.to be_a(Class).and be.<(described_class) }
-      its(:definition) {
-        is_expected.to eq args
-      }
-      it {
-        is_expected.to have_attributes(
-          symbol: :foo,
-          path: '/bar',
-          description: 'Test.',
-          docs: 'http://google.com'
-        )
-      }
-    end
-
-    describe '#call'
+RSpec.describe TLAW::Endpoint do
+  def param(name, **arg)
+    TLAW::Params::Param.new(name: name, **arg)
   end
+
+  let(:parent_class) {
+    class_double('TLAW::ApiPath',
+      url_template: 'http://example.com/{x}', full_param_defs: [param(:x), param(:y)])
+  }
+
+  let(:cls) {
+    described_class.define(parent: parent_class, symbol: :ep, path: '/foo', param_defs: param_defs)
+  }
+  let(:param_defs) { [param(:a), param(:b)] }
+  let(:parent) { instance_double('TLAW::ApiPath', prepared_params: parent_params, api: api) }
+  let(:api) { instance_double('TLAW::API', request: nil) }
+  let(:parent_params) { {x: 'bar', y: 'baz'} }
+
+  subject(:endpoint) { cls.new(parent, a: 1, b: 2) }
+
+  describe '#initialize' do
+    # params validation
+  end
+
+  its(:url) { is_expected.to eq 'http://example.com/bar/foo' }
+  its(:request_params) { are_expected.to eq(y: 'baz', a: '1', b: '2') }
+
+  # describe '#call' do
+
+  # end
 end
 
 __END__

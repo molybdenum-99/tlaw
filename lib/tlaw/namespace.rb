@@ -130,7 +130,7 @@ module TLAW
       end
     end
 
-    def_delegators :object_class,
+    def_delegators :self_class,
                    :symbol, :name_to_call,
                    :child_index, :children, :namespaces, :endpoint, :endpoints,
                    :param_set, :describe_short

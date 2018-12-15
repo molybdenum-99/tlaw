@@ -24,5 +24,13 @@ RSpec.describe TLAW::DSL::EndpointBuilder do
         }
       )
     }
+    its(:params) { are_expected.to be_a(TLAW::Params) }
+    its(:'params.list') {
+      is_expected.to match contain_exactly(
+        have_attributes(name: :baz, keyword?: false),
+        have_attributes(name: :foo, keyword?: true, type: TLAW::Params::ClassType.new(Integer)),
+        have_attributes(name: :quux, type: TLAW::Params::Type.default_type)
+      )
+    }
   end
 end

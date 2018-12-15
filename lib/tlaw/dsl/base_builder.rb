@@ -10,20 +10,12 @@ module TLAW
       end
 
       def docs(link)
-        @definition[:docs] = link
+        @definition[:docs_link] = link
         self
       end
 
       def description(text)
-        # first, remove spaces at a beginning of each line
-        # then, remove empty lines before and after docs block
-        #
-        # FIXME: It is just a loose imitation of Ruby 2.3's "squiggly heredoc". Maybe we don't need
-        # it anymore?..
-        @definition[:description] =
-          text
-          .gsub(/^[ \t]+/, '')
-          .gsub(/\A\n|\n\s*\Z/, '')
+        @definition[:description] = text
         self
       end
 
