@@ -23,6 +23,10 @@ module TLAW
         end
       end
 
+      def is_defined?
+        !symbol.nil?
+      end
+
       def full_param_defs
         [*parent&.full_param_defs, *param_defs]
       end

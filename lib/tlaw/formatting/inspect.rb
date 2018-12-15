@@ -6,7 +6,7 @@ module TLAW
       def endpoint(object)
         "#<#{object.class.name}(" +
           object.params.map { |name, val| "#{name}: #{val.inspect}" }.join(', ') +
-          "); docs: .describe>"
+          '); docs: .describe>'
       end
 
       def endpoint_class(klass)

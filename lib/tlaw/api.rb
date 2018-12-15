@@ -67,11 +67,6 @@ module TLAW
         super.sub(/\A./, '')
       end
 
-      # @private
-      def name_to_call
-        "#{name || '(unnamed API class)'}.new"
-      end
-
       protected
 
       attr_writer :url_template

@@ -8,6 +8,7 @@ RSpec.describe TLAW::Namespace do
       described_class.define(
         symbol: :ns,
         path: '/ns',
+        param_defs: [param(:a), param(:b)],
         children: [
           TLAW::Endpoint.define(symbol: :ep1, path: '/ep1'),
           TLAW::Namespace.define(symbol: :ns1, path: '/ns1')
@@ -22,6 +23,14 @@ RSpec.describe TLAW::Namespace do
           be.<(TLAW::Namespace).and(have_attributes(symbol: :ns1, parent: cls)),
         ]
       }
+
+    before {
+      allow(cls).to receive(:name).and_return('Namespace')
+    }
+
+    its(:inspect) {
+      is_expected.to eq 'Namespace(call-sequence: ns(a: nil, b: nil); namespaces: ns1; endpoints: ep1; docs: .describe)'
+    }
   end
 
   describe '#child' do

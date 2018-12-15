@@ -4,7 +4,7 @@ module TLAW
 
     def call_sequence(klass)
       params = params_to_ruby(klass.param_defs)
-      name = klass.is_a?(TLAW::API) ? "{klass.name}.new" : klass.symbol.to_s
+      name = klass < API ? "#{klass.name}.new" : klass.symbol.to_s
       params.empty? ? name : "#{name}(#{params})"
     end
 
@@ -15,10 +15,10 @@ module TLAW
 
       # FIXME: default.inspect will fail with, say, Time
       [
-        *req_arg.map { |p| "#{p.name}" },
+        *req_arg.map { |p| p.name.to_s },
         *opt_arg.map { |p| "#{p.name}=#{p.default.inspect}" },
         *req_key.map { |p| "#{p.name}:" },
-        *opt_key.map { |p| "#{p.name}: #{p.default.inspect}"}
+        *opt_key.map { |p| "#{p.name}: #{p.default.inspect}" }
       ].join(', ')
     end
   end

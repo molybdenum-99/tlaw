@@ -28,11 +28,8 @@ module TLAW
       # some_api.some_namespace.endpoint(:my_endpoint)
       # # => <SomeApi::SomeNamespace::MyEndpoint call-sequence: my_endpoint(param1, param2: nil), docs: .describe>
       # ```
-      # def inspect
-      #   Inspect.inspect_endpoint(self)
-      # end
-
       def inspect
+        return super unless is_defined?
         Formatting::Inspect.endpoint_class(self)
       end
     end

@@ -1,8 +1,12 @@
 RSpec.describe TLAW::API do
   describe '.define' do
+    def param(name, **arg)
+      TLAW::Param.new(name: name, **arg)
+    end
+
     context 'with keywords' do
       subject(:cls) {
-        described_class.define(base_url: 'http://foo/{bar}')
+        described_class.define(base_url: 'http://foo/{bar}', param_defs: [param(:x)])
       }
       it {
         is_expected.to have_attributes(
@@ -11,7 +15,10 @@ RSpec.describe TLAW::API do
           path: ''
         )
       }
+      before { allow(cls).to receive(:name).and_return('MyAPI') }
+      its(:inspect) { is_expected.to eq 'MyAPI(call-sequence: MyAPI.new(x: nil); docs: .describe)' }
     end
+
 
     context 'with block (DSL)'
   end

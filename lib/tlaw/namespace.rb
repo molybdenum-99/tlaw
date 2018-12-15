@@ -92,9 +92,10 @@ module TLAW
         child(name, restrict_to: Endpoint)
       end
 
-      # def inspect
-      #   Inspect.inspect_namespace(self)
-      # end
+      def inspect
+        return super unless is_defined? || self < API
+        Formatting::Inspect.namespace_class(self)
+      end
 
       # @private
       def children
