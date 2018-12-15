@@ -28,9 +28,9 @@ module TLAW
       # some_api.some_namespace.endpoint(:my_endpoint)
       # # => <SomeApi::SomeNamespace::MyEndpoint call-sequence: my_endpoint(param1, param2: nil), docs: .describe>
       # ```
-      def inspect
-        Inspect.inspect_endpoint(self)
-      end
+      # def inspect
+      #   Inspect.inspect_endpoint(self)
+      # end
     end
 
     attr_reader :url, :request_params

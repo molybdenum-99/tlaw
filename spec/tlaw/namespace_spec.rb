@@ -1,15 +1,51 @@
 RSpec.describe TLAW::Namespace do
-  describe '.define' do
+  def param(name, **arg)
+    TLAW::Param.new(name: name, **arg)
   end
 
-  describe '#child' do
-    let(:cls) {
+  describe '.define' do
+    subject(:cls) {
       described_class.define(
-        parent: parent_cls,
+        symbol: :ns,
+        path: '/ns',
         children: [
+          TLAW::Endpoint.define(symbol: :ep1, path: '/ep1'),
+          TLAW::Namespace.define(symbol: :ns1, path: '/ns1')
         ]
       )
     }
+
+    its(:children) {
+      are_expected
+        .to match [
+          be.<(TLAW::Endpoint).and(have_attributes(symbol: :ep1, parent: cls)),
+          be.<(TLAW::Namespace).and(have_attributes(symbol: :ns1, parent: cls)),
+        ]
+      }
+  end
+
+  describe '#child' do
+    let(:ep) {
+      TLAW::Endpoint.define(symbol: :ep1, path: '/ep1', param_defs: [param(:x)])
+    }
+    let(:ns) {
+      TLAW::Namespace.define(symbol: :ns1, path: '/ns1', param_defs: [param(:x)])
+    }
+    let(:parent_cls) { class_double('TLAW::APIPath', url_template: 'http://foo/bar') }
+    let(:cls) {
+      described_class.define(
+        symbol: :ns,
+        path: '/ns',
+        children: [ep, ns]
+      ).tap { |c| c.parent = parent_cls }
+    }
+    let(:obj) { cls.new(nil) }
+
+    subject { obj.method(:child) }
+
+    its_call(:ep1, TLAW::Endpoint, x: 1) { is_expected.to ret be_a(ep).and have_attributes(params: {x: 1}) }
+    its_call(:ep1, TLAW::Namespace, x: 1) { is_expected.to raise_error ArgumentError, "Unregistered namespace: ep1" }
+    its_call(:ns1, TLAW::Namespace, x: 1) { is_expected.to ret be_a(ns).and have_attributes(params: {x: 1}) }
   end
 end
 

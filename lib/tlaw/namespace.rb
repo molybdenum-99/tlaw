@@ -31,6 +31,13 @@ module TLAW
   #
   class Namespace < APIPath
     class << self
+
+      def define(children: [], **args)
+        super(**args).tap do |cls|
+          cls.children = children.dup.each { |c| c.parent = cls }
+        end
+      end
+
       # @private
       def base_url=(url)
         @base_url = url
@@ -95,20 +102,9 @@ module TLAW
         child(name, restrict_to: Endpoint)
       end
 
-      def inspect
-        Inspect.inspect_namespace(self)
-      end
-
-      def children=(children)
-        children.each(&method(:add_child))
-      end
-
-      # @private
-      def add_child(child)
-        child_index[child.symbol] = child
-
-        child.base_url = base_url + child.path if !child.base_url && base_url
-      end
+      # def inspect
+      #   Inspect.inspect_namespace(self)
+      # end
 
       # @private
       def children
@@ -128,6 +124,14 @@ module TLAW
       def describe
         Inspect.describe_namespace(self)
       end
+
+      protected
+
+      def children=(children)
+        children.each do |child|
+          child_index[child.symbol] = child
+        end
+      end
     end
 
     def_delegators :self_class,
@@ -135,24 +139,26 @@ module TLAW
                    :child_index, :children, :namespaces, :endpoint, :endpoints,
                    :param_set, :describe_short
 
-    def inspect
-      Inspect.inspect_namespace(self.class, @parent_params)
-    end
+    # def inspect
+    #   Inspect.inspect_namespace(self.class, @parent_params)
+    # end
 
-    def describe
-      Inspect.describe_namespace(self.class, @parent_params)
-    end
+    # def describe
+    #   Inspect.describe_namespace(self.class, @parent_params)
+    # end
 
     private
 
-    def child(symbol, expected_class, **params)
-      child_index[symbol]
-        .tap do |child_class|
-          child_class && child_class < expected_class or
-            fail ArgumentError,
-                 "Unregistered #{expected_class.name.downcase}: #{symbol}"
-        end
-        .new(self, **@parent_params, **params)
+    def child(sym, expected_class, **params)
+      child_index[sym]
+        .tap { |child_class| validate_class(sym, child_class, expected_class) }
+        .new(self, **params)
+    end
+
+    def validate_class(sym, child_class, expected_class)
+      return if child_class < expected_class
+      fail ArgumentError,
+           "Unregistered #{expected_class.name.split('::').last.downcase}: #{sym}"
     end
   end
 end

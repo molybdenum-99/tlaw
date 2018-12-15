@@ -60,9 +60,9 @@ module TLAW
       attr_writer :symbol, :param_defs, :path, :description, :xml, :docs_link
     end
 
-    include HasParent
-
     extend Forwardable
+
+    attr_reader :parent, :params
 
     def initialize(parent, **params)
       @parent = parent
@@ -71,6 +71,10 @@ module TLAW
 
     def prepared_params
       (parent&.prepared_params || {}).merge(prepare_params(@params))
+    end
+
+    def parents
+      Util.parents(self)
     end
 
     private
@@ -85,7 +89,7 @@ module TLAW
         .map { |dfn| [dfn, arguments[dfn.name]] }
         .reject { |_, v| v.nil? }
         .map { |dfn, arg| dfn.(arg) }
-        .inject(&:merge)
+        .inject(&:merge) || {}
     end
 
     def guard_unknown!(arguments)

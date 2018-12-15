@@ -1,6 +1,6 @@
 RSpec.describe TLAW::Endpoint do
   def param(name, **arg)
-    TLAW::Params::Param.new(name: name, **arg)
+    TLAW::Param.new(name: name, **arg)
   end
 
   let(:parent_class) {
