@@ -1,3 +1,42 @@
+RSpec.describe TLAW::API do
+  describe '.define' do
+    context 'with keywords' do
+      subject(:cls) {
+        described_class.define(base_url: 'http://foo/{bar}')
+      }
+      it {
+        is_expected.to have_attributes(
+          url_template: 'http://foo/{bar}',
+          symbol: nil,
+          path: ''
+        )
+      }
+    end
+
+    context 'with block (DSL)'
+  end
+
+  let(:cls) {
+    described_class.define(base_url: 'http://foo/{bar}')
+  }
+
+  describe '#initialize' do
+    it {
+      expect { |b| cls.new(&b) }.to yield_with_args(instance_of(Faraday::Connection))
+    }
+  end
+
+  describe '#request' do
+    let(:api) { cls.new }
+    subject { api.request('http://foo/bar?x=1', y: 2) }
+
+    its_block {
+      is_expected.to get_webmock('http://foo/bar?x=1&y=2').and_return('{}')
+    }
+  end
+end
+
+__END__
 module TLAW
   describe API do
     let(:api_class) {

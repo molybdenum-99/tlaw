@@ -31,19 +31,9 @@ module TLAW
   #
   class Namespace < APIPath
     class << self
-
       def define(children: [], **args)
         super(**args).tap do |cls|
           cls.children = children.dup.each { |c| c.parent = cls }
-        end
-      end
-
-      # @private
-      def base_url=(url)
-        @base_url = url
-
-        children.each do |c|
-          c.base_url = base_url + c.path if c.path && !c.base_url
         end
       end
 

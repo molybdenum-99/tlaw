@@ -45,6 +45,10 @@ Style/FormatString:
 Metrics/ParameterLists:
   CountKeywordArgs: false
 
+# Experimenting with "what'll look more natural"
+Style/LambdaCall:
+  Enabled: false
+
 # see http://zverok.github.io/blog/2016-02-23-control-flow.html
 Style/AndOr:
   Enabled: false

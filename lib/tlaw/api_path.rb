@@ -32,7 +32,7 @@ module TLAW
       end
 
       def url_template
-        parent&.url_template or fail RuntimeError, "Orphan path #{path}, can't determine full URL"
+        parent&.url_template or fail "Orphan path #{path}, can't determine full URL"
         [parent.url_template, path].join
       end
 

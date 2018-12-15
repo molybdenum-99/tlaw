@@ -33,9 +33,22 @@ module TLAW
     end
 
     class << self
+      attr_reader :url_template
+      private :parent, :parent=
+
       # Runs the {DSL} inside your API wrapper class.
-      def define(&block)
-        DSL::APIWrapper.new(self).define(&block)
+      def define(**args, &block)
+        (args.any? && block) ||
+          (args.none? && !block) and
+          fail ArgumentError, 'Either keyword arguments or block should be passed'
+
+        if args.any?
+          url = args.fetch(:base_url) { fail ArgumentError, 'base_url not specified' }
+          args = args.except(:base_url).merge(symbol: nil, path: '')
+          super(**args).tap { |cls| cls.url_template = url }
+        else
+          DSL::APIWrapper.new(self).define(&block)
+        end
       end
 
       # Returns detailed description of an API, like this:
@@ -58,10 +71,16 @@ module TLAW
       def name_to_call
         "#{name || '(unnamed API class)'}.new"
       end
+
+      protected
+
+      attr_writer :url_template
     end
 
-    def initialize(*args, &block)
-      super(*args)
+    private :parent
+
+    def initialize(**params, &block)
+      super(nil, **params)
 
       @client = Faraday.new do |faraday|
         faraday.use FaradayMiddleware::FollowRedirects
@@ -70,15 +89,15 @@ module TLAW
       end
     end
 
-    def request(url, response_processor)
-      @client.get(url).yield_self do |response|
+    def request(url, **params)
+      @client.get(url, **params).yield_self do |response|
         guard_errors!(response)
-        parse(response.body, response_processor)
+        parse(response.body)
+        # parse(response.body, response_processor)
       end
     rescue API::Error
       raise # Not catching in the next block
     rescue StandardError => e
-      raise unless url
       raise API::Error, "#{e.class} at #{url}: #{e.message}"
     end
 
@@ -94,13 +113,17 @@ module TLAW
            (message ? ': ' + message : '')
     end
 
-    def parse(body, response_processor)
-      # TODO: xml is part of "response processing chain"
-      if self.class.xml
-        Crack::XML.parse(body)
-      else
-        JSON.parse(body)
-      end.yield_self { |response| response_processor.process(response) }
+    def parse(body)
+      JSON.parse(body) # FIXME: symbolize_keys?..
     end
+
+    # def parse(body, response_processor)
+    #   # TODO: xml is part of "response processing chain"
+    #   if self.class.xml
+    #     Crack::XML.parse(body)
+    #   else
+    #     JSON.parse(body)
+    #   end.yield_self { |response| response_processor.process(response) }
+    # end
   end
 end
