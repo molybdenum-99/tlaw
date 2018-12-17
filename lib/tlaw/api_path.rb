@@ -13,13 +13,9 @@ module TLAW
       attr_reader :symbol, :parent, :path, :param_defs, :docs_link
       attr_writer :parent
 
-      def define(symbol:, path:, param_defs: [], description: nil, docs_link: nil)
+      def define(**args)
         Class.new(self).tap do |subclass|
-          subclass.symbol = symbol
-          subclass.path = path
-          subclass.param_defs = param_defs
-          subclass.description = description
-          subclass.docs_link = docs_link
+          subclass.setup(**args)
         end
       end
 
@@ -61,6 +57,15 @@ module TLAW
 
       protected
 
+      def setup(symbol:, path:, param_defs: [], description: nil, docs_link: nil)
+        self.symbol = symbol
+        self.path = path
+        self.param_defs = param_defs
+        self.description = description
+        self.param_defs = param_defs
+      end
+
+
       attr_writer :symbol, :param_defs, :path, :description, :xml, :docs_link
     end
 
@@ -79,6 +84,10 @@ module TLAW
 
     def parents
       Util.parents(self)
+    end
+
+    def api
+      is_a?(API) ? self : parent&.api
     end
 
     private
@@ -106,10 +115,6 @@ module TLAW
       required_param_defs.map(&:name).-(arguments.keys).yield_self { |missing|
         missing.empty? or fail ArgumentError, "Missing arguments: #{missing.join(', ')}"
       }
-    end
-
-    def api
-      is_a?(API) ? self : parent&.api
     end
 
     # For def_delegators

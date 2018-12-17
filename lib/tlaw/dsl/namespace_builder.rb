@@ -48,14 +48,16 @@ module TLAW
       end
 
       def finalize
-        Namespace.define(**definition).tap do |cls|
-          children.each do |child|
-            cls.module_eval(child_method_code(child))
-          end
-        end
+        Namespace.define(**definition).tap(&method(:define_children_methods))
       end
 
       private
+
+      def define_children_methods(namespace)
+        children.each do |child|
+          namespace.module_eval(child_method_code(child))
+        end
+      end
 
       def child_method_code(child)
         params = child.param_defs.map { |par| "#{par.name}: #{par.name}" }.join(', ')

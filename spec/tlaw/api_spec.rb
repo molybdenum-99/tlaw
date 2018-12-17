@@ -1,9 +1,5 @@
 RSpec.describe TLAW::API do
   describe '.define' do
-    def param(name, **arg)
-      TLAW::Param.new(name: name, **arg)
-    end
-
     context 'with keywords' do
       subject(:cls) {
         described_class.define(base_url: 'http://foo/{bar}', param_defs: [param(:x)])
@@ -19,8 +15,17 @@ RSpec.describe TLAW::API do
       its(:inspect) { is_expected.to eq 'MyAPI(call-sequence: MyAPI.new(x: nil); docs: .describe)' }
     end
 
-
-    context 'with block (DSL)'
+    context 'with block (DSL)' do
+      subject(:cls) { Class.new(described_class) }
+      before {
+        cls.define do
+          endpoint :a
+          namespace :b
+        end
+      }
+      its(:endpoints) { is_expected.to contain_exactly(be.<(TLAW::Endpoint).and have_attributes(symbol: :a))}
+      its(:namespaces) { is_expected.to contain_exactly(be.<(TLAW::Namespace).and have_attributes(symbol: :b))}
+    end
   end
 
   let(:cls) {

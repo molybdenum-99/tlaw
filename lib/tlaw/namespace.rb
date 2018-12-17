@@ -31,12 +31,6 @@ module TLAW
   #
   class Namespace < APIPath
     class << self
-      def define(children: [], **args)
-        super(**args).tap do |cls|
-          cls.children = children.dup.each { |c| c.parent = cls }
-        end
-      end
-
       RESTRICTION = {
         endpoints: Endpoint,
         namespaces: Namespace,
@@ -117,6 +111,11 @@ module TLAW
       end
 
       protected
+
+      def setup(children: [], **args)
+        super(**args)
+        self.children = children.dup.each { |c| c.parent = self }
+      end
 
       def children=(children)
         children.each do |child|

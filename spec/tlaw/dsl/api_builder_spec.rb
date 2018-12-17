@@ -5,6 +5,8 @@ RSpec.describe TLAW::DSL::ApiBuilder do
     let(:api) { Class.new(TLAW::API) }
     let(:builder) {
       described_class.new(api) do
+        base 'http://google.com'
+
         namespace :foo do
           endpoint :bar do
           end
@@ -13,6 +15,8 @@ RSpec.describe TLAW::DSL::ApiBuilder do
     }
 
     subject { builder.finalize }
+
+    its(:base_url) { 'http://google.com' }
 
     context 'when built for existing class' do
       before do

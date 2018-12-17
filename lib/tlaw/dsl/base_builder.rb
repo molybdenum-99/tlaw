@@ -24,8 +24,11 @@ module TLAW
         self
       end
 
-      def param(name, type = nil, **opts)
+      alias desc description
+
+      def param(name, type = nil, enum: nil, **opts)
         opts = opts.merge(type: type) if type
+        opts = opts.merge(type: enum_type(enum)) if enum
         params.merge!(name => opts) { |_, o, n| o.merge(n) }
         self
       end
@@ -34,7 +37,21 @@ module TLAW
         fail NotImplementedError, "#{self.class} doesn't implement #finalize"
       end
 
+      def post_process(*) end
+      def post_process_items(*) end
+
       private
+
+      def enum_type(enum)
+        case enum
+        when Hash
+          enum
+        when Enumerable # well... in fact respond_to?(:each) probably will do
+          enum.map { |v| [v, v] }.to_h
+        else
+          fail ArgumentError, "Can't construct enum from #{enum.inspect}"
+        end
+      end
 
       def params_from_path(path)
         Addressable::Template.new(path).keys.map { |key| [key.to_sym, keyword: false] }.to_h

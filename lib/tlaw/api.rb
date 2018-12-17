@@ -47,8 +47,15 @@ module TLAW
           args = args.except(:base_url).merge(symbol: nil, path: '')
           super(**args).tap { |cls| cls.url_template = url }
         else
-          DSL::APIWrapper.new(self).define(&block)
+          DSL::ApiBuilder.new(self, &block).finalize
+          self
         end
+      end
+
+      def setup(base_url: nil, **args)
+        base_url or fail ArgumentError, "API can't be defined without base_url"
+        self.url_template = base_url
+        super(**args)
       end
 
       # Returns detailed description of an API, like this:
