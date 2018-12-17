@@ -33,10 +33,10 @@ module TLAW
   module Examples
     class UrbanDictionary < TLAW::API
       define do
-        desc %Q{
+        desc <<~D
           Really small API. Described as "official but undocumented"
           by some.
-        }
+        D
 
         base 'http://api.urbandictionary.com/v0'
 

@@ -109,7 +109,8 @@ module TLAW
       #
       # @return [Util::Description]
       def describe
-        Inspect.describe_namespace(self)
+        return '' unless is_defined?
+        Formatting::Describe.namespace_class(self)
       end
 
       protected

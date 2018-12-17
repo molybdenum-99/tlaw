@@ -60,6 +60,10 @@ module TLAW
         super(**args)
       end
 
+      def is_defined?
+        self < API
+      end
+
       # Returns detailed description of an API, like this:
       #
       # ```ruby

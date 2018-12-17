@@ -91,6 +91,8 @@ module TLAW
       is_a?(API) ? self : parent&.api
     end
 
+    def_delegators :self_class, :describe
+
     private
 
     def_delegators :self_class, :param_defs, :required_param_defs

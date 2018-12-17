@@ -31,6 +31,7 @@ RSpec.describe TLAW::Namespace do
     its(:inspect) {
       is_expected.to eq 'Namespace(call-sequence: ns(a: nil, b: nil); namespaces: ns1; endpoints: ep1; docs: .describe)'
     }
+    its(:describe) { is_expected.to be_a String }
   end
 
   describe '#child' do

@@ -27,3 +27,4 @@ module TLAW
 end
 
 require_relative 'formatting/inspect'
+require_relative 'formatting/describe'
