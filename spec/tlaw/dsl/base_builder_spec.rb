@@ -24,10 +24,7 @@ RSpec.describe TLAW::DSL::BaseBuilder do
 
   describe '#description' do
     subject { builder.method(:description) }
-    its_call(%Q{
-      Very detailed and thoroughful
-      description.
-    }) {
+    its_call("Very detailed and thoroughful\ndescription.") {
       is_expected.to change(builder, :definition).to include(description: "Very detailed and thoroughful\ndescription.")
     }
   end
@@ -35,7 +32,7 @@ RSpec.describe TLAW::DSL::BaseBuilder do
   describe '#docs' do
     subject { builder.method(:docs) }
     its_call('https://google.com') {
-      is_expected.to change(builder, :definition).to include(docs: 'https://google.com')
+      is_expected.to change(builder, :definition).to include(docs_link: 'https://google.com')
     }
   end
 

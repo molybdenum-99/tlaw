@@ -1,12 +1,17 @@
 module TLAW
   module DSL
     class BaseBuilder
-      attr_reader :definition
+      attr_reader :params
 
-      def initialize(name:, path: nil, **opts, &block)
-        path ||= "/#{name}" # Not default arg, because we need to process explicitly passed path: nil, too
-        @definition = {name: name, path: path, params: params_from_path(path)}
+      def initialize(symbol:, path: nil, **opts, &block)
+        path ||= "/#{symbol}" # Not default arg, because we need to process explicitly passed path: nil, too
+        @definition = {symbol: symbol, path: path, }
+        @params = params_from_path(path)
         instance_eval(&block) if block
+      end
+
+      def definition
+        @definition.merge(param_defs: params.map { |name, **opts| Param.new(name: name, **opts)})
       end
 
       def docs(link)
@@ -21,8 +26,7 @@ module TLAW
 
       def param(name, type = nil, **opts)
         opts = opts.merge(type: type) if type
-        @definition[:params] ||= {}
-        @definition[:params].merge!(name => opts) { |_, o, n| o.merge(n) }
+        params.merge!(name => opts) { |_, o, n| o.merge(n) }
         self
       end
 

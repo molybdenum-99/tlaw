@@ -4,10 +4,14 @@ module TLAW
     class Type
       attr_reader :type
 
+      def self.default_type
+        @default_type ||= Type.new(nil)
+      end
+
       def self.coerce(type = nil)
         case type
         when nil
-          new(nil)
+          default_type
         when Type
           type
         when Class
@@ -23,6 +27,10 @@ module TLAW
 
       def initialize(type)
         @type = type
+      end
+
+      def ==(other)
+        other.is_a?(self.class) && other.type == type
       end
 
       def to_doc_type
