@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TLAW
   # This module is core of a TLAW API definition. It works like this:
   #
@@ -407,7 +409,6 @@ end
 # require_relative 'dsl/endpoint_wrapper'
 # require_relative 'dsl/namespace_wrapper'
 # require_relative 'dsl/post_process_proxy'
-
 
 require_relative 'dsl/api_builder'
 require_relative 'dsl/base_builder'

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TLAW
   # Basically, just a 2-d array with column names. Or you can think of
   # it as an array of hashes. Or loose DataFrame implementation.

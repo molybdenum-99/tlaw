@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'faraday'
 require 'faraday_middleware'
 require 'addressable/template'
@@ -48,7 +50,7 @@ module TLAW
 
       @url = template.expand(**prepared_params).to_s.yield_self(&method(:fix_slash))
       url_keys = template.keys.map(&:to_sym)
-      @request_params = prepared_params.reject { |k, | url_keys.include?(k) }
+      @request_params = prepared_params.reject { |k,| url_keys.include?(k) }
     end
 
     # Does the real call to the API, with all params passed to this method
@@ -60,7 +62,7 @@ module TLAW
     # @return [Hash,Array] Parsed, flattened and post-processed response
     #   body.
     def call
-      api.request(url, **request_params) #, response_processor)
+      api.request(url, **request_params) # , response_processor)
     end
 
     def inspect

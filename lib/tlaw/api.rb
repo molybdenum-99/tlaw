@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TLAW
   # API is just a top-level {Namespace}.
   #

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TLAW
   module Util
     module_function
@@ -35,7 +37,7 @@ module TLAW
     # TLAW uses it when responds to {APIPath.describe}.
     #
     class Description < String
-      alias_method :inspect, :to_s
+      alias inspect to_s
 
       def initialize(str)
         super(str.to_s.gsub(/ +\n/, "\n"))

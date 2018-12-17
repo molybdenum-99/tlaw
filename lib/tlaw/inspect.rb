@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TLAW
   module Inspect
     def inspect_endpoint(klass)
@@ -70,7 +72,6 @@ module TLAW
     end
 
     private
-
 
     def describe_short(klass)
       ".#{call_sequence(klass)}"

@@ -8,15 +8,14 @@ AllCops:
   Exclude:
     - 'examples/**/*'
     - 'samples/**/*'
+    - lib/tlaw/params/set.rb
+    - lib/tlaw/params/base.rb
+    - lib/tlaw/dsl/*_wrapper.rb
     - 'tmp/**/*'
     - 'Rakefile'
     - '*.gemspec'
     - 'Gemfile'
   DisplayCopNames: true
-
-# Ruby 2.3+
-FrozenStringLiteralComment:
-  Enabled: false
 
 # My personal style
 # -----------------
@@ -26,9 +25,6 @@ Style/MultilineBlockChain:
 
 Layout/SpaceInsideHashLiteralBraces:
   EnforcedStyle: no_space
-
-Style/Alias:
-  EnforcedStyle: prefer_alias_method
 
 Style/SignalException:
   EnforcedStyle: semantic

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TLAW
   MAJOR = 0
   MINOR = 0

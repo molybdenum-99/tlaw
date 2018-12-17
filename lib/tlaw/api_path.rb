@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # require_relative 'params/set'
 require_relative 'has_parent'
 require 'forwardable'
@@ -64,7 +66,6 @@ module TLAW
         self.description = description
         self.param_defs = param_defs
       end
-
 
       attr_writer :symbol, :param_defs, :path, :description, :xml, :docs_link
     end

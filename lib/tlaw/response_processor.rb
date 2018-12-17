@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TLAW
   # @private
   # FIXME: everything is awfully dirty here

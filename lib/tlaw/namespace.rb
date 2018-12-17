@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TLAW
   # Namespace is basically a container for {Endpoint}s. It allows to
   # nest Ruby calls (like `api.namespace1.namespace2.real_call(params)`),

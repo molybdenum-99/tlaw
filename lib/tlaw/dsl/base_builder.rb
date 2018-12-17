@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TLAW
   module DSL
     class BaseBuilder
@@ -5,13 +7,13 @@ module TLAW
 
       def initialize(symbol:, path: nil, **opts, &block)
         path ||= "/#{symbol}" # Not default arg, because we need to process explicitly passed path: nil, too
-        @definition = {symbol: symbol, path: path, }
+        @definition = opts.merge(symbol: symbol, path: path)
         @params = params_from_path(path)
         instance_eval(&block) if block
       end
 
       def definition
-        @definition.merge(param_defs: params.map { |name, **opts| Param.new(name: name, **opts)})
+        @definition.merge(param_defs: params.map { |name, **opts| Param.new(name: name, **opts) })
       end
 
       def docs(link)
@@ -38,6 +40,7 @@ module TLAW
       end
 
       def post_process(*) end
+
       def post_process_items(*) end
 
       private
