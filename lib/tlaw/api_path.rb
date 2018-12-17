@@ -23,7 +23,7 @@ module TLAW
         end
       end
 
-      def is_defined?
+      def is_defined? # rubocop:disable Naming/PredicateName
         !symbol.nil?
       end
 

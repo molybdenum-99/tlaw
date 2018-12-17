@@ -8,14 +8,14 @@ module TLAW
 
       ENDPOINT_METHOD = <<~CODE
         def %{call_sequence}
-          child(:%{symbol}, Endpoint).call(%{params})
+          child(:%{symbol}, Endpoint, %{params}).call
         end
       CODE
 
       NAMESPACE_METHOD = <<~CODE
         def %{call_sequence}
           child(:%{symbol}, Namespace, %{params})
-        end'
+        end
       CODE
 
       METHODS = {Endpoint => ENDPOINT_METHOD, Namespace => NAMESPACE_METHOD}.freeze
@@ -29,35 +29,41 @@ module TLAW
         super.merge(children: children)
       end
 
-      def endpoint(name, path = nil, **opts, &block)
-        children << EndpointBuilder.new(name: name, path: path, parent: result_class, **opts, &block).finalize
+      def endpoint(symbol, path = nil, **opts, &block)
+        EndpointBuilder.new(
+          symbol: symbol,
+          path: path,
+          **opts,
+          &block
+        ).finalize.tap(&children.method(:push))
       end
 
-      def namespace(name, path = nil, **opts, &block)
-        children << NamespaceBuilder.new(name: name, path: path, parent: result_class, **opts, &block).finalize
+      def namespace(symbol, path = nil, **opts, &block)
+        NamespaceBuilder.new(
+          symbol: symbol,
+          path: path,
+          **opts,
+          &block
+        ).finalize.tap(&children.method(:push))
       end
 
       def finalize
-        result_class.tap do |cls|
-          cls.setup!(definition)
-          children.each do |child| define_child_method(cls, child) end
+        Namespace.define(**definition).tap do |cls|
+          children.each do |child|
+            cls.module_eval(child_method_code(child))
+          end
         end
       end
 
       private
 
-      def result_class
-        @result_class ||= Class.new(Namespace)
-      end
-
-      def define_child_method(host, child)
-        code = METHODS.fetch(child.ancestors[1]) % {
-          call_sequence: child.call_sequence,
+      def child_method_code(child)
+        params = child.param_defs.map { |par| "#{par.name}: #{par.name}" }.join(', ')
+        METHODS.fetch(child.ancestors[1]) % {
+          call_sequence: Formatting.call_sequence(child),
           symbol: child.symbol,
-          params: child.param_set.to_hash_code
+          params: params
         }
-
-        host.module_eval(code)
       end
     end
   end

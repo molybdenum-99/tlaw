@@ -1,8 +1,4 @@
 RSpec.describe TLAW::Endpoint do
-  def param(name, **arg)
-    TLAW::Param.new(name: name, **arg)
-  end
-
   let(:parent_class) {
     class_double('TLAW::ApiPath',
       url_template: 'http://example.com/{x}', full_param_defs: [param(:x), param(:y)])

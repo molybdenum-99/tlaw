@@ -113,3 +113,8 @@ RSpec::Matchers.define :define_constant do |name|
     @modules.count - 1 == @path.size
   end
 end
+
+def param(name, **arg)
+  TLAW::Param.new(name: name, **arg)
+end
+
