@@ -57,24 +57,18 @@ Style/PercentLiteralDelimiters:
   PreferredDelimiters:
     default: "{}"
 
+Metrics/LineLength:
+  Max: 100
+  IgnoredPatterns:
+    - '\#.*' # ignore long comments
+
 # That's just how things are here
 # -------------------------------
-
-Metrics/AbcSize:
-  Max: 18
-
-Metrics/CyclomaticComplexity:
-  Max: 7
 
 Metrics/MethodLength:
   Max: 15
 
 Lint/NonLocalExitFromIterator:
-  Enabled: false
-
-# Rubocop doesn't allow to "exclude comments" here, and good examples in
-# comments require really long lines.
-Metrics/LineLength:
   Enabled: false
 
 # Working on it!
@@ -96,8 +90,8 @@ Style/EmptyCaseCondition:
 Style/CommentAnnotation:
   Enabled: false
 
-Performance/RedundantBlockCall:
-  Enabled: false
+# Performance/RedundantBlockCall:
+#   Enabled: false
 
 Metrics/ClassLength:
   Enabled: false

@@ -60,7 +60,7 @@ module TLAW
         super(**args)
       end
 
-      def is_defined?
+      def is_defined? # rubocop:disable Naming/PredicateName
         self < API
       end
 

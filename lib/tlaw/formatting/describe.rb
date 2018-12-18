@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TLAW
   module Formatting
     module Describe
@@ -41,8 +43,8 @@ module TLAW
 
         "\n\n  #{title}:\n\n" +
           klasses.map(&method(:short))
-                  .map { |cd| indent(cd, '  ') }
-                  .join("\n\n")
+                 .map { |cd| indent(cd, '  ') }
+                 .join("\n\n")
       end
 
       def param_defs(defs)
@@ -54,15 +56,19 @@ module TLAW
       end
 
       def param_def(param)
-        res = ['@param', param.name]
-        res << doc_type(param.type)&.yield_self { |t| "[#{t}]" }
-        res << param.description
-        if param.type.respond_to?(:possible_values)
-          res << "\n  Possible values: #{param.type.possible_values}"
-        end
-        res << param.default&.yield_self { |d| "(default = #{d.inspect})" }
+        [
+          '@param',
+          param.name,
+          doc_type(param.type)&.yield_self { |t| "[#{t}]" },
+          param.description,
+          possible_values(param.type),
+          param.default&.yield_self { |d| "(default = #{d.inspect})" }
+        ].compact.join(' ').gsub(/ +\n/, "\n")
+      end
 
-        res.compact.join(' ').gsub(/ +\n/, "\n")
+      def possible_values(type)
+        return unless type.respond_to?(:possible_values)
+        "\n  Possible values: #{type.possible_values}"
       end
 
       def doc_type(type)

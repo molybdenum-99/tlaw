@@ -3,7 +3,6 @@
 # require_relative 'params/set'
 require_relative 'has_parent'
 require 'forwardable'
-require_relative 'inspect'
 
 module TLAW
   # Base class for all API pathes: entire API, namespaces and endpoints.

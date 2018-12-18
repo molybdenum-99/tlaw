@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'backports/2.5.0/kernel/yield_self'
+require 'backports/2.5.0/hash/transform_keys'
 require 'open-uri'
 require 'json'
 require 'addressable/uri'

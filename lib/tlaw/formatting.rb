@@ -10,7 +10,7 @@ module TLAW
       params.empty? ? name : "#{name}(#{params})"
     end
 
-    def params_to_ruby(params)
+    def params_to_ruby(params) # rubocop:disable Metrics/AbcSize
       key, arg = params.partition(&:keyword?)
       req_arg, opt_arg = arg.partition(&:required?)
       req_key, opt_key = key.partition(&:required?)

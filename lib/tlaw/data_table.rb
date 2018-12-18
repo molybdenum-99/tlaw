@@ -42,15 +42,11 @@ module TLAW
     #
     # @param hashes [Array<Hash>]
     def initialize(hashes)
-      hashes = hashes.each_with_index.map { |h, i|
-        h.is_a?(Hash) or
-          fail ArgumentError,
-               "All rows are expected to be hashes, row #{i} is #{h.class}"
-
-        h.map { |k, v| [k.to_s, v] }.to_h
-      }
+      hashes = hashes.each_with_index(&method(:enforce_hash!))
+                     .map { |h| h.transform_keys(&:to_s) }
       empty = hashes.map(&:keys).flatten.uniq.map { |k| [k, nil] }.to_h
-      hashes = hashes.map { |h| empty.merge(h) }
+      hashes = hashes.map(&empty.method(:merge))
+
       super(hashes)
     end
 
@@ -113,6 +109,13 @@ module TLAW
     # @private
     def pretty_print(printer)
       printer.text("#<#{self.class.name}[#{keys.join(', ')}] x #{size}>")
+    end
+
+    private
+
+    def enforce_hash!(val, idx)
+      val.is_a?(Hash) or fail ArgumentError,
+                              "All rows are expected to be hashes, row #{idx} is #{val.class}"
     end
   end
 end

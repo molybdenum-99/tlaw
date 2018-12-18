@@ -1,5 +1,5 @@
 module TLAW
-  describe DataTable do
+  RSpec.describe DataTable do
     let(:data) {
       [
         {a: 1, b: 'a', c: Date.parse('2016-01-01')},
