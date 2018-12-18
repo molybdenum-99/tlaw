@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'tlaw/param'
 
 RSpec.describe TLAW::Param do
@@ -6,6 +8,7 @@ RSpec.describe TLAW::Param do
 
     context 'with minimal args' do
       let(:args) { {name: :x} }
+
       it {
         is_expected.to have_attributes(
           name: :x,
@@ -31,6 +34,7 @@ RSpec.describe TLAW::Param do
           format: :to_s.to_proc
         }
       }
+
       it {
         is_expected.to have_attributes(
           name: :x,
@@ -46,6 +50,7 @@ RSpec.describe TLAW::Param do
 
   describe '#call' do
     subject { ->(value, **definition) { described_class.new(**defaults, **definition).call(value) } }
+
     let(:defaults) { {name: :x} }
 
     context 'basics' do
@@ -72,7 +77,7 @@ RSpec.describe TLAW::Param do
     end
 
     context 'value formatting' do
-      its_call(5, format: ->(x) { -x } ) { is_expected.to ret(x: '-5') }
+      its_call(5, format: ->(x) { -x }) { is_expected.to ret(x: '-5') }
     end
   end
 end

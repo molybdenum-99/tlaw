@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 RSpec.describe TLAW::Endpoint do
   let(:parent_class) {
     class_double('TLAW::ApiPath',
-      url_template: 'http://example.com/{x}', full_param_defs: [param(:x), param(:y)])
+                 url_template: 'http://example.com/{x}', full_param_defs: [param(:x), param(:y)])
   }
   let(:param_defs) { [param(:a), param(:b)] }
 
@@ -14,6 +16,7 @@ RSpec.describe TLAW::Endpoint do
   describe 'class behavior' do
     describe 'formatting' do
       subject { cls }
+
       before {
         allow(cls).to receive(:name).and_return('Endpoint')
       }
@@ -58,9 +61,10 @@ RSpec.describe TLAW::Endpoint do
             .finalize
             .tap { |cls| cls.parent = parent_class }
         }
-        subject(:endpoint) { cls.new(parent) }
+        let(:endpoint) { cls.new(parent) }
+
         let(:opts) { {} }
-        let(:definitions) { proc{} }
+        let(:definitions) { proc {} }
         let(:body) {
           {
             meta: {page: 1, per: 50},
@@ -91,14 +95,15 @@ RSpec.describe TLAW::Endpoint do
           let(:body) {
             '<foo><bar>1</bar><baz>2</baz></foo>'
           }
-          it { is_expected.to eq("foo.bar"=>"1", "foo.baz"=>"2") }
+
+          it { is_expected.to eq('foo.bar' => '1', 'foo.baz' => '2') }
         end
 
         context 'additional processors' do
           let(:definitions) {
             proc do
               post_process { |h| h['additional'] = 5 }
-              post_process('meta.per') { |p| p ** 2 }
+              post_process('meta.per') { |p| p**2 }
               post_process_items('rows') {
                 post_process { |i| i['c'] = -i['a'] }
                 post_process('a', &:to_s)
@@ -112,9 +117,9 @@ RSpec.describe TLAW::Endpoint do
               'meta.per' => 2500,
               'additional' => 5,
               'rows' => TLAW::DataTable.new([
-                {'a' => '1', 'b' => 2, 'c' => -1},
-                {'a' => '3', 'b' => 4, 'c' => -3}
-              ])
+                                              {'a' => '1', 'b' => 2, 'c' => -1},
+                                              {'a' => '3', 'b' => 4, 'c' => -3}
+                                            ])
             )
           }
         end

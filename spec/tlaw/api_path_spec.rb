@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe TLAW::APIPath do
   def param(name, **arg)
     TLAW::Param.new(name: name, **arg)
@@ -5,7 +7,21 @@ RSpec.describe TLAW::APIPath do
 
   let(:parent_cls) {
     class_double('TLAW::ApiPath',
-      url_template: 'http://example.com/{x}', full_param_defs: [param(:x), param(:y)])
+                 url_template: 'http://example.com/{x}', full_param_defs: [param(:x), param(:y)])
+  }
+
+  let(:parent) { instance_double('TLAW::APIPath', prepared_params: {x: 'xxx'}) }
+  let(:cls) {
+    described_class.define(
+      symbol: :bar,
+      path: '/bar',
+      param_defs: [
+        param(:a, required: true),
+        param(:b, type: Integer, field: :bb),
+        param(:c, format: ->(t) { t.strftime('%Y-%m-%d') }),
+        param(:d, type: {true => 't', false => 'f'})
+      ]
+    ).tap { |res| res.parent = parent_cls }
   }
 
   describe '.define' do
@@ -33,7 +49,7 @@ RSpec.describe TLAW::APIPath do
         path: '/bar',
         # description: 'Test.', -- hm...
         docs_link: 'http://google.com',
-        param_defs: be_an(Array).and(have_attributes(size: 2)),
+        param_defs: be_an(Array).and(have_attributes(size: 2))
       )
     }
 
@@ -55,20 +71,6 @@ RSpec.describe TLAW::APIPath do
     end
   end
 
-  let(:cls) {
-    described_class.define(
-      symbol: :bar,
-      path: '/bar',
-      param_defs: [
-        param(:a, required: true),
-        param(:b, type: Integer, field: :bb),
-        param(:c, format: ->(t) { t.strftime('%Y-%m-%d') }),
-        param(:d, type: {true => 't', false => 'f'})
-      ]
-    ).tap { |res| res.parent = parent_cls }
-  }
-  let(:parent) { instance_double('TLAW::APIPath', prepared_params: {x: 'xxx'}) }
-
   describe '#initialize' do
     subject(:path) { cls.new(parent, a: 5) }
 
@@ -76,7 +78,7 @@ RSpec.describe TLAW::APIPath do
   end
 
   describe '#prepared_params' do
-    subject { ->(params) { cls.new(parent, **params).prepared_params }  }
+    subject { ->(params) { cls.new(parent, **params).prepared_params } }
 
     its_call(a: 1, b: 2, c: Time.parse('2017-05-01'), d: true) {
       is_expected.to ret(a: '1', bb: '2', c: '2017-05-01', d: 't', x: 'xxx')

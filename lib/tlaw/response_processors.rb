@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TLAW
   module ResponseProcessors
     module_function
@@ -32,7 +34,7 @@ module TLAW
       return value unless value.is_a?(Hash)
 
       value
-        .map { |k, v| key_pattern === k ? [k, yield(v)] : [k, v] }
+        .map { |k, v| key_pattern === k ? [k, yield(v)] : [k, v] } # rubocop:disable Style/CaseEquality
         .to_h
     end
 

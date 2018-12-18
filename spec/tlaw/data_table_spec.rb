@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TLAW
   RSpec.describe DataTable do
     let(:data) {

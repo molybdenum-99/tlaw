@@ -9,6 +9,9 @@ Metrics/BlockLength:
 Metrics/ModuleLength:
   Enabled: false
 
+Metrics/LineLength:
+  Enabled: false
+
 Layout/MultilineBlockLayout:
   Enabled: false
 
@@ -36,6 +39,9 @@ RSpec/MultipleExpectations:
 RSpec/VerifiedDoubles:
   Exclude:
     - 'tlaw/param_spec.rb'
+
+RSpec/SubjectStub:
+  Enabled: false
 
 # TODO:
 RSpec/ContextWording:

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'tlaw/formatting/describe'
 
 RSpec.describe TLAW::Formatting::Describe do

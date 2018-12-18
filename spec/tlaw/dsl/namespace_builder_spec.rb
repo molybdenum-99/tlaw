@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'tlaw/dsl/namespace_builder'
 
 RSpec.describe TLAW::DSL::NamespaceBuilder do
@@ -9,7 +11,7 @@ RSpec.describe TLAW::DSL::NamespaceBuilder do
     its_block {
       is_expected.to change(builder, :children)
         .to contain_exactly(
-          have_attributes(symbol: :foo).and be < (TLAW::Endpoint)
+          have_attributes(symbol: :foo).and(be < TLAW::Endpoint)
         )
     }
     its_block {
@@ -25,12 +27,12 @@ RSpec.describe TLAW::DSL::NamespaceBuilder do
     its_block {
       is_expected.to change(builder, :children)
         .to contain_exactly(
-          have_attributes(symbol: :foo).and be < (TLAW::Namespace)
+          have_attributes(symbol: :foo).and(be < TLAW::Namespace)
         )
     }
     its_block {
       is_expected
-        .to send_message(TLAW::DSL::NamespaceBuilder, :new)
+        .to send_message(described_class, :new)
         .with(symbol: :foo, path: '/bar').calling_original
     }
   end
@@ -47,6 +49,7 @@ RSpec.describe TLAW::DSL::NamespaceBuilder do
         end
       end
     }
+
     subject(:finalize) { builder.finalize }
 
     it { is_expected.to be < TLAW::Namespace }

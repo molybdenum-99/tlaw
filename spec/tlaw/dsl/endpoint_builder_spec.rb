@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'tlaw/dsl/endpoint_builder'
 
 RSpec.describe TLAW::DSL::EndpointBuilder do
@@ -9,6 +11,7 @@ RSpec.describe TLAW::DSL::EndpointBuilder do
         param :quux
       end
     }
+
     subject { builder.finalize }
 
     it { is_expected.to be < TLAW::Endpoint }
@@ -16,7 +19,7 @@ RSpec.describe TLAW::DSL::EndpointBuilder do
       is_expected.to have_attributes(
         symbol: :foo,
         path: '/bar/{baz}',
-        description: 'Good description',
+        description: 'Good description'
       )
     }
     its(:param_defs) {

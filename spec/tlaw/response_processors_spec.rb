@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe TLAW::ResponseProcessors do
   # TODO: more thorough tests, these are obviously ad-hoc
   describe 'Generators.transform_nested' do

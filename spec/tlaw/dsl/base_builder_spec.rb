@@ -1,8 +1,13 @@
+# frozen_string_literal: true
+
 require 'tlaw/dsl/base_builder'
 
 RSpec.describe TLAW::DSL::BaseBuilder do
+  let(:opts) { {} }
+  let(:builder) { described_class.new(symbol: :foo, **opts) }
+
   describe '#initialize' do
-    subject(:call) { ->(*params) { described_class.new(*params).definition }  }
+    subject(:call) { ->(*params) { described_class.new(*params).definition } }
 
     its_call(symbol: :foo) { is_expected.to ret include(symbol: :foo, path: '/foo') }
     its_call(symbol: :foo, path: '/bar') { is_expected.to ret include(symbol: :foo, path: '/bar') }
@@ -19,11 +24,9 @@ RSpec.describe TLAW::DSL::BaseBuilder do
     end
   end
 
-  let(:builder) { described_class.new(symbol: :foo, **opts) }
-  let(:opts) { {} }
-
   describe '#description' do
     subject { builder.method(:description) }
+
     its_call("Very detailed and thoroughful\ndescription.") {
       is_expected.to change(builder, :definition).to include(description: "Very detailed and thoroughful\ndescription.")
     }
@@ -31,6 +34,7 @@ RSpec.describe TLAW::DSL::BaseBuilder do
 
   describe '#docs' do
     subject { builder.method(:docs) }
+
     its_call('https://google.com') {
       is_expected.to change(builder, :definition).to include(docs_link: 'https://google.com')
     }
@@ -50,7 +54,7 @@ RSpec.describe TLAW::DSL::BaseBuilder do
         is_expected.to change(builder, :params).to include(baz: {keyword: false, type: Integer})
       }
       its_call(:x, Integer) {
-        is_expected.to change{ builder.params.keys }.to %i[baz x]
+        is_expected.to change { builder.params.keys }.to %i[baz x]
       }
     end
   end

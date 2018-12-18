@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'tlaw/dsl/api_builder'
 
 RSpec.describe TLAW::DSL::ApiBuilder do

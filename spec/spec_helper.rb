@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rspec/its'
 require 'faker'
 require 'webmock/rspec'
@@ -97,7 +99,7 @@ RSpec::Matchers.define :define_constant do |name|
     else
       last_found = @path[0...@modules.count - 1].join('::')
       not_found = @path[@modules.count - 1] # FIXME: slice or something, I forgot :(
-      problem = @modules.last.respond_to?(:const_defined?) ? "does not define #{not_found}" : "is not a module"
+      problem = @modules.last.respond_to?(:const_defined?) ? "does not define #{not_found}" : 'is not a module'
       "#{description}, but #{last_found} #{problem}"
     end
   end
@@ -106,9 +108,9 @@ RSpec::Matchers.define :define_constant do |name|
 
   def const_exists?(name)
     @path = name.split('::').drop_while(&:empty?)
-    @modules = @path.reduce([Kernel]) { |(*prevs, cur), name|
-      break [*prevs, cur] unless cur.respond_to?(:const_defined?) && cur.const_defined?(name)
-      [*prevs, cur, cur.const_get(name)]
+    @modules = @path.reduce([Kernel]) { |(*prevs, cur), nm|
+      break [*prevs, cur] unless cur.respond_to?(:const_defined?) && cur.const_defined?(nm)
+      [*prevs, cur, cur.const_get(nm)]
     }
     @modules.count - 1 == @path.size
   end
@@ -117,4 +119,3 @@ end
 def param(name, **arg)
   TLAW::Param.new(name: name, **arg)
 end
-

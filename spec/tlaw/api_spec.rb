@@ -1,6 +1,13 @@
+# frozen_string_literal: true
+
 RSpec.describe TLAW::API do
+  let(:cls) {
+    Class.new(described_class).tap { |cls| cls.setup(base_url: 'http://foo/{bar}') }
+  }
+
   describe '.define' do
     subject(:cls) { Class.new(described_class) }
+
     before {
       cls.define do
         base 'http://foo/bar'
@@ -9,8 +16,8 @@ RSpec.describe TLAW::API do
       end
     }
     its(:url_template) { is_expected.to eq 'http://foo/bar' }
-    its(:endpoints) { is_expected.to contain_exactly(be.<(TLAW::Endpoint).and have_attributes(symbol: :a))}
-    its(:namespaces) { is_expected.to contain_exactly(be.<(TLAW::Namespace).and have_attributes(symbol: :b))}
+    its(:endpoints) { is_expected.to contain_exactly(be.<(TLAW::Endpoint).and(have_attributes(symbol: :a))) }
+    its(:namespaces) { is_expected.to contain_exactly(be.<(TLAW::Namespace).and(have_attributes(symbol: :b))) }
   end
 
   describe '.setup' do
@@ -18,8 +25,10 @@ RSpec.describe TLAW::API do
       subject(:cls) {
         Class.new(described_class)
       }
+
       before {
         cls.setup(base_url: 'http://foo/{bar}', param_defs: [param(:x)])
+        allow(cls).to receive(:name).and_return('MyAPI')
       }
       it {
         is_expected.to have_attributes(
@@ -28,14 +37,9 @@ RSpec.describe TLAW::API do
           path: ''
         )
       }
-      before { allow(cls).to receive(:name).and_return('MyAPI') }
       its(:inspect) { is_expected.to eq 'MyAPI(call-sequence: MyAPI.new(x: nil); docs: .describe)' }
     end
   end
-
-  let(:cls) {
-    Class.new(described_class).tap { |cls| cls.setup(base_url: 'http://foo/{bar}') }
-  }
 
   describe '#initialize' do
     it {
@@ -45,6 +49,7 @@ RSpec.describe TLAW::API do
 
   describe '#request' do
     let(:api) { cls.new }
+
     subject { api.request('http://foo/bar?x=1', y: 2) }
 
     its_block {
