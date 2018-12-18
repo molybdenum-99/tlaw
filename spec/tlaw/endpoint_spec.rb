@@ -3,6 +3,7 @@ RSpec.describe TLAW::Endpoint do
     class_double('TLAW::ApiPath',
       url_template: 'http://example.com/{x}', full_param_defs: [param(:x), param(:y)])
   }
+  let(:param_defs) { [param(:a), param(:b)] }
 
   let(:cls) {
     described_class
@@ -10,235 +11,113 @@ RSpec.describe TLAW::Endpoint do
       .tap { |cls| cls.parent = parent_class }
   }
 
-  describe 'formatting' do
-    subject { cls }
-    before {
-      allow(cls).to receive(:name).and_return('Endpoint')
-    }
+  describe 'class behavior' do
+    describe 'formatting' do
+      subject { cls }
+      before {
+        allow(cls).to receive(:name).and_return('Endpoint')
+      }
 
-    its(:inspect) { is_expected.to eq 'Endpoint(call-sequence: ep(a: nil, b: nil); docs: .describe)' }
-  end
-
-
-  let(:param_defs) { [param(:a), param(:b)] }
-  let(:parent) { instance_double('TLAW::ApiPath', prepared_params: parent_params, api: api) }
-  let(:api) { instance_double('TLAW::API', request: nil) }
-  let(:parent_params) { {x: 'bar', y: 'baz'} }
-
-  subject(:endpoint) { cls.new(parent, a: 1, b: 2) }
-
-  its(:url) { is_expected.to eq 'http://example.com/bar/foo' }
-  its(:request_params) { are_expected.to eq(y: 'baz', a: '1', b: '2') }
-
-  describe 'formatting' do
-    before {
-      allow(cls).to receive(:name).and_return('Endpoint')
-    }
-
-    its(:inspect) { is_expected.to eq '#<Endpoint(a: 1, b: 2); docs: .describe>' }
-  end
-
-  describe '#call' do
-    subject { endpoint.method(:call) }
-
-    its_call {
-      is_expected
-        .to send_message(api, :request)
-        .with('http://example.com/bar/foo', y: 'baz', a: '1', b: '2')
-    }
-  end
-end
-
-__END__
-    let(:url_template) { 'https://api.example.com' }
-    let(:endpoint_class) { Class.new(described_class).tap { |c| c.base_url = url_template } }
-    let(:endpoint) { endpoint_class.new }
-
-    context '.param_set' do
-      subject { endpoint_class }
-
-      its(:param_set) { is_expected.to be_a Params::Set }
+      its(:inspect) { is_expected.to eq 'Endpoint(call-sequence: ep(a: nil, b: nil); docs: .describe)' }
+      its(:describe) { is_expected.to be_a String }
     end
+  end
 
-    describe '#construct_url' do
-      let(:params) { {} }
+  describe 'object behavior' do
+    let(:parent) { instance_double('TLAW::ApiPath', prepared_params: parent_params, api: api) }
+    let(:api) { instance_double('TLAW::API', request: nil) }
+    let(:parent_params) { {x: 'bar', y: 'baz'} }
 
-      subject(:url) { endpoint.__send__(:construct_url, **params) }
+    subject(:endpoint) { cls.new(parent, a: 1, b: 2) }
 
-      context 'no params' do
-        it { is_expected.to eq 'https://api.example.com/' }
-      end
+    its(:url) { is_expected.to eq 'http://example.com/bar/foo' }
+    its(:request_params) { are_expected.to eq(y: 'baz', a: '1', b: '2') }
 
-      context 'only query params' do
-        before {
-          endpoint_class.param_set.add(:q)
-          endpoint_class.param_set.add(:pagesize, type: :to_i, format: ->(v) { v * 10 })
-        }
-        let(:params) { {q: 'Kharkiv oblast', pagesize: 10} }
+    describe 'formatting' do
+      before {
+        allow(cls).to receive(:name).and_return('Endpoint')
+      }
 
-        it { is_expected.to eq 'https://api.example.com/?q=Kharkiv%20oblast&pagesize=100' }
-      end
-
-      context 'path & query params' do
-        before {
-          endpoint_class.param_set.add(:q)
-          endpoint_class.param_set.add(:pagesize, type: :to_i, format: ->(v) { v * 10 })
-        }
-        let(:params) { {q: 'Kharkiv', pagesize: 10} }
-
-        let(:url_template) { 'https://api.example.com{/q}' }
-
-        it { is_expected.to eq 'https://api.example.com/Kharkiv?pagesize=100' }
-      end
-
-      context 'path with ?' do
-        before {
-          endpoint_class.param_set.add(:q)
-          endpoint_class.param_set.add(:pagesize, type: :to_i, format: ->(v) { v * 10 })
-        }
-        let(:params) { {q: 'Kharkiv', pagesize: 10} }
-
-        let(:url_template) { 'https://api.example.com?q={q}' }
-
-        it { is_expected.to eq 'https://api.example.com/?q=Kharkiv&pagesize=100' }
-      end
-
-      context 'parent-defined params'
+      its(:inspect) { is_expected.to eq '#<Endpoint(a: 1, b: 2); docs: .describe>' }
     end
 
     describe '#call' do
-      before {
-        endpoint_class.param_set.add(:q)
-        endpoint_class.response_processor.add_post_processor('response.message', &:downcase)
+      subject { endpoint.method(:call) }
+
+      its_call {
+        is_expected
+          .to send_message(api, :request)
+          .with('http://example.com/bar/foo', y: 'baz', a: '1', b: '2')
+          .returning(instance_double('Faraday::Response', body: ''))
       }
 
-      let(:deep_hash) {
-        {
-          response: {status: 200, message: 'OK'},
-          data: {field1: 'foo', field2: {bar: 1}}
+      describe 'response parsing' do
+        let(:cls) {
+          TLAW::DSL::EndpointBuilder.new(symbol: :foo, **opts)
+            .tap { |b| b.instance_eval(&definitions) }
+            .finalize
+            .tap { |cls| cls.parent = parent_class }
         }
-      }
-
-      it 'calls web with params provided' do
-        expect { endpoint.call(q: 'Why') }
-          .to get_webmock('https://api.example.com?q=Why')
-          .and_return({test: 'me'}.to_json)
-      end
-
-      context 'parent params' do
-        let(:parent_param_set) {
-          Params::Set.new.tap { |ps| ps.add(:api_key) }
+        subject(:endpoint) { cls.new(parent) }
+        let(:opts) { {} }
+        let(:definitions) { proc{} }
+        let(:body) {
+          {
+            meta: {page: 1, per: 50},
+            rows: [{a: 1, b: 2}, {a: 3, b: 4}]
+          }.to_json
         }
-        let(:endpoint) { endpoint_class.new(api_key: 'foo') }
 
         before {
-          endpoint_class.param_set.parent = parent_param_set
+          allow(api)
+            .to receive(:request)
+            .and_return(instance_double('Faraday::Response', body: body))
         }
 
-        it 'calls web with params provided' do
-          expect { endpoint.call(q: 'Why') }
-            .to get_webmock('https://api.example.com?api_key=foo&q=Why')
-            .and_return({test: 'me'}.to_json)
-        end
-      end
+        subject { endpoint.call }
 
-      it 'parses response & flatterns it' do
-        stub_request(:get, 'https://api.example.com?q=Why')
-          .to_return(body: deep_hash.to_json)
-
-        expect(endpoint.call(q: 'Why'))
-          .to eq(
-            'response.status' => 200,
-            'response.message' => 'ok',
-            'data.field1' => 'foo',
-            'data.field2.bar' => 1
-          )
-      end
-
-      context 'errors' do
-        context 'just code' do
-          before {
-            stub_request(:get, 'https://api.example.com?q=Why')
-              .to_return(status: 404)
-          }
-
-          specify {
-            expect { endpoint.call(q: 'Why') }
-              .to raise_error(API::Error, 'HTTP 404 at https://api.example.com/?q=Why')
+        context 'by default' do
+          it {
+            is_expected.to eq(
+              'meta.page' => 1,
+              'meta.per' => 50,
+              'rows' => TLAW::DataTable.new([{a: 1, b: 2}, {a: 3, b: 4}])
+            )
           }
         end
-        context 'code + json message'
-        context 'code + text'
-        context 'code + html'
 
-        context 'exception while processing' do
-          before {
-            stub_request(:get, 'https://api.example.com?q=Why')
-              .to_return { fail JSON::ParserError, 'Unparseable!' }
+        context 'with XML response' do
+          let(:opts) { {xml: true} }
+          let(:body) {
+            '<foo><bar>1</bar><baz>2</baz></foo>'
+          }
+          it { is_expected.to eq("foo.bar"=>"1", "foo.baz"=>"2") }
+        end
+
+        context 'additional processors' do
+          let(:definitions) {
+            proc do
+              post_process { |h| h['additional'] = 5 }
+              post_process('meta.per') { |p| p ** 2 }
+              post_process_items('rows') {
+                post_process { |i| i['c'] = -i['a'] }
+                post_process('a', &:to_s)
+              }
+            end
           }
 
-          specify {
-            expect { endpoint.call(q: 'Why') }
-              .to raise_error(API::Error, 'JSON::ParserError at https://api.example.com/?q=Why: Unparseable!')
+          it {
+            is_expected.to eq(
+              'meta.page' => 1,
+              'meta.per' => 2500,
+              'additional' => 5,
+              'rows' => TLAW::DataTable.new([
+                {'a' => '1', 'b' => 2, 'c' => -1},
+                {'a' => '3', 'b' => 4, 'c' => -3}
+              ])
+            )
           }
         end
-      end
-    end
-
-    describe '#to_code' do
-      before {
-        endpoint_class.symbol = :ep
-
-        endpoint_class.param_set.add :kv1
-        endpoint_class.param_set.add :kv2, required: true
-        endpoint_class.param_set.add :kv3, default: 14
-
-        endpoint_class.param_set.add :arg1, keyword: false
-        endpoint_class.param_set.add :arg2, keyword: false, default: 'foo'
-        endpoint_class.param_set.add :arg3, keyword: false, required: true
-      }
-
-      subject { endpoint_class.to_code }
-
-      it { is_expected
-        .to  include('def ep(arg3, arg1=nil, arg2="foo", kv2:, kv1: nil, kv3: 14)')
-        .and include('.call(kv1: kv1, kv2: kv2, kv3: kv3, arg1: arg1, arg2: arg2, arg3: arg3)')
-      }
-    end
-
-    context 'documentation' do
-      before {
-        endpoint_class.symbol = :ep
-        endpoint_class.description = "This is cool endpoint!\nIt works."
-
-        endpoint_class.param_set.add :kv1, type: Time
-        endpoint_class.param_set.add :kv2, type: :to_i, required: true
-
-        endpoint_class.param_set.add :arg1, keyword: false
-        endpoint_class.param_set.add :arg3, type: :to_time, keyword: false, required: true
-
-        allow(endpoint_class).to receive(:name).and_return('SomeEndpoint')
-      }
-
-      describe '#inspect' do
-        subject { endpoint.inspect }
-
-        it { is_expected.to eq 'SomeEndpoint(call-sequence: ep(arg3, arg1=nil, kv2:, kv1: nil); docs: .describe)' }
-      end
-
-      describe '#describe' do
-        subject { endpoint.describe.to_s }
-
-        it { is_expected.to eq(%{
-          |.ep(arg3, arg1=nil, kv2:, kv1: nil)
-          |  This is cool endpoint!
-          |  It works.
-          |
-          |  @param arg3 [#to_time]
-          |  @param arg1
-          |  @param kv2 [#to_i]
-          |  @param kv1 [Time]
-        }.unindent)}
       end
     end
   end

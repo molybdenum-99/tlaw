@@ -35,6 +35,7 @@ module TLAW
         EndpointBuilder.new(
           symbol: symbol,
           path: path,
+          context: self,
           **opts,
           &block
         ).finalize.tap(&children.method(:push))
@@ -44,6 +45,7 @@ module TLAW
         NamespaceBuilder.new(
           symbol: symbol,
           path: path,
+          context: self,
           **opts,
           &block
         ).finalize.tap(&children.method(:push))

@@ -3,12 +3,14 @@
 module TLAW
   module DSL
     class BaseBuilder
-      attr_reader :params
+      attr_reader :params, :processors
 
-      def initialize(symbol:, path: nil, **opts, &block)
+      def initialize(symbol:, path: nil, context: nil, xml: false, **opts, &block)
         path ||= "/#{symbol}" # Not default arg, because we need to process explicitly passed path: nil, too
         @definition = opts.merge(symbol: symbol, path: path)
         @params = params_from_path(path)
+        @processors = (context&.processors || []).dup
+        @parser = parser(xml)
         instance_eval(&block) if block
       end
 
@@ -39,11 +41,36 @@ module TLAW
         fail NotImplementedError, "#{self.class} doesn't implement #finalize"
       end
 
-      def post_process(*) end
+      G = ResponseProcessors::Generators
 
-      def post_process_items(*) end
+      def post_process(key_pattern = nil, &block)
+        @processors << (key_pattern ? G.transform_by_key(key_pattern, &block) : G.mutate(&block))
+      end
+
+      class PostProcessProxy
+        def initialize(owner, parent_key)
+          @owner = owner
+          @parent_key = parent_key
+        end
+
+        def post_process(key = nil, &block)
+          @owner.processors << G.transform_nested(@parent_key, key, &block)
+        end
+      end
+
+      def post_process_items(key_pattern, &block)
+        PostProcessProxy.new(self, key_pattern).instance_eval(&block)
+      end
+
+      def post_process_replace(&block)
+        @processors << block
+      end
 
       private
+
+      def parser(xml)
+        xml ? Crack::XML.method(:parse) : JSON.method(:parse)
+      end
 
       def enum_type(enum)
         case enum

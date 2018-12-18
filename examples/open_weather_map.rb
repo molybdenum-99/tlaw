@@ -158,7 +158,7 @@ module TLAW
             param :zoom, :to_i, default: 10, keyword: true,
               desc: 'Map zoom level.'
 
-            param :cluster, enum: {true => 'yes', false: 'no'},
+            param :cluster, enum: {true => 'yes', false => 'no'},
               default: true,
               desc: 'Use server clustering of points'
           end
@@ -225,7 +225,7 @@ module TLAW
         # OpenWeatherMap reports most of logical errors with HTTP code
         # 200 and responses like {cod: "500", message: "Error message"}
         post_process { |h|
-          !h.key?('cod') || (200..400).cover?(h['cod'].to_i) or
+          !h.key?('cod') || (200...400).cover?(h['cod'].to_i) or
             fail "#{h['cod']}: #{h['message']}"
         }
 
@@ -251,7 +251,7 @@ module TLAW
           post_process('coord.lon') { nil }
 
           # See http://openweathermap.org/weather-conditions#How-to-get-icon-URL
-          post_process('weather.icon') { |i| "http://openweathermap.org/img/w/#{i}.png" }
+          post_process('weather.icon', &'http://openweathermap.org/img/w/%s.png'.method(:%) }
         end
 
         # For endpoints returning weather in one place

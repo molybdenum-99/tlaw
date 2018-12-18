@@ -2,6 +2,7 @@
 
 require 'backports/2.5.0/kernel/yield_self'
 require 'backports/2.5.0/hash/transform_keys'
+require 'backports/2.5.0/enumerable/all'
 require 'open-uri'
 require 'json'
 require 'addressable/uri'
@@ -56,6 +57,6 @@ require_relative 'tlaw/api'
 
 require_relative 'tlaw/formatting'
 
-require_relative 'tlaw/response_processor'
+require_relative 'tlaw/response_processors'
 
 require_relative 'tlaw/dsl'

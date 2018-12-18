@@ -89,11 +89,7 @@ module TLAW
     end
 
     def request(url, **params)
-      @client.get(url, **params).yield_self do |response|
-        guard_errors!(response)
-        parse(response.body)
-        # parse(response.body, response_processor)
-      end
+      @client.get(url, **params).tap(&method(:guard_errors!))
     rescue API::Error
       raise # Not catching in the next block
     rescue StandardError => e
@@ -111,18 +107,5 @@ module TLAW
            "HTTP #{response.status} at #{response.env[:url]}" +
            (message ? ': ' + message : '')
     end
-
-    def parse(body)
-      JSON.parse(body) # FIXME: symbolize_keys?..
-    end
-
-    # def parse(body, response_processor)
-    #   # TODO: xml is part of "response processing chain"
-    #   if self.class.xml
-    #     Crack::XML.parse(body)
-    #   else
-    #     JSON.parse(body)
-    #   end.yield_self { |response| response_processor.process(response) }
-    # end
   end
 end

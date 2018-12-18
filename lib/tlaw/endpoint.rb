@@ -22,6 +22,8 @@ module TLAW
   #
   class Endpoint < APIPath
     class << self
+      attr_reader :processors
+
       # Inspects endpoint class prettily.
       #
       # Example:
@@ -39,6 +41,15 @@ module TLAW
         return '' unless is_defined?
         Formatting::Describe.endpoint_class(self)
       end
+
+      protected
+
+      def setup(processors: [], **args)
+        super(**args)
+        self.processors = processors.dup
+      end
+
+      attr_writer :processors
     end
 
     attr_reader :url, :request_params
@@ -67,7 +78,7 @@ module TLAW
     # @return [Hash,Array] Parsed, flattened and post-processed response
     #   body.
     def call
-      api.request(url, **request_params) # , response_processor)
+      api.request(url, **request_params).body.yield_self(&method(:parse))
     end
 
     def inspect
@@ -78,7 +89,7 @@ module TLAW
 
     private
 
-    def_delegators :self_class, :url_template
+    def_delegators :self_class, :url_template, :processors
 
     # Fix params substitution: if it was in path part, we shouldn't have escaped "/"
     # E.g. for template "http://google.com/{foo}/bar", and foo="some/path", Addressable would
@@ -87,6 +98,10 @@ module TLAW
       url, query = url.split('?', 2)
       url.gsub!('%2F', '/')
       [url, query].compact.join('?')
+    end
+
+    def parse(body)
+      processors.inject(body) { |res, proc| proc.(res) }
     end
   end
 end

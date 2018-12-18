@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-# require_relative 'params/set'
-require_relative 'has_parent'
 require 'forwardable'
 
 module TLAW

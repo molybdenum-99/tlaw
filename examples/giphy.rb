@@ -68,19 +68,20 @@ module TLAW
           end
         end
 
-        namespace :gifs do
-          endpoint :[], '/{id}' do
-            desc 'One GIF by unique id.'
+        # TODO: redefinition doesn't work!
+        # namespace :gifs do
+        #   endpoint :[], '/{id}' do
+        #     desc 'One GIF by unique id.'
 
-            param :id, required: true
-          end
+        #     param :id, required: true
+        #   end
 
-          endpoint :multiple, '/?ids={ids}' do
-            desc 'Sevaral GIFs by unique ids.'
+        #   endpoint :multiple, '/?ids={ids}' do
+        #     desc 'Sevaral GIFs by unique ids.'
 
-            param :ids, :to_a, required: true
-          end
-        end
+        #     param :ids, :to_a, required: true
+        #   end
+        # end
       end
     end
   end
