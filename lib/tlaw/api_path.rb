@@ -64,6 +64,7 @@ module TLAW
         self.param_defs = param_defs
         self.description = description
         self.param_defs = param_defs
+        self.docs_link = docs_link
       end
 
       attr_writer :symbol, :param_defs, :path, :description, :xml, :docs_link

@@ -39,25 +39,16 @@ module TLAW
       private :parent, :parent=
 
       # Runs the {DSL} inside your API wrapper class.
-      def define(**args, &block)
-        (args.any? && block) ||
-          (args.none? && !block) and
-          fail ArgumentError, 'Either keyword arguments or block should be passed'
-
-        if args.any?
-          url = args.fetch(:base_url) { fail ArgumentError, 'base_url not specified' }
-          args = args.except(:base_url).merge(symbol: nil, path: '')
-          super(**args).tap { |cls| cls.url_template = url }
-        else
-          DSL::ApiBuilder.new(self, &block).finalize
-          self
-        end
+      def define(&block)
+        self == API and fail '#define should be called on the descendant of the TLAW::API'
+        DSL::ApiBuilder.new(self, &block).finalize
+        self
       end
 
       def setup(base_url: nil, **args)
         base_url or fail ArgumentError, "API can't be defined without base_url"
         self.url_template = base_url
-        super(**args)
+        super(symbol: nil, path: '', **args)
       end
 
       def is_defined? # rubocop:disable Naming/PredicateName
