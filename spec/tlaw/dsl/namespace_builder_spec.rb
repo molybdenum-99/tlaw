@@ -50,7 +50,7 @@ RSpec.describe TLAW::DSL::NamespaceBuilder do
         }
       }
 
-      subject {  builder.children.values.first }
+      subject { builder.children.values.first }
 
       it {
         is_expected
@@ -61,7 +61,7 @@ RSpec.describe TLAW::DSL::NamespaceBuilder do
         are_expected.to contain_exactly(have_attributes(name: :bar), have_attributes(name: :baz))
       }
       its(:'endpoints.first.param_defs') {
-        are_expected.to contain_exactly(have_attributes(name: :y, :required? => true))
+        are_expected.to contain_exactly(have_attributes(name: :y, required?: true))
       }
     end
   end

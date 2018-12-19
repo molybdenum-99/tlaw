@@ -6,7 +6,7 @@ require_relative 'endpoint_builder'
 module TLAW
   module DSL
     class NamespaceBuilder < BaseBuilder
-      CHILD_CLASSES = {NamespaceBuilder => Namespace, EndpointBuilder => Endpoint}
+      CHILD_CLASSES = {NamespaceBuilder => Namespace, EndpointBuilder => Endpoint}.freeze
 
       attr_reader :children
 
