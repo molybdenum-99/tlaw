@@ -140,8 +140,8 @@ module TLAW
     end
 
     def_delegators :self_class, :symbol,
-      :namespaces, :endpoints,
-      :namespace, :endpoint
+                   :namespaces, :endpoints,
+                   :namespace, :endpoint
 
     # def inspect
     #   Inspect.inspect_namespace(self.class, @parent_params)
