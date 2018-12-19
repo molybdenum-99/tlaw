@@ -2,6 +2,7 @@
 
 module TLAW
   module Formatting
+    # @private
     module Inspect
       module_function
 

@@ -2,6 +2,7 @@
 
 module TLAW
   module DSL
+    # @private
     class BaseBuilder
       attr_reader :params, :processors
 
@@ -47,6 +48,7 @@ module TLAW
         @processors << (key_pattern ? G.transform_by_key(key_pattern, &block) : G.mutate(&block))
       end
 
+      # @private
       class PostProcessProxy
         def initialize(owner, parent_key)
           @owner = owner

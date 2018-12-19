@@ -404,14 +404,7 @@ module TLAW
   end
 end
 
-# require_relative 'dsl/api_wrapper'
-# require_relative 'dsl/base_wrapper'
-# require_relative 'dsl/endpoint_wrapper'
-# require_relative 'dsl/namespace_wrapper'
-# require_relative 'dsl/post_process_proxy'
-
 require_relative 'dsl/api_builder'
 require_relative 'dsl/base_builder'
 require_relative 'dsl/endpoint_builder'
 require_relative 'dsl/namespace_builder'
-# require_relative 'dsl/post_process_proxy'

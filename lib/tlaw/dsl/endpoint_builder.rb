@@ -4,6 +4,7 @@ require_relative 'base_builder'
 
 module TLAW
   module DSL
+    # @private
     class EndpointBuilder < BaseBuilder
       def definition
         # TODO: Here we'll be more flexible in future, allowing to avoid flatten/datablize

@@ -5,6 +5,7 @@ require_relative 'endpoint_builder'
 
 module TLAW
   module DSL
+    # @private
     class NamespaceBuilder < BaseBuilder
       CHILD_CLASSES = {NamespaceBuilder => Namespace, EndpointBuilder => Endpoint}.freeze
 

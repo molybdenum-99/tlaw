@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module TLAW
+  # @private
   module Util
     module_function
 

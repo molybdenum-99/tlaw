@@ -94,7 +94,7 @@ module TLAW
     def_delegators :self_class, :url_template, :processors
 
     # Fix params substitution: if it was in path part, we shouldn't have escaped "/"
-    # E.g. for template "http://google.com/{foo}/bar", and foo="some/path", Addressable would
+    # E.g. for template `http://google.com/{foo}/bar`, and foo="some/path", Addressable would
     # produce "http://google.com/some%2fpath/bar", but we want "http://google.com/some/path/bar"
     def fix_slash(url)
       url, query = url.split('?', 2)

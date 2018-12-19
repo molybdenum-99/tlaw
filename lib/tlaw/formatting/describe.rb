@@ -2,6 +2,7 @@
 
 module TLAW
   module Formatting
+    # @private
     module Describe
       class << self
         def endpoint_class(klass)

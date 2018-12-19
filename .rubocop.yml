@@ -8,9 +8,6 @@ AllCops:
   Exclude:
     - 'examples/**/*'
     - 'samples/**/*'
-    - lib/tlaw/params/set.rb
-    - lib/tlaw/params/base.rb
-    - lib/tlaw/dsl/*_wrapper.rb
     - 'tmp/**/*'
     - 'Rakefile'
     - '*.gemspec'
@@ -70,16 +67,6 @@ Metrics/MethodLength:
 
 Lint/NonLocalExitFromIterator:
   Enabled: false
-
-# Working on it!
-# --------------
-
-Style/Documentation:
-  Enabled: false
-
-Style/Lambda:
-  Exclude:
-    - 'lib/tlaw/response_processor.rb'
 
 # Those are just useless
 # ----------------------

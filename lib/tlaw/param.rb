@@ -3,6 +3,7 @@
 require_relative 'param/type'
 
 module TLAW
+  # @private
   class Param
     attr_reader :name, :field, :type, :description, :default, :format
 

@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 module TLAW
+  # @private
   module ResponseProcessors
+    # @private
     module Generators
       module_function
 

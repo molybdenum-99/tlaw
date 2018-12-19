@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 module TLAW
+  # @private
   module Formatting
+    # @public
     # Description is just a String subclass with rewritten `inspect`
     # implementation (useful in `irb`/`pry`):
     #

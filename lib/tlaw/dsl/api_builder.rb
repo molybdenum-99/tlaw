@@ -6,6 +6,7 @@ require_relative 'namespace_builder'
 
 module TLAW
   module DSL
+    # @private
     class ApiBuilder < NamespaceBuilder
       # @private
       CLASS_NAMES = {
