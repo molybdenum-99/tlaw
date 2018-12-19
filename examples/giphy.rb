@@ -31,6 +31,10 @@ module TLAW
               desc 'Fetch GIPHY stickers (GIFs with transparent background).'
             end
 
+            post_process_items('data') do
+              post_process(/\.(size|mp4_size|webp_size|width|height|frames)/, &:to_i)
+            end
+
             endpoint :search do
               desc 'Search all GIFs by word or phrase.'
 
@@ -60,10 +64,6 @@ module TLAW
 
               param :tag
               param :rating, desc: 'Parental advisory rating'
-            end
-
-            post_process_items('data') do
-              post_process(/\.(size|mp4_size|webp_size|width|height|frames)/, &:to_i)
             end
           end
         end

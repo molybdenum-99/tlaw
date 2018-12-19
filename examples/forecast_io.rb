@@ -37,6 +37,22 @@ module TLAW
             Return summary properties in the desired language. (2-letters code)
           }
 
+        post_process 'currently.time', &Time.method(:at)
+
+        post_process_items('minutely.data') {
+          post_process 'time', &Time.method(:at)
+        }
+
+        post_process_items('hourly.data') {
+          post_process 'time', &Time.method(:at)
+        }
+
+        post_process_items('daily.data') {
+          post_process 'time', &Time.method(:at)
+          post_process 'sunriseTime', &Time.method(:at)
+          post_process 'sunsetTime', &Time.method(:at)
+        }
+
         endpoint :forecast, '/{lat},{lng}' do
           desc %Q{Forecast for the next week.}
 
@@ -85,22 +101,6 @@ module TLAW
               currently, minutely, hourly, daily, alerts, flags.
             }
         end
-
-        post_process 'currently.time', &Time.method(:at)
-
-        post_process_items('minutely.data') {
-          post_process 'time', &Time.method(:at)
-        }
-
-        post_process_items('hourly.data') {
-          post_process 'time', &Time.method(:at)
-        }
-
-        post_process_items('daily.data') {
-          post_process 'time', &Time.method(:at)
-          post_process 'sunriseTime', &Time.method(:at)
-          post_process 'sunsetTime', &Time.method(:at)
-        }
       end
     end
 

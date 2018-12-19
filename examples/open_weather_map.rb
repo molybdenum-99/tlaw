@@ -23,6 +23,45 @@ module TLAW
         param :units, enum: %i[standard metric imperial], default: :standard,
           desc: 'Units for temperature and other values. Standard is Kelvin.'
 
+        # OpenWeatherMap reports most of logical errors with HTTP code
+        # 200 and responses like {cod: "500", message: "Error message"}
+        post_process { |h|
+          !h.key?('cod') || (200...400).cover?(h['cod'].to_i) or
+            fail "#{h['cod']}: #{h['message']}"
+        }
+
+        WEATHER_POST_PROCESSOR = lambda do |*|
+          # Most of the time there is exactly one weather item...
+          # ...but sometimes there are two. So, flatterning them looks
+          # more reasonable than having DataTable of 1-2 rows.
+          post_process { |h|
+            h['weather2'] = h['weather'].last if h['weather'] && h['weather'].count > 1
+          }
+          post_process('weather', &:first)
+
+          post_process('dt', &Time.method(:at))
+          post_process('dt_txt') { nil } # TODO: we need cleaner way to say "remove this"
+          post_process('sys.sunrise', &Time.method(:at))
+          post_process('sys.sunset', &Time.method(:at))
+
+          # https://github.com/zverok/geo_coord promo here!
+          post_process { |e|
+            e['coord'] = Geo::Coord.new(e['coord.lat'], e['coord.lon']) if e['coord.lat'] && e['coord.lon']
+          }
+          post_process('coord.lat') { nil }
+          post_process('coord.lon') { nil }
+
+          # See http://openweathermap.org/weather-conditions#How-to-get-icon-URL
+          post_process('weather.icon', &'http://openweathermap.org/img/w/%s.png'.method(:%))
+        end
+
+        # For endpoints returning weather in one place
+        instance_eval(&WEATHER_POST_PROCESSOR)
+
+        # For endpoints returning list of weathers (forecast or several
+        # cities).
+        post_process_items('list', &WEATHER_POST_PROCESSOR)
+
         namespace :current, '/weather' do
           desc %Q{
             Allows to obtain current weather at one place, designated
@@ -112,7 +151,8 @@ module TLAW
             param :start_with, required: true, desc: 'Beginning of city name'
             param :country_code, desc: 'ISO 3166 2-letter country code'
 
-            param :cnt, :to_i, range: 1..50, default: 10,
+            # param :cnt, :to_i, range: 1..50, default: 10,
+            param :cnt, :to_i, enum: 1..50, default: 10,
               desc: 'Max number of results to return'
 
             param :accurate, field: :type,
@@ -134,7 +174,8 @@ module TLAW
             param :lat, :to_f, required: true, desc: 'Latitude'
             param :lng, :to_f, required: true, desc: 'Longitude'
 
-            param :cnt, :to_i, range: 1..50, default: 10,
+            # param :cnt, :to_i, range: 1..50, default: 10,
+            param :cnt, :to_i, enum: 1..50, default: 10,
               desc: 'Max number of results to return'
 
             param :cluster, enum: {true => 'yes', false: 'no'},
@@ -177,6 +218,13 @@ module TLAW
 
           docs 'http://openweathermap.org/forecast5'
 
+          post_process { |e|
+            e['city.coord'] = Geo::Coord.new(e['city.coord.lat'], e['city.coord.lon']) \
+              if e['city.coord.lat'] && e['city.coord.lon']
+          }
+          post_process('city.coord.lat') { nil }
+          post_process('city.coord.lon') { nil }
+
           endpoint :city, '?q={city}{,country_code}' do
             desc %Q{
               Weather forecast by city name (with optional country code
@@ -213,53 +261,7 @@ module TLAW
             param :lat, :to_f, required: true, desc: 'Latitude'
             param :lng, :to_f, required: true, desc: 'Longitude'
           end
-
-          post_process { |e|
-            e['city.coord'] = Geo::Coord.new(e['city.coord.lat'], e['city.coord.lon']) \
-              if e['city.coord.lat'] && e['city.coord.lon']
-          }
-          post_process('city.coord.lat') { nil }
-          post_process('city.coord.lon') { nil }
         end
-
-        # OpenWeatherMap reports most of logical errors with HTTP code
-        # 200 and responses like {cod: "500", message: "Error message"}
-        post_process { |h|
-          !h.key?('cod') || (200...400).cover?(h['cod'].to_i) or
-            fail "#{h['cod']}: #{h['message']}"
-        }
-
-        WEATHER_POST_PROCESSOR = lambda do |*|
-          # Most of the time there is exactly one weather item...
-          # ...but sometimes there are two. So, flatterning them looks
-          # more reasonable than having DataTable of 1-2 rows.
-          post_process { |h|
-            h['weather2'] = h['weather'].last if h['weather'] && h['weather'].count > 1
-          }
-          post_process('weather', &:first)
-
-          post_process('dt', &Time.method(:at))
-          post_process('dt_txt') { nil } # TODO: we need cleaner way to say "remove this"
-          post_process('sys.sunrise', &Time.method(:at))
-          post_process('sys.sunset', &Time.method(:at))
-
-          # https://github.com/zverok/geo_coord promo here!
-          post_process { |e|
-            e['coord'] = Geo::Coord.new(e['coord.lat'], e['coord.lon']) if e['coord.lat'] && e['coord.lon']
-          }
-          post_process('coord.lat') { nil }
-          post_process('coord.lon') { nil }
-
-          # See http://openweathermap.org/weather-conditions#How-to-get-icon-URL
-          post_process('weather.icon', &'http://openweathermap.org/img/w/%s.png'.method(:%) }
-        end
-
-        # For endpoints returning weather in one place
-        instance_eval(&WEATHER_POST_PROCESSOR)
-
-        # For endpoints returning list of weathers (forecast or several
-        # cities).
-        post_process_items('list', &WEATHER_POST_PROCESSOR)
       end
     end
   end

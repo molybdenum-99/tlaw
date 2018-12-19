@@ -36,7 +36,8 @@ module TLAW
 
         namespace.children.each do |child|
           class_name = CLASS_NAMES.fetch(child.symbol, Util.camelize(child.symbol.to_s))
-          namespace.const_set(class_name, child)
+          # namespace.send(:remove_const, class_name) if namespace.const_defined?(class_name)
+          namespace.const_set(class_name, child) unless namespace.const_defined?(class_name)
           constantize_children(child)
         end
       end

@@ -46,8 +46,12 @@ module TLAW
       end
 
       def setup(base_url: nil, **args)
-        base_url or fail ArgumentError, "API can't be defined without base_url"
-        self.url_template = base_url
+        if url_template
+          base_url and fail ArgumentError, "API's base_url can't be changed on redefinition"
+        else
+          base_url or fail ArgumentError, "API can't be defined without base_url"
+          self.url_template = base_url
+        end
         super(symbol: nil, path: '', **args)
       end
 
