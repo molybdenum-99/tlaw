@@ -5,11 +5,7 @@ module TLAW
     module_function
 
     def camelize(string)
-      string
-        .sub(/^[a-z\d]*/, &:capitalize)
-        .gsub(%r{(?:_|(/))([a-z\d]*)}i) {
-          "#{$1}#{$2.capitalize}" # rubocop:disable Style/PerlBackrefs
-        }
+      string.sub(/^[a-z\d]*/, &:capitalize)
     end
 
     # Returns [parent, parent.parent, ...]

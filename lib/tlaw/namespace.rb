@@ -33,7 +33,7 @@ module TLAW
   #
   class Namespace < APIPath
     class << self
-      RESTRICTION = {
+      TRAVERSE_RESTRICTION = {
         endpoints: Endpoint,
         namespaces: Namespace,
         nil => APIPath
@@ -41,7 +41,7 @@ module TLAW
 
       def traverse(restrict_to = nil, &block)
         return to_enum(:traverse, restrict_to) unless block_given?
-        klass = RESTRICTION.fetch(restrict_to)
+        klass = TRAVERSE_RESTRICTION.fetch(restrict_to)
         children.each do |child|
           yield child if child < klass
           child.traverse(restrict_to, &block) if child.respond_to?(:traverse)
@@ -56,10 +56,9 @@ module TLAW
       # Returns the namespace's child of the requested name.
       #
       # @return [Array<Endpoint>]
-      def child(name, restrict_to: nil)
-        child_index.fetch(name).tap do |ep|
-          fail ArgumentError, "#{name} is not an #{restrict_to}" unless ep < (restrict_to || Object)
-        end
+      def child(symbol, restrict_to: APIPath)
+        child_index[symbol]
+          .tap { |child| validate_class(symbol, child, restrict_to) }
       end
 
       # Lists all current namespace's nested namespaces.
@@ -129,12 +128,18 @@ module TLAW
           child_index[child.symbol] = child
         end
       end
+
+      private
+
+      def validate_class(sym, child_class, expected_class)
+        return if child_class&.<(expected_class)
+        kind = expected_class.name.split('::').last.downcase.sub('apipath', 'path')
+        fail ArgumentError,
+             "Unregistered #{kind}: #{sym}"
+      end
     end
 
-    def_delegators :self_class,
-                   :symbol, :name_to_call,
-                   :child_index, :children, :namespaces, :endpoint, :endpoints,
-                   :param_set, :describe_short
+    def_delegators :self_class, :symbol, :namespaces, :endpoints
 
     # def inspect
     #   Inspect.inspect_namespace(self.class, @parent_params)
@@ -147,15 +152,7 @@ module TLAW
     private
 
     def child(sym, expected_class, **params)
-      child_index[sym]
-        .tap { |child_class| validate_class(sym, child_class, expected_class) }
-        .new(self, **params)
-    end
-
-    def validate_class(sym, child_class, expected_class)
-      return if child_class < expected_class
-      fail ArgumentError,
-           "Unregistered #{expected_class.name.split('::').last.downcase}: #{sym}"
+      self.class.child(sym, restrict_to: expected_class).new(self, **params)
     end
   end
 end

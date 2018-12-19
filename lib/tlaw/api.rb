@@ -55,21 +55,18 @@ module TLAW
         self < API
       end
 
-      # Returns detailed description of an API, like this:
+      # @method describe
+      #   Returns detailed description of an API, like this:
       #
-      # ```ruby
-      # MyCoolAPI.describe
-      # # MyCoolAPI.new()
-      # #   This is cool API.
-      # #
-      # #   Namespaces:
-      # #   .awesome()
-      # #     This is awesome.
-      # ```
-      #
-      def describe(*)
-        super.sub(/\A./, '')
-      end
+      #   ```ruby
+      #   MyCoolAPI.describe
+      #   # MyCoolAPI.new()
+      #   #   This is cool API.
+      #   #
+      #   #   Namespaces:
+      #   #   .awesome()
+      #   #     This is awesome.
+      #   ```
 
       protected
 
@@ -90,19 +87,19 @@ module TLAW
 
     def request(url, **params)
       @client.get(url, **params).tap(&method(:guard_errors!))
-    rescue API::Error
+    rescue Error
       raise # Not catching in the next block
     rescue StandardError => e
-      raise API::Error, "#{e.class} at #{url}: #{e.message}"
+      raise Error, "#{e.class} at #{url}: #{e.message}"
     end
 
     def guard_errors!(response)
       # TODO: follow redirects
       return response if (200...400).cover?(response.status)
 
-      fail API::Error,
+      fail Error,
            "HTTP #{response.status} at #{response.env[:url]}" +
-           extract_message(body)&.yield_self { |m| ': ' + m }.to_s
+           extract_message(response.body)&.yield_self { |m| ': ' + m }.to_s
     end
 
     def extract_message(body)
