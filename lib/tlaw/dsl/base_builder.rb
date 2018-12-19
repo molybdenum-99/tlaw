@@ -5,10 +5,10 @@ module TLAW
     class BaseBuilder
       attr_reader :params, :processors
 
-      def initialize(symbol:, path: nil, context: nil, xml: false, **opts, &block)
+      def initialize(symbol:, path: nil, context: nil, xml: false, params: {}, **opts, &block)
         path ||= "/#{symbol}" # Not default arg, because we need to process explicitly passed path: nil, too
         @definition = opts.merge(symbol: symbol, path: path)
-        @params = params_from_path(path)
+        @params = params.merge(params_from_path(path))
         @processors = (context&.processors || []).dup
         @parser = parser(xml)
         instance_eval(&block) if block

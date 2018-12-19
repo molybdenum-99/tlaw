@@ -6,6 +6,8 @@ require_relative 'endpoint_builder'
 module TLAW
   module DSL
     class NamespaceBuilder < BaseBuilder
+      CHILD_CLASSES = {NamespaceBuilder => Namespace, EndpointBuilder => Endpoint}
+
       attr_reader :children
 
       ENDPOINT_METHOD = <<~CODE
@@ -22,33 +24,21 @@ module TLAW
 
       METHODS = {Endpoint => ENDPOINT_METHOD, Namespace => NAMESPACE_METHOD}.freeze
 
-      def initialize(*)
-        @children = []
-        super
+      def initialize(children: [], **args, &block)
+        @children = children.map { |c| [c.symbol, c] }.to_h
+        super(**args, &block)
       end
 
       def definition
-        super.merge(children: children)
+        super.merge(children: children.values)
       end
 
       def endpoint(symbol, path = nil, **opts, &block)
-        EndpointBuilder.new(
-          symbol: symbol,
-          path: path,
-          context: self,
-          **opts,
-          &block
-        ).finalize.tap(&children.method(:push))
+        child(EndpointBuilder, symbol, path, **opts, &block)
       end
 
       def namespace(symbol, path = nil, **opts, &block)
-        NamespaceBuilder.new(
-          symbol: symbol,
-          path: path,
-          context: self,
-          **opts,
-          &block
-        ).finalize.tap(&children.method(:push))
+        child(NamespaceBuilder, symbol, path, **opts, &block)
       end
 
       def finalize
@@ -57,8 +47,26 @@ module TLAW
 
       private
 
+      def child(builder_class, symbol, path, **opts, &block)
+        target_class = CHILD_CLASSES.fetch(builder_class)
+        existing = children[symbol]
+          &.tap { |c|
+            c < target_class or fail ArgumentError, "#{symbol} already defined as #{c.ansestors.first}"
+          }
+          &.definition || {}
+
+        builder_class.new(
+          symbol: symbol,
+          path: path,
+          context: self,
+          **opts,
+          **existing,
+          &block
+        ).finalize.tap { |child| children[symbol] = child }
+      end
+
       def define_children_methods(namespace)
-        children.each do |child|
+        children.each_value do |child|
           namespace.module_eval(child_method_code(child))
         end
       end

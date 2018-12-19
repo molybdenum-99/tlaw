@@ -27,6 +27,19 @@ module TLAW
       @format = format
     end
 
+    def to_h
+      {
+        name: name,
+        field: field,
+        type: type,
+        description: description,
+        required: required?,
+        keyword: keyword?,
+        default: default,
+        format: format
+      }
+    end
+
     def required?
       @required
     end

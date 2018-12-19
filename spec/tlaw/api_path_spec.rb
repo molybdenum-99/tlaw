@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
 RSpec.describe TLAW::APIPath do
-  def param(name, **arg)
-    TLAW::Param.new(name: name, **arg)
-  end
-
   let(:parent_cls) {
-    class_double('TLAW::ApiPath',
-                 url_template: 'http://example.com/{x}', full_param_defs: [param(:x), param(:y)])
+    class_double(
+      'TLAW::ApiPath',
+      parent: nil,
+      url_template: 'http://example.com/{x}',
+      full_param_defs: [param(:x), param(:y)]
+    )
   }
 
   let(:parent) { instance_double('TLAW::APIPath', prepared_params: {x: 'xxx'}) }
@@ -68,6 +68,7 @@ RSpec.describe TLAW::APIPath do
           full_param_defs: be_an(Array).and(have_attributes(size: 4))
         )
       }
+      its(:parents) { are_expected.to eq [parent_cls] }
     end
   end
 

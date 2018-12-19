@@ -59,6 +59,16 @@ RSpec.describe TLAW::Formatting::Describe do
           @param a [Integer] It is a param!
           @param b It is another one
             Possible values: "a", "b"
+
+          Namespaces:
+
+          .nested(c: nil)
+            Nested NS
+
+          Endpoints:
+
+          .ep(d: nil)
+            Nested EP
       DESC
     }
   end

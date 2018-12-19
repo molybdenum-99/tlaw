@@ -78,6 +78,8 @@ module TLAW
     # @return [Hash,Array] Parsed, flattened and post-processed response
     #   body.
     def call
+      # TODO: we have a whole response here, so we can potentially have processors that
+      # extract some useful information (pagination, rate-limiting) from _headers_.
       api.request(url, **request_params).body.yield_self(&method(:parse))
     end
 

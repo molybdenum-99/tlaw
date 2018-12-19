@@ -18,6 +18,16 @@ module TLAW
         end
       end
 
+      def definition
+        {
+          symbol: symbol,
+          path: path,
+          description: description,
+          docs_link: docs_link,
+          params: param_defs.map { |p| [p.name, p.to_h] }.to_h
+        }
+      end
+
       def is_defined? # rubocop:disable Naming/PredicateName
         !symbol.nil?
       end
@@ -40,18 +50,10 @@ module TLAW
       end
 
       # @private
+      # FIXME: Why???
       def description
         return unless @description || @docs_link
-
-        Util::Description.new(
-          [@description, ("Docs: #{@docs_link}" if @docs_link)]
-            .compact.join("\n\n")
-        )
-      end
-
-      # @private
-      def response_processor
-        @response_processor ||= ResponseProcessor.new
+        [@description, ("Docs: #{@docs_link}" if @docs_link)].compact.join("\n\n")
       end
 
       protected

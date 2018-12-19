@@ -2,6 +2,28 @@
 
 module TLAW
   module Formatting
+    # Description is just a String subclass with rewritten `inspect`
+    # implementation (useful in `irb`/`pry`):
+    #
+    # ```ruby
+    # str = "Description of endpoint:\nIt has params:..."
+    # # "Description of endpoint:\nIt has params:..."
+    #
+    # TLAW::Util::Description.new(str)
+    # # Description of endpoint:
+    # # It has params:...
+    # ```
+    #
+    # TLAW uses it when responds to {APIPath.describe}.
+    #
+    class Description < String
+      alias inspect to_s
+
+      def initialize(str)
+        super(str.to_s.gsub(/ +\n/, "\n"))
+      end
+    end
+
     module_function
 
     def call_sequence(klass)

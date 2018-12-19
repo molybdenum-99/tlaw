@@ -27,7 +27,14 @@ RSpec.describe TLAW::Endpoint do
   end
 
   describe 'object behavior' do
-    let(:parent) { instance_double('TLAW::ApiPath', prepared_params: parent_params, api: api) }
+    let(:parent) {
+      instance_double(
+        'TLAW::ApiPath',
+        prepared_params: parent_params,
+        api: api,
+        parent: nil
+      )
+    }
     let(:api) { instance_double('TLAW::API', request: nil) }
     let(:parent_params) { {x: 'bar', y: 'baz'} }
 
@@ -35,6 +42,7 @@ RSpec.describe TLAW::Endpoint do
 
     its(:url) { is_expected.to eq 'http://example.com/bar/foo' }
     its(:request_params) { are_expected.to eq(y: 'baz', a: '1', b: '2') }
+    its(:parents) { are_expected.to eq [parent] }
 
     describe 'formatting' do
       before {

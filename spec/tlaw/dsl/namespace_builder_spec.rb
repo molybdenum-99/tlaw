@@ -10,14 +10,14 @@ RSpec.describe TLAW::DSL::NamespaceBuilder do
 
     its_block {
       is_expected.to change(builder, :children)
-        .to contain_exactly(
-          have_attributes(symbol: :foo).and(be < TLAW::Endpoint)
+        .to match(
+          foo: have_attributes(symbol: :foo).and(be < TLAW::Endpoint)
         )
     }
     its_block {
       is_expected
         .to send_message(TLAW::DSL::EndpointBuilder, :new)
-        .with(symbol: :foo, path: '/bar').calling_original
+        .with(symbol: :foo, path: '/bar', context: instance_of(described_class)).calling_original
     }
   end
 
@@ -25,16 +25,45 @@ RSpec.describe TLAW::DSL::NamespaceBuilder do
     subject { builder.namespace(:foo, '/bar') { param :bar } }
 
     its_block {
-      is_expected.to change(builder, :children)
-        .to contain_exactly(
-          have_attributes(symbol: :foo).and(be < TLAW::Namespace)
+      is_expected
+        .to change(builder, :children)
+        .to match(
+          foo: have_attributes(symbol: :foo).and(be < TLAW::Namespace)
         )
     }
     its_block {
       is_expected
         .to send_message(described_class, :new)
-        .with(symbol: :foo, path: '/bar').calling_original
+        .with(symbol: :foo, path: '/bar', context: instance_of(described_class)).calling_original
     }
+
+    context 'when it is second definition' do
+      before {
+        builder.namespace(:foo, '/bar') {
+          param :bar
+          endpoint(:x) { param :y }
+        }
+        builder.namespace(:foo) {
+          desc 'Description.'
+          param :baz
+          endpoint(:x) { param :y, required: true }
+        }
+      }
+
+      subject {  builder.children.values.first }
+
+      it {
+        is_expected
+          .to be.<(TLAW::Namespace)
+          .and have_attributes(symbol: :foo, path: '/bar', description: 'Description.')
+      }
+      its(:param_defs) {
+        are_expected.to contain_exactly(have_attributes(name: :bar), have_attributes(name: :baz))
+      }
+      its(:'endpoints.first.param_defs') {
+        are_expected.to contain_exactly(have_attributes(name: :y, :required? => true))
+      }
+    end
   end
 
   describe '#finalize' do

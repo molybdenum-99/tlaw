@@ -2,18 +2,11 @@
 
 module TLAW
   module ResponseProcessors
-    module_function
-
     module Generators
       module_function
 
       def mutate(&block)
         proc { |hash| hash.tap(&block) }
-      end
-
-      # FIXME: redundant!
-      def replace(&block)
-        block
       end
 
       def transform_by_key(key_pattern, &block)
@@ -30,53 +23,57 @@ module TLAW
       end
     end
 
-    def transform_by_key(value, key_pattern)
-      return value unless value.is_a?(Hash)
+    class << self
+      def transform_by_key(value, key_pattern)
+        return value unless value.is_a?(Hash)
 
-      value
-        .map { |k, v| key_pattern === k ? [k, yield(v)] : [k, v] } # rubocop:disable Style/CaseEquality
-        .to_h
-    end
-
-    def transform_nested(value, key_pattern, &block)
-      transform_by_key(value, key_pattern) { |v| v.is_a?(Array) ? v.map(&block) : v }
-    end
-
-    def flatten(value)
-      case value
-      when Hash
-        flatten_hash(value)
-      when Array
-        value.map(&method(:flatten))
-      else
         value
+          .map { |k, v| key_pattern === k ? [k, yield(v)] : [k, v] } # rubocop:disable Style/CaseEquality
+          .to_h
       end
-    end
 
-    def datablize(value)
-      case value
-      when Hash
-        value.transform_values(&method(:datablize))
-      when Array
-        if !value.empty? && value.all?(Hash)
-          DataTable.new(value)
+      def transform_nested(value, key_pattern, &block)
+        transform_by_key(value, key_pattern) { |v| v.is_a?(Array) ? v.map(&block) : v }
+      end
+
+      def flatten(value)
+        case value
+        when Hash
+          flatten_hash(value)
+        when Array
+          value.map(&method(:flatten))
         else
           value
         end
-      else
-        value
       end
-    end
 
-    def flatten_hash(hash)
-      hash.flat_map do |k, v|
-        v = flatten(v)
-        if v.is_a?(Hash)
-          v.map { |k1, v1| ["#{k}.#{k1}", v1] }
+      def datablize(value)
+        case value
+        when Hash
+          value.transform_values(&method(:datablize))
+        when Array
+          if !value.empty? && value.all?(Hash)
+            DataTable.new(value)
+          else
+            value
+          end
         else
-          [[k, v]]
+          value
         end
-      end.reject { |_, v| v.nil? }.to_h
+      end
+
+      private
+
+      def flatten_hash(hash)
+        hash.flat_map do |k, v|
+          v = flatten(v)
+          if v.is_a?(Hash)
+            v.map { |k1, v1| ["#{k}.#{k1}", v1] }
+          else
+            [[k, v]]
+          end
+        end.reject { |_, v| v.nil? }.to_h
+      end
     end
   end
 end

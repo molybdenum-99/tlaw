@@ -35,10 +35,6 @@ module TLAW
         other.is_a?(self.class) && other.type == type
       end
 
-      def to_doc_type
-        nil
-      end
-
       def call(value)
         validation_error(value)
           &.yield_self { |msg|
@@ -46,6 +42,8 @@ module TLAW
           }
         _convert(value)
       end
+
+      private
 
       def validation_error(_value)
         nil
@@ -58,6 +56,8 @@ module TLAW
 
     # @private
     class ClassType < Type
+      private
+
       def validation_error(value)
         "instance of #{type}" unless value.is_a?(type)
       end
@@ -65,24 +65,18 @@ module TLAW
       def _convert(value)
         value
       end
-
-      def to_doc_type
-        type.name
-      end
     end
 
     # @private
     class DuckType < Type
+      private
+
       def _convert(value)
         value.send(type)
       end
 
       def validation_error(value)
         "object responding to ##{type}" unless value.respond_to?(type)
-      end
-
-      def to_doc_type
-        "##{type}"
       end
     end
 
@@ -91,6 +85,8 @@ module TLAW
       def possible_values
         type.keys.map(&:inspect).join(', ')
       end
+
+      private
 
       def validation_error(value)
         "one of #{possible_values}" unless type.key?(value)

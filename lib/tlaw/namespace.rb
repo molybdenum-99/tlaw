@@ -49,6 +49,10 @@ module TLAW
         self
       end
 
+      def definition
+        super.merge(children: children)
+      end
+
       # Returns the namespace's child of the requested name.
       #
       # @return [Array<Endpoint>]

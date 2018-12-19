@@ -100,12 +100,16 @@ module TLAW
       # TODO: follow redirects
       return response if (200...400).cover?(response.status)
 
-      body = JSON.parse(response.body) rescue nil
-      message = body && (body['message'] || body['error'])
-
       fail API::Error,
            "HTTP #{response.status} at #{response.env[:url]}" +
-           (message ? ': ' + message : '')
+           extract_message(body)&.yield_self { |m| ': ' + m }.to_s
+    end
+
+    def extract_message(body)
+      # TODO: well, that's just awful
+      data = JSON.parse(body) rescue nil
+      return unless data.is_a?(Hash)
+      data.values_at('message', 'error').compact.first
     end
   end
 end
