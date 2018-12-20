@@ -1,10 +1,15 @@
 # frozen_string_literal: true
 
+require 'json'
+
+require 'backports/2.4.0/string/match'
+require 'backports/2.4.0/hash/compact'
+require 'backports/2.4.0/hash/transform_values'
+
 require 'backports/2.5.0/kernel/yield_self'
 require 'backports/2.5.0/hash/transform_keys'
 require 'backports/2.5.0/enumerable/all'
-require 'open-uri'
-require 'json'
+
 require 'addressable/uri'
 require 'addressable/template'
 
