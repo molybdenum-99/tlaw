@@ -49,11 +49,9 @@ module TLAW
     end
 
     def call(value)
-      # TODO: shouldn't to_s `nil`? Or should drop '' afterwards?..
-      # TODO: it had also to_url_part before, joining if the formatter returned array
       type.(value)
         .yield_self(&format)
-        .yield_self { |val| {field => val.to_s} }
+        .yield_self { |val| {field => Array(val).join(',')} }
     rescue TypeError => e
       raise TypeError, "#{name}: #{e.message}"
     end

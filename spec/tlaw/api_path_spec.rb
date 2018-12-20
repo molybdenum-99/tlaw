@@ -84,6 +84,13 @@ RSpec.describe TLAW::APIPath do
     its_call(a: 1, b: 2, c: Time.parse('2017-05-01'), d: true) {
       is_expected.to ret(a: '1', bb: '2', c: '2017-05-01', d: 't', x: 'xxx')
     }
+    its_call(a: 1, b: nil) {
+      is_expected.to ret(a: '1', x: 'xxx')
+    }
+
+    its_call(a: [1, 2, 3]) {
+      is_expected.to ret(a: '1,2,3', x: 'xxx')
+    }
 
     its_call(b: 2) {
       is_expected.to raise_error(ArgumentError, 'Missing arguments: a')
@@ -94,60 +101,5 @@ RSpec.describe TLAW::APIPath do
     its_call(a: 1, b: 'test') {
       is_expected.to raise_error(TypeError, 'b: expected instance of Integer, got "test"')
     }
-  end
-end
-
-__END__
-module TLAW
-  describe APIPath do
-    describe '.define_method_on' do
-      let(:object) {
-        Class.new(described_class) {
-          def self.to_code
-            "def foo\nputs 'foo'\nend"
-          end
-        }
-      }
-      let(:host) { double }
-
-      it 'sends definition to host' do
-        expect(host).to receive(:module_eval)
-          .with("def foo\nputs 'foo'\nend", __FILE__, 7)
-
-        object.define_method_on(host)
-      end
-    end
-
-    describe '.class_name' do
-      let(:object) {
-        Class.new(described_class).tap { |c| c.symbol = symbol }
-      }
-
-      subject { object.class_name }
-
-      context 'for regular symbols' do
-        let(:symbol) { :my_dear_baby_13 }
-
-        it { is_expected.to eq 'MyDearBaby13' }
-      end
-
-      context '[]' do
-        let(:symbol) { :[] }
-
-        it { is_expected.to eq 'Element' }
-      end
-    end
-
-    describe '.to_method_definition' do
-      subject(:example) {
-        Class.new(described_class).tap { |c|
-          c.symbol = :foo
-          c.param_set.add(:bar, required: true, keyword: false)
-          c.param_set.add(:baz)
-        }
-      }
-
-      its(:to_method_definition) { is_expected.to eq('foo(bar, baz: nil)') }
-    end
   end
 end
