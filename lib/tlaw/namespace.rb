@@ -33,12 +33,20 @@ module TLAW
   #
   class Namespace < APIPath
     class << self
+      # @private
       TRAVERSE_RESTRICTION = {
         endpoints: Endpoint,
         namespaces: Namespace,
         nil => APIPath
       }.freeze
 
+      # Traverses through all of the children (depth-first). Yields them into a block specified,
+      # or returns `Enumerator` if no block was passed.
+      #
+      # @yields [Namespace,Endpoint]
+      # @param restrict_to [Symbol] `:endpoints` or `:namespaces` to traverse only children of
+      #   specified class; if not passed, traverses all of them.
+      # @return [Enumerator, self] Enumerator is returned if no block passed.
       def traverse(restrict_to = nil, &block)
         return to_enum(:traverse, restrict_to) unless block_given?
 
@@ -50,29 +58,27 @@ module TLAW
         self
       end
 
-      def definition
-        super.merge(children: children)
-      end
-
       # Returns the namespace's child of the requested name.
       #
-      # @return [Array<Endpoint>]
-      def child(symbol, restrict_to: APIPath)
-        child_index[symbol]
-          .tap { |child| validate_class(symbol, child, restrict_to) }
+      # @param name [Symbol]
+      # @param restrict_to [Class] `Namespace` or `Endpoint`
+      # @return [Array<APIPath>]
+      def child(name, restrict_to: APIPath)
+        child_index[name]
+          .tap { |child| validate_class(name, child, restrict_to) }
       end
 
       # Lists all current namespace's nested namespaces.
       #
-      # @return [Namespace, ...]
+      # @return [Array<Namespace>]
       def namespaces
         children.grep(Namespace.singleton_class)
       end
 
-      # Returns the namespace's endpoint of the requested name.
+      # Returns the namespace's nested namespace of the requested name.
       #
-      # @param name
-      # @return [Array<Endpoint>]
+      # @param name [Symbol]
+      # @return [Namespace]
       def namespace(name)
         child(name, restrict_to: Namespace)
       end
@@ -86,16 +92,33 @@ module TLAW
 
       # Returns the namespace's endpoint of the requested name.
       #
-      # @param name
-      # @return [Array<Endpoint>]
+      # @param name [Symbol]
+      # @return [Endpoint]
       def endpoint(name)
         child(name, restrict_to: Endpoint)
       end
 
+      # @return [String]
       def inspect
         return super unless is_defined? || self < API
 
         Formatting::Inspect.namespace_class(self)
+      end
+
+      # Detailed namespace documentation.
+      #
+      # See {APIPath.describe} for explanations.
+      #
+      # @return [Formatting::Description]
+      def describe
+        return '' unless is_defined?
+
+        Formatting::Describe.namespace_class(self)
+      end
+
+      # @private
+      def definition
+        super.merge(children: children)
       end
 
       # @private
@@ -106,17 +129,6 @@ module TLAW
       # @private
       def child_index
         @child_index ||= {}
-      end
-
-      # Detailed namespace documentation.
-      #
-      # See {APIPath.describe} for explanations.
-      #
-      # @return [Util::Description]
-      def describe
-        return '' unless is_defined?
-
-        Formatting::Describe.namespace_class(self)
       end
 
       protected
@@ -147,10 +159,16 @@ module TLAW
                    :namespaces, :endpoints,
                    :namespace, :endpoint
 
+    # @return [String]
     def inspect
       Formatting::Inspect.namespace(self)
     end
 
+    # Returns `curl` string to call specified endpoit with specified params from command line.
+    #
+    # @param endpoint [Symbol] Endpoint's name
+    # @param params [Hash] Endpoint's argument
+    # @return [String]
     def curl(endpoint, **params)
       child(endpoint, Endpoint, **params).to_curl
     end

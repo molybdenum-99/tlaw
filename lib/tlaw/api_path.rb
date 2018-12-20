@@ -10,14 +10,17 @@ module TLAW
     class << self
       # @private
       attr_reader :symbol, :parent, :path, :param_defs, :description, :docs_link
+      # @private
       attr_writer :parent
 
+      # @private
       def define(**args)
         Class.new(self).tap do |subclass|
           subclass.setup(**args)
         end
       end
 
+      # @private
       def definition
         {
           symbol: symbol,
@@ -28,23 +31,28 @@ module TLAW
         }
       end
 
+      # @private
       def is_defined? # rubocop:disable Naming/PredicateName
         !symbol.nil?
       end
 
+      # @private
       def full_param_defs
         [*parent&.full_param_defs, *param_defs]
       end
 
+      # @private
       def required_param_defs
         param_defs.select(&:required?)
       end
 
+      # @private
       def url_template
         parent&.url_template or fail "Orphan path #{path}, can't determine full URL"
         [parent.url_template, path].join
       end
 
+      # @return [Array<Class>]
       def parents
         Util.parents(self)
       end
@@ -65,6 +73,7 @@ module TLAW
 
     extend Forwardable
 
+    # @private
     attr_reader :parent, :params
 
     def initialize(parent, **params)
@@ -72,19 +81,24 @@ module TLAW
       @params = params
     end
 
-    def prepared_params
-      (parent&.prepared_params || {}).merge(prepare_params(@params))
-    end
-
+    # @return [Array<APIPath>]
     def parents
       Util.parents(self)
     end
 
+    def_delegators :self_class, :describe
+
+    # @private
+    # Could've been protected, but it hurts testability :shrug:
+    def prepared_params
+      (parent&.prepared_params || {}).merge(prepare_params(@params))
+    end
+
+    protected
+
     def api
       is_a?(API) ? self : parent&.api
     end
-
-    def_delegators :self_class, :describe
 
     private
 

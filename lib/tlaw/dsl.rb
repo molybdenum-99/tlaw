@@ -401,6 +401,11 @@ module TLAW
     #   ```
     #
     #   See also {#post_process} for some generic explanation of post-processing.
+
+    # @private
+    # If there is no content in class, YARD got mad with directives.
+    # See: https://github.com/lsegal/yard/issues/1207
+    DUMMY = nil
   end
 end
 

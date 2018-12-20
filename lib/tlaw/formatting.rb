@@ -1,9 +1,8 @@
 # frozen_string_literal: true
 
 module TLAW
-  # @private
+  # Just a bit of formatting utils.
   module Formatting
-    # @public
     # Description is just a String subclass with rewritten `inspect`
     # implementation (useful in `irb`/`pry`):
     #
@@ -11,12 +10,12 @@ module TLAW
     # str = "Description of endpoint:\nIt has params:..."
     # # "Description of endpoint:\nIt has params:..."
     #
-    # TLAW::Util::Description.new(str)
+    # TLAW::Formatting::Description.new(str)
     # # Description of endpoint:
     # # It has params:...
     # ```
     #
-    # TLAW uses it when responds to {APIPath.describe}.
+    # TLAW uses it when responds to {Namespace.describe}/{Endpoint.describe}.
     #
     class Description < String
       alias inspect to_s
@@ -28,12 +27,14 @@ module TLAW
 
     module_function
 
+    # @private
     def call_sequence(klass)
       params = params_to_ruby(klass.param_defs)
       name = klass < API ? "#{klass.name}.new" : klass.symbol.to_s
       params.empty? ? name : "#{name}(#{params})"
     end
 
+    # @private
     def params_to_ruby(params) # rubocop:disable Metrics/AbcSize
       key, arg = params.partition(&:keyword?)
       req_arg, opt_arg = arg.partition(&:required?)

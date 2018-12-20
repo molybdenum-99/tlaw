@@ -35,28 +35,14 @@ module TLAW
     end
 
     class << self
+      # @private
       attr_reader :url_template
-      private :parent, :parent=
 
       # Runs the {DSL} inside your API wrapper class.
       def define(&block)
         self == API and fail '#define should be called on the descendant of the TLAW::API'
         DSL::ApiBuilder.new(self, &block).finalize
         self
-      end
-
-      def setup(base_url: nil, **args)
-        if url_template
-          base_url and fail ArgumentError, "API's base_url can't be changed on redefinition"
-        else
-          base_url or fail ArgumentError, "API can't be defined without base_url"
-          self.url_template = base_url
-        end
-        super(symbol: nil, path: '', **args)
-      end
-
-      def is_defined? # rubocop:disable Naming/PredicateName
-        self < API
       end
 
       # @method describe
@@ -72,9 +58,27 @@ module TLAW
       #   #     This is awesome.
       #   ```
 
+      # @private
+      def setup(base_url: nil, **args)
+        if url_template
+          base_url and fail ArgumentError, "API's base_url can't be changed on redefinition"
+        else
+          base_url or fail ArgumentError, "API can't be defined without base_url"
+          self.url_template = base_url
+        end
+        super(symbol: nil, path: '', **args)
+      end
+
+      # @private
+      def is_defined? # rubocop:disable Naming/PredicateName
+        self < API
+      end
+
       protected
 
       attr_writer :url_template
+
+      private :parent, :parent=
     end
 
     private :parent
@@ -89,6 +93,7 @@ module TLAW
       end
     end
 
+    # @private
     def request(url, **params)
       @client.get(url, **params).tap(&method(:guard_errors!))
     rescue Error
@@ -96,6 +101,8 @@ module TLAW
     rescue StandardError => e
       raise Error, "#{e.class} at #{url}: #{e.message}"
     end
+
+    private
 
     def guard_errors!(response)
       # TODO: follow redirects

@@ -22,6 +22,7 @@ module TLAW
   #
   class Endpoint < APIPath
     class << self
+      # @private
       attr_reader :processors
 
       # Inspects endpoint class prettily.
@@ -54,6 +55,7 @@ module TLAW
       attr_writer :processors
     end
 
+    # @private
     attr_reader :url, :request_params
 
     # Creates endpoint class (or  descendant) instance. Typically, you
@@ -85,10 +87,12 @@ module TLAW
       api.request(url, **request_params).body.yield_self(&method(:parse))
     end
 
+    # @retun [String]
     def inspect
       Formatting::Inspect.endpoint(self)
     end
 
+    # @private
     def to_curl
       separator = url.include?('?') ? '&' : '?'
       full_url = url + separator + request_params.map(&'%s=%s'.method(:%)).join('&')
