@@ -151,6 +151,10 @@ module TLAW
       Formatting::Inspect.namespace(self)
     end
 
+    def curl(endpoint, **params)
+      child(endpoint, Endpoint, **params).to_curl
+    end
+
     private
 
     def child(sym, expected_class, **params)

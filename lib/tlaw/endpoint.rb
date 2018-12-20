@@ -89,6 +89,13 @@ module TLAW
       Formatting::Inspect.endpoint(self)
     end
 
+    def to_curl
+      separator = url.include?('?') ? '&' : '?'
+      full_url = url + separator + request_params.map(&'%s=%s'.method(:%)).join('&')
+      # FIXME: Probably unreliable (escaping), but Shellwords.escape do the wrong thing.
+      %{curl "#{(full_url)}"}
+    end
+
     private
 
     def_delegators :self_class, :url_template, :processors
