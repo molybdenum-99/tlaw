@@ -41,6 +41,7 @@ module TLAW
 
       def traverse(restrict_to = nil, &block)
         return to_enum(:traverse, restrict_to) unless block_given?
+
         klass = TRAVERSE_RESTRICTION.fetch(restrict_to)
         children.each do |child|
           yield child if child < klass
@@ -93,6 +94,7 @@ module TLAW
 
       def inspect
         return super unless is_defined? || self < API
+
         Formatting::Inspect.namespace_class(self)
       end
 
@@ -113,6 +115,7 @@ module TLAW
       # @return [Util::Description]
       def describe
         return '' unless is_defined?
+
         Formatting::Describe.namespace_class(self)
       end
 
@@ -133,6 +136,7 @@ module TLAW
 
       def validate_class(sym, child_class, expected_class)
         return if child_class&.<(expected_class)
+
         kind = expected_class.name.split('::').last.downcase.sub('apipath', 'path')
         fail ArgumentError,
              "Unregistered #{kind}: #{sym}"

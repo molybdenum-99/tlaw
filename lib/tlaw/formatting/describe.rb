@@ -40,6 +40,7 @@ module TLAW
 
         def param_defs(defs)
           return nil if defs.empty?
+
           defs
             .map(&method(:param_def))
             .join("\n")
@@ -59,6 +60,7 @@ module TLAW
 
         def possible_values(type)
           return unless type.respond_to?(:possible_values)
+
           "\n  Possible values: #{type.possible_values}"
         end
 

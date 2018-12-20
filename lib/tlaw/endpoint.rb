@@ -34,11 +34,13 @@ module TLAW
       # ```
       def inspect
         return super unless is_defined?
+
         Formatting::Inspect.endpoint_class(self)
       end
 
       def describe
         return '' unless is_defined?
+
         Formatting::Describe.endpoint_class(self)
       end
 
