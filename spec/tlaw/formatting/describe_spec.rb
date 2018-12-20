@@ -7,6 +7,7 @@ RSpec.describe TLAW::Formatting::Describe do
     let(:ep) {
       TLAW::DSL::EndpointBuilder.new(symbol: :foo, path: '/foo') {
         desc 'The description'
+        docs 'http://example.com'
 
         param :a, Integer, keyword: false, required: true, desc: 'It is a param!'
         param :b, enum: %w[a b], required: true, desc: 'It is another one'
@@ -20,6 +21,8 @@ RSpec.describe TLAW::Formatting::Describe do
         foo(a, b:)
 
           The description
+
+          Docs: http://example.com
 
           @param a [Integer] It is a param!
           @param b It is another one

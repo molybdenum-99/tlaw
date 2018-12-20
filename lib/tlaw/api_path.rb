@@ -9,7 +9,7 @@ module TLAW
   class APIPath
     class << self
       # @private
-      attr_reader :symbol, :parent, :path, :param_defs, :docs_link
+      attr_reader :symbol, :parent, :path, :param_defs, :description, :docs_link
       attr_writer :parent
 
       def define(**args)
@@ -47,13 +47,6 @@ module TLAW
 
       def parents
         Util.parents(self)
-      end
-
-      # @private
-      # FIXME: Why???
-      def description
-        return unless @description || @docs_link
-        [@description, ("Docs: #{@docs_link}" if @docs_link)].compact.join("\n\n")
       end
 
       protected

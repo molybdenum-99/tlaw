@@ -9,6 +9,7 @@ module TLAW
           [
             Formatting.call_sequence(klass),
             klass.description&.yield_self { |desc| "\n" + indent(desc, '  ') },
+            klass.docs_link&.yield_self(&"\n  Docs: %s".method(:%)),
             param_defs(klass.param_defs)
           ].compact.join("\n").yield_self(&Description.method(:new))
         end
