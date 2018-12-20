@@ -93,7 +93,7 @@ module TLAW
       separator = url.include?('?') ? '&' : '?'
       full_url = url + separator + request_params.map(&'%s=%s'.method(:%)).join('&')
       # FIXME: Probably unreliable (escaping), but Shellwords.escape do the wrong thing.
-      %{curl "#{(full_url)}"}
+      %{curl "#{full_url}"}
     end
 
     private
