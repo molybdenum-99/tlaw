@@ -4,7 +4,7 @@ module TLAW
   module DSL
     # @private
     class BaseBuilder
-      attr_reader :params, :processors
+      attr_reader :params, :processors, :shared_definitions
 
       def initialize(symbol:, path: nil, context: nil, xml: false, params: {}, **opts, &block)
         path ||= "/#{symbol}" # Not default arg, because we need to process explicitly passed path: nil, too
@@ -12,6 +12,7 @@ module TLAW
         @params = params.merge(params_from_path(path))
         @processors = (context&.processors || []).dup
         @parser = parser(xml)
+        @shared_definitions = context&.shared_definitions || {}
         instance_eval(&block) if block
       end
 
@@ -37,6 +38,18 @@ module TLAW
           description: description&.yield_self(&Util.method(:deindent))
         ).compact
         params.merge!(name => opts) { |_, o, n| o.merge(n) }
+        self
+      end
+
+      def shared_def(name, &block)
+        @shared_definitions[name] = block
+        self
+      end
+
+      def use_def(name)
+        shared_definitions
+          .fetch(name) { fail ArgumentError, "#{name.inspect} is not a shared definition" }
+          .tap { |block| instance_eval(&block) }
         self
       end
 

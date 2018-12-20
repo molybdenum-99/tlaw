@@ -30,6 +30,17 @@ module TLAW
             fail "#{h['cod']}: #{h['message']}"
         }
 
+        shared_def :lat_lng do
+          param :lat, :to_f, required: true, desc: 'Latitude'
+          param :lng, :to_f, required: true, desc: 'Longitude'
+        end
+
+        shared_def :cluster do
+          param :cluster, enum: {true => 'yes', false: 'no'},
+            default: true,
+            desc: 'Use server clustering of points'
+        end
+
         WEATHER_POST_PROCESSOR = lambda do |*|
           # Most of the time there is exactly one weather item...
           # ...but sometimes there are two. So, flatterning them looks
@@ -103,8 +114,7 @@ module TLAW
 
             docs 'http://openweathermap.org/current#geo'
 
-            param :lat, :to_f, required: true, desc: 'Latitude'
-            param :lng, :to_f, required: true, desc: 'Longitude'
+            use_def :lat_lng
           end
 
           endpoint :zip, '?zip={zip}{,country_code}' do
@@ -151,7 +161,6 @@ module TLAW
             param :start_with, required: true, desc: 'Beginning of city name'
             param :country_code, desc: 'ISO 3166 2-letter country code'
 
-            # param :cnt, :to_i, range: 1..50, default: 10,
             param :cnt, :to_i, enum: 1..50, default: 10,
               desc: 'Max number of results to return'
 
@@ -171,16 +180,12 @@ module TLAW
 
             docs 'http://openweathermap.org/current#cycle'
 
-            param :lat, :to_f, required: true, desc: 'Latitude'
-            param :lng, :to_f, required: true, desc: 'Longitude'
+            use_def :lat_lng
 
-            # param :cnt, :to_i, range: 1..50, default: 10,
             param :cnt, :to_i, enum: 1..50, default: 10,
               desc: 'Max number of results to return'
 
-            param :cluster, enum: {true => 'yes', false: 'no'},
-              default: true,
-              desc: 'Use server clustering of points'
+            use_def :cluster
           end
 
           # Real path is api/bbox/city - not inside /find, but logically
@@ -199,9 +204,7 @@ module TLAW
             param :zoom, :to_i, default: 10, keyword: true,
               desc: 'Map zoom level.'
 
-            param :cluster, enum: {true => 'yes', false => 'no'},
-              default: true,
-              desc: 'Use server clustering of points'
+            use_def :cluster
           end
         end
 
@@ -258,8 +261,7 @@ module TLAW
 
             docs 'http://openweathermap.org/forecast5#geo5'
 
-            param :lat, :to_f, required: true, desc: 'Latitude'
-            param :lng, :to_f, required: true, desc: 'Longitude'
+            use_def :lat_lng
           end
         end
       end

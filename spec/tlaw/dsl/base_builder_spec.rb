@@ -74,6 +74,31 @@ RSpec.describe TLAW::DSL::BaseBuilder do
 
   # TODO: params => param_defs test
 
+  describe '#shared_def' do
+    before {
+      builder.shared_def(:foo) {}
+    }
+    subject { builder }
+
+    its(:shared_definitions) { are_expected.to include(:foo) }
+  end
+
+  describe '#use_def' do
+    before {
+      builder.shared_def(:foo) {
+        param :bar
+      }
+    }
+    subject { builder.method(:use_def) }
+
+    its_call(:foo) {
+      is_expected.to change(builder, :params).to include(:bar)
+    }
+    its_call(:bar) {
+      is_expected.to raise_error ArgumentError, ':bar is not a shared definition'
+    }
+  end
+
   describe '#post_process'
   describe '#post_process_items'
 end
