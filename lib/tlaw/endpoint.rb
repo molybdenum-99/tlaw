@@ -87,8 +87,6 @@ module TLAW
       Formatting::Inspect.endpoint(self)
     end
 
-    def_delegators :self_class, :describe
-
     private
 
     def_delegators :self_class, :url_template, :processors

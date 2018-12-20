@@ -130,4 +130,17 @@ RSpec.describe TLAW::Namespace do
     its_call(:ep1, described_class, x: 1) { is_expected.to raise_error ArgumentError, 'Unregistered namespace: ep1' }
     its_call(:ns1, described_class, x: 1) { is_expected.to ret be_a(ns).and have_attributes(params: {x: 1}) }
   end
+
+  context 'formatting' do
+    before {
+      allow(cls).to receive(:name).and_return('Namespace')
+    }
+
+    subject(:obj) { cls.new(nil, a: 1, b: 5) }
+
+    its(:inspect) {
+      is_expected.to eq '#<Namespace(a: 1, b: 5); namespaces: ns1; endpoints: ep1; docs: .describe>'
+    }
+    its(:describe) { is_expected.to eq cls.describe }
+  end
 end

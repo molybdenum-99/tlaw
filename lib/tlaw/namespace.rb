@@ -143,13 +143,9 @@ module TLAW
                    :namespaces, :endpoints,
                    :namespace, :endpoint
 
-    # def inspect
-    #   Inspect.inspect_namespace(self.class, @parent_params)
-    # end
-
-    # def describe
-    #   Inspect.describe_namespace(self.class, @parent_params)
-    # end
+    def inspect
+      Formatting::Inspect.namespace(self)
+    end
 
     private
 

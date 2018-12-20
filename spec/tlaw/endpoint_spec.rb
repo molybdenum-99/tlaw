@@ -50,6 +50,7 @@ RSpec.describe TLAW::Endpoint do
       }
 
       its(:inspect) { is_expected.to eq '#<Endpoint(a: 1, b: 2); docs: .describe>' }
+      its(:describe) { is_expected.to eq cls.describe }
     end
 
     describe '#call' do
