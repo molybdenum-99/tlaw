@@ -25,15 +25,17 @@ module TLAW
       end
 
       def description(text)
-        @definition[:description] = text
+        @definition[:description] = Util.deindent(text)
         self
       end
 
       alias desc description
 
-      def param(name, type = nil, enum: nil, **opts)
-        opts = opts.merge(type: type) if type
-        opts = opts.merge(type: enum_type(enum)) if enum
+      def param(name, type = nil, enum: nil, desc: nil, description: desc, **opts)
+        opts = opts.merge(
+          type: type || enum&.yield_self(&method(:enum_type)),
+          description: description&.yield_self(&Util.method(:deindent))
+        ).compact
         params.merge!(name => opts) { |_, o, n| o.merge(n) }
         self
       end

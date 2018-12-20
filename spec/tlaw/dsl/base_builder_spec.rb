@@ -30,6 +30,13 @@ RSpec.describe TLAW::DSL::BaseBuilder do
     its_call("Very detailed and thoroughful\ndescription.") {
       is_expected.to change(builder, :definition).to include(description: "Very detailed and thoroughful\ndescription.")
     }
+    its_call(%{
+      The description with some
+        weird spacing.
+      ...and other stuff.
+    }) {
+      is_expected.to change(builder, :definition).to include(description: "The description with some\nweird spacing.\n...and other stuff.")
+    }
   end
 
   describe '#docs' do
@@ -45,6 +52,12 @@ RSpec.describe TLAW::DSL::BaseBuilder do
 
     its_call(:x, Integer) {
       is_expected.to change(builder, :params).to include(x: {type: Integer})
+    }
+    its_call(:x, desc: " Foo\n  bar.") {
+      is_expected.to change(builder, :params).to include(x: {description: "Foo\nbar."})
+    }
+    its_call(:x, description: " Foo\n  bar.") {
+      is_expected.to change(builder, :params).to include(x: {description: "Foo\nbar."})
     }
 
     context 'merging with params from path (preserve order and options)' do

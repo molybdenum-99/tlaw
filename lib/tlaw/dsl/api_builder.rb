@@ -20,7 +20,6 @@ module TLAW
       end
 
       def finalize
-        # TODO: What if result is dynamic, without associated const name?
         @api_class.setup(**definition)
         define_children_methods(@api_class)
         constantize_children(@api_class)

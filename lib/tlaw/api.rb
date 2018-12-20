@@ -107,7 +107,7 @@ module TLAW
     end
 
     def extract_message(body)
-      # TODO: well, that's just awful
+      # FIXME: well, that's just awful
       data = JSON.parse(body) rescue nil
       return unless data.is_a?(Hash)
       data.values_at('message', 'error').compact.first
