@@ -16,7 +16,8 @@ module TLAW
       def initialize(api_class, &block)
         @api_class = api_class
         @definition = {}
-        super(symbol: nil, &block)
+        # super(symbol: nil, children: api_class.children || [], &block)
+        super(symbol: nil, **api_class.definition, &block)
       end
 
       def finalize

@@ -1,35 +1,57 @@
 # frozen_string_literal: true
 
 module TLAW
-  # Namespace is basically a container for {Endpoint}s. It allows to
-  # nest Ruby calls (like `api.namespace1.namespace2.real_call(params)`),
-  # optionally providing some parameters while nesting, like
-  # `worldbank.countries('uk').population(2016)`.
+  # Namespace is a grouping tool for API endpoints.
   #
-  # By default, namespaces nesting also means URL nesting (e.g.
-  # `base_url/namespace1/namespace2/endpoint`), but that could be altered
-  # on namespace definition, see {DSL} module for details.
-  #
-  # Typically, as with {Endpoint}, you never create namespace instances
-  # or subclasses by yourself: you use {DSL} for their definition and
-  # then call `.<namespace_name>` method on parent namespace (or API instance):
+  # Assuming we have this API definition:
   #
   # ```ruby
-  # class SampleAPI < TLAW::API
-  #   # namespace definition:
-  #   namespace :my_ns do
-  #     endpoint :weather
+  # class OpenWeatherMap < TLAW::API
+  #   define do
+  #     base 'http://api.openweathermap.org/data/2.5'
+  #
+  #     namespace :current, '/weather' do
+  #       endpoint :city, '?q={city}{,country_code}'
+  #     end
   #   end
   # end
-  #
-  # # usage:
-  # api = SampleAPI.new
-  #
-  # api.namespaces # => [SampleAPI::MyNS], subclass of namespace
-  # api.namespace(:my_ns) # => SampleAPI::MyNS
-  # api.my_ns # => short-living instance of SampleAPI::MyNS
-  # api.my_ns.weather # => real call to API
   # ```
+  #
+  # We can now use it this way:
+  #
+  # ```ruby
+  # api = OpenWeatherMap.new
+  # api.namespaces
+  # # => [OpenWeatherMap::Current(call-sequence: current; endpoints: city; docs: .describe)]
+  # api.current
+  # # => #<OpenWeatherMap::Current(); endpoints: city; docs: .describe>
+  # #    OpenWeatherMap::Current is dynamically generated class, descendant from Namespace,
+  # #    it is inspectable and usable for future calls
+  #
+  # api.current.describe
+  # # current
+  # #
+  # #   Endpoints:
+  # #
+  # #   .city(city=nil, country_code=nil)
+  #
+  # api.current.city('Kharkiv', 'UA')
+  # # => real API call at /weather?q=Kharkiv,UA
+  # ```
+  #
+  # Namespaces are useful for logical endpoint grouping and allow providing additional params to
+  # them. When params are defined for namespace by DSL, the call could look like this:
+  #
+  # ```ruby
+  # worldbank.countries('uk').population(2016)
+  # #         ^^^^^^^^^^^^^^            ^
+  # # namespace :countries have         |
+  # # defined country_code parameter    |
+  # #                               all namespace and endpoint params would be passed to endpoint call,
+  # #                               so real API call would probably look like ...?country=uk&year=2016
+  # ```
+  #
+  # See {DSL} for more details on namespaces, endpoints and params definitions.
   #
   class Namespace < APIPath
     class << self
@@ -43,7 +65,7 @@ module TLAW
       # Traverses through all of the children (depth-first). Yields them into a block specified,
       # or returns `Enumerator` if no block was passed.
       #
-      # @yields [Namespace,Endpoint]
+      # @yield [Namespace or Endpoint]
       # @param restrict_to [Symbol] `:endpoints` or `:namespaces` to traverse only children of
       #   specified class; if not passed, traverses all of them.
       # @return [Enumerator, self] Enumerator is returned if no block passed.
@@ -75,7 +97,7 @@ module TLAW
         children.grep(Namespace.singleton_class)
       end
 
-      # Returns the namespace's nested namespace of the requested name.
+      # Returns the namespace's nested namespaces of the requested name.
       #
       # @param name [Symbol]
       # @return [Namespace]
@@ -106,8 +128,6 @@ module TLAW
       end
 
       # Detailed namespace documentation.
-      #
-      # See {APIPath.describe} for explanations.
       #
       # @return [Formatting::Description]
       def describe

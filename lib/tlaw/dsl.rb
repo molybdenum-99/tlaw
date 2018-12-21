@@ -23,17 +23,15 @@ module TLAW
   #
   module DSL
     # @!method base(url)
-    #   Allows to set entire API base URL, all endpoints and namespaces
-    #   pathes are calculated relative to it.
+    #   Set entire API base URL, all endpoints and namespaces pathes are calculated relative to it.
     #
     #   **Works for:** API
     #
     #   @param url [String]
 
     # @!method desc(text)
-    #   Allows to set description string for your API object. It can
-    #   be multiline, and TLAW will automatically un-indent excessive
-    #   indentations:
+    #   Set description string for API object (namespace or endpoint). It can be multiline, and
+    #   TLAW will automatically un-indent excessive indentations:
     #
     #   ```ruby
     #       # ...several levels of indents while you create a definition
@@ -54,8 +52,7 @@ module TLAW
     #   @param text [String]
 
     # @!method docs(link)
-    #   Allows to add link to documentation as a separate line to
-    #   object description. Just to be semantic :)
+    #   Add link to documentation as a separate line to object description. Just to be semantic :)
     #
     #   ```ruby
     #   # you do something like
@@ -80,19 +77,17 @@ module TLAW
     #
     #   Param defnition defines several things:
     #
-    #   * how method definition to call this namespace/endpoint would
-    #     look like: whether the parameter is keyword or regular argument,
-    #     whether it is required and what is default value otherwise;
-    #   * how parameter is processed: converted and validated from passed
-    #     value;
-    #   * how param is sent to target API: how it will be called in
-    #     the query string and formatted on call.
+    #   * how method definition to call this namespace/endpoint would look like: whether the
+    #     parameter is keyword or regular argument, whether it is required and what is default
+    #     value otherwise;
+    #   * how parameter is processed: converted and validated from passed value;
+    #   * how param is sent to target API: how it will be called in the query string and formatted
+    #     on call.
     #
     #   Note also those things about params:
     #
-    #   * as described in {#namespace} and {#endpoint}, setting path template
-    #     will implicitly set params. You can rewrite this on implicit
-    #     param call, for ex:
+    #   * as described in {#namespace} and {#endpoint}, setting path template will implicitly set
+    #     params. You can rewrite this on implicit param call, for ex:
     #
     #   ```ruby
     #   endpoint :foo, '/foo/{bar}'
@@ -112,8 +107,7 @@ module TLAW
     #   # call-sequence now is foo(bar, baz:)
     #   ```
     #
-    #   * param of outer namespace are passed to API on call from inner
-    #     namespaces and endpoints, for ex:
+    #   * param of outer namespace are passed to API on call to inner namespaces and endpoints, for ex:
     #
     #   ```ruby
     #   namespace :city do
@@ -132,39 +126,37 @@ module TLAW
     #   **Works for:** API, namespace, endpoint
     #
     #   @param name [Symbol] Parameter name
-    #   @param type [Class, Symbol] Expected parameter type. Could by
-    #     some class (then parameter would be checked for being instance
-    #     of this class or it would be `ArgumentError`), or duck type
-    #     (method name that parameter value should respond to).
-    #   @param keyword [true, false] Whether the param will go as a
-    #     keyword param to method definition.
-    #   @param required [true, false] Whether this param is required.
-    #     It will be considered on method definition.
+    #   @param type [Class, Symbol] Expected parameter type. Could by some class (then parameter
+    #     would be checked for being instance of this class or it would be `ArgumentError`), or
+    #     duck type (method name that parameter value should respond to).
+    #   @param keyword [true, false] Whether the param will go as a keyword param to method definition.
+    #   @param required [true, false] Whether this param is required. It will be considered on
+    #     method definition.
     #   @param opts [Hash] Options
-    #   @option opts [Symbol] :field What the field would be called in
-    #     API query string (it would be `name` by default).
-    #   @option opts [#to_proc] :format How to format this option before
-    #     including into URL. By default, it is just `.to_s`.
-    #   @option opts [String] :desc Params::Base description. You could do it
-    #     multiline and with indents, like {#desc}.
-    #   @option opts :default Default value for this param. Would be
-    #     rendered in method definition and then passed to target API
-    #     _(TODO: in future, there also would be "invisible" params,
-    #     that are just passed to target, always the same, as well as
-    #     params that aren't passed at all if user gave default value.)_
-    #   @option opts [Hash, Array] :enum Whether parameter only accepts
-    #     enumerated values. Two forms are accepted:
+    #   @option opts [Symbol] :field What the field would be called in API query string (it would be
+    #     param's name by default).
+    #   @option opts [#to_proc] :format How to format this option before including into URL. By
+    #    default, it is just `.to_s`.
+    #   @option opts [String] :desc Params::Base description. You could do it multiline and with
+    #    indents, like {#desc}.
+    #   @option opts :default Default value for this param. Would be rendered in method definition
+    #     and then passed to target API _(TODO: in future, there also would be "invisible" params,
+    #     that are just passed to target, always the same, as well as params that aren't passed at
+    #     all if user gave default value.)_
+    #   @option opts [Hash, Array] :enum Whether parameter only accepts enumerated values. Two forms
+    #     are accepted:
     #
     #     ```ruby
-    #     # array form
+    #     # Enumerable form
     #     param :units, enum: %i[us metric britain]
-    #     # parameter accepts only :us, :metric, :britain values, and
-    #     # passes them to target API as is
+    #     # parameter accepts only :us, :metric, :britain values, and passes them to target API as is
+    #     # any Enumerable is OK:
+    #     param :count, enum: 1..5
+    #     # ^ note that means [1, 2, 3, 4, 5], not "any Numeric between 1 and 5"
     #
     #     # hash "accepted => passed" form
     #     param :compact, enum: {true => 'gzip', false => nil}
-    #     # parameter accepts true or false, on true passes "compact=gzip",
-    #     # on false passes nothing.
+    #     # parameter accepts true or false, on true passes "compact=gzip", on false passes nothing.
     #     ```
 
     # @!method namespace(name, path = nil, &block)
@@ -172,23 +164,20 @@ module TLAW
     #
     #   {Namespace} has two roles:
     #
-    #   * on Ruby API, defines how you access to the final endpoint,
-    #     like `api.namespace1.namespace2(some_param).endpoint(...)`
+    #   * on Ruby API, defines how you access to the final endpoint, like
+    #     `api.namespace1.namespace2(some_param).endpoint(...)`
     #   * on calling API, it adds its path to entire URL.
     #
-    #   **NB:** If you call `namespace(:something)` and it was already defined,
-    #   current definition will be added to existing one (but it can't
-    #   change path of existing one, which is reasonable).
+    #   **NB:** If you call `namespace(:something)` and it was already defined, current definition
+    #   will be added to existing one (but it can't change path of existing one, which is reasonable).
     #
     #   **Works for:** API, namespace
     #
-    #   @param name [Symbol] Name of the method by which namespace would
-    #     be accessible.
+    #   @param name [Symbol] Name of the method by which namespace would be accessible.
     #   @param path [String] Path to add to API inside this namespace.
-    #     When not provided, considered to be `/<name>`. When provided,
-    #     taken literally (no slashes or other symbols added). Note, that
-    #     you can use `/../` in path, redesigning someone else's APIs on
-    #     the fly. Also, you can use [RFC 6570](https://www.rfc-editor.org/rfc/rfc6570.txt)
+    #     When not provided, considered to be `/<name>`. When provided, taken literally (no slashes
+    #     or other symbols added). Note, that you can use `/../` in path, redesigning someone else's
+    #     APIs on the fly. Also, you can use [RFC 6570](https://www.rfc-editor.org/rfc/rfc6570.txt)
     #     URL templates to mark params going straightly into URI.
     #
     #     Some examples:
@@ -210,10 +199,9 @@ module TLAW
     #     # method quux(id = nil), API URL http://api.example.com/foo/quux/123
     #     # ...where 123 is what you've passed as id
     #     ```
-    #   @param block Definition of current namespace params, and
-    #     namespaces and endpoints inside current.
-    #     Note that by defining params inside this block, you can change
-    #     namespace's method call sequence.
+    #   @param block Definition of current namespace params, and namespaces and endpoints inside
+    #     current. Note that by defining params inside this block, you can change namespace's method
+    #     call sequence.
     #
     #     For example:
     #
@@ -233,42 +221,35 @@ module TLAW
     #     # call-sequence: foo(bar, baz:)
     #     ```
     #
-    #     ...and so on. See also {#param} for understanding what you
-    #     can change here.
-    #
+    #     ...and so on. See also {#param} for understanding what you can change here.
 
     # @!method endpoint(name, path = nil, **opts, &block)
     #   Defines new endpoint or updates existing one.
     #
-    #   {Endpoint} is the thing doing the real work: providing Ruby API
-    #   method to really call target API.
+    #   {Endpoint} is the thing doing the real work: providing Ruby API method to really call target
+    #   API.
     #
-    #   **NB:** If you call `endpoint(:something)` and it was already defined,
-    #   current definition will be added to existing one (but it can't
-    #   change path of existing one, which is reasonable).
+    #   **NB:** If you call `endpoint(:something)` and it was already defined, current definition
+    #   will be added to existing one (but it can't change path of existing one, which is reasonable).
     #
     #   **Works for:** API, namespace
     #
-    #   @param name [Symbol] Name of the method by which endpoint would
-    #     be accessible.
+    #   @param name [Symbol] Name of the method by which endpoint would be accessible.
     #   @param path [String] Path to call API from this endpoint.
-    #     When not provided, considered to be `/<name>`. When provided,
-    #     taken literally (no slashes or other symbols added). Note, that
-    #     you can use `/../` in path, redesigning someone else's APIs on
-    #     the fly. Also, you can use [RFC 6570](https://www.rfc-editor.org/rfc/rfc6570.txt)
+    #     When not provided, considered to be `/<name>`. When provided, taken literally (no slashes
+    #     or other symbols added). Note, that you can use `/../` in path, redesigning someone else's
+    #     APIs on the fly. Also, you can use [RFC 6570](https://www.rfc-editor.org/rfc/rfc6570.txt)
     #     URL templates to mark params going straightly into URI.
     #
     #     Look at {#namespace} for examples, idea is the same.
     #
     #   @param opts [Hash] Some options, currently only `:xml`.
-    #   @option opts [true, false] :xml Whether endpoint's response should
-    #     be parsed as XML (JSON otherwise & by default). Parsing in this
-    #     case is performed with [crack](https://github.com/jnunemaker/crack),
-    #     producing the hash, to which all other rules of post-processing
-    #     are applied.
-    #   @param block Definition of endpoint's params and docs.
-    #     Note that by defining params inside this block, you can change
-    #     endpoints's method call sequence.
+    #   @option opts [true, false] :xml Whether endpoint's response should be parsed as XML (JSON
+    #     otherwise & by default). Parsing in this case is performed with
+    #     [crack](https://github.com/jnunemaker/crack), producing the hash, to which all other rules
+    #     of post-processing are applied.
+    #   @param block Definition of endpoint's params and docs. Note that by defining params inside
+    #     this block, you can change endpoints's method call sequence.
     #
     #     For example:
     #
@@ -288,47 +269,42 @@ module TLAW
     #     # call-sequence: foo(bar, baz:)
     #     ```
     #
-    #     ...and so on. See also {#param} for understanding what you
-    #     can change here.
+    #     ...and so on. See also {#param} for understanding what you can change here.
 
     # @!method post_process(key = nil, &block)
     #   Sets post-processors for response.
     #
-    #   There are also {#post_process_replace} (for replacing entire
-    #   response with something else) and {#post_process_items} (for
-    #   post-processing each item of sub-array).
+    #   There are also {#post_process_replace} (for replacing entire response with something else)
+    #   and {#post_process_items} (for post-processing each item of sub-array).
     #
     #   Notes:
     #
-    #   * you can set any number of post-processors of any kind, and they
-    #     will be applied in exactly the same order they are set;
-    #   * you can set post-processors in parent namespace (or for entire
-    #     API), in this case post-processors of _outer_ namespace are
-    #     always applied before inner ones. That allow you to define some
-    #     generic parsing/rewriting on API level, then more specific
-    #     key postprocessors on endpoints;
-    #   * hashes are flattened again after _each_ post-processor, so if
-    #     for some `key` you'll return `{count: 1, continue: false}`,
-    #     response hash will immediately have
-    #     `{"key.count" => 1, "key.continue" => false}`.
+    #   * You can set any number of post-processors of any kind, and they will be applied in exactly
+    #     the same order they are set.
+    #   * You can set post-processors in parent namespace (or for entire API), in this case
+    #     post-processors of _outer_ namespace are always applied before inner ones. That allow you
+    #     to define some generic parsing/rewriting on API level, then more specific key
+    #     postprocessors on endpoints. But only post-processors defined BEFORE the nested object
+    #     definition would be taken into account.
+    #   * Hashes are flattened again after _each_ post-processor, so if for some `key` you'll
+    #     return `{count: 1, continue: false}`, response hash will immediately have
+    #     `{"key.count" => 1, "key.continue" => false}`. TODO: Probably it is subject to change.
     #
     #   @overload post_process(&block)
-    #     Sets post-processor for whole response. Note, that in this case
-    #     _return_ value of block is ignored, it is expected that your
-    #     block will receive response and modify it inplace, like this:
+    #     Sets post-processor for whole response. Note, that in this case _return_ value of block
+    #     is ignored, it is expected that your block will receive response and modify it inplace,
+    #     like this:
     #
     #     ```ruby
     #     post_process do |response|
     #       response['coord'] = Geo::Coord.new(response['lat'], response['lng'])
     #     end
     #     ```
-    #     If you need to replace entire response with something else,
-    #     see {#post_process_replace}
+    #     If you need to replace entire response with something else, see {#post_process_replace}
     #
     #   @overload post_process(key, &block)
-    #     Sets post-processor for one response key. Post-processor is
-    #     called only if key exists in the response, and value by this
-    #     key is replaced with post-processor's response.
+    #     Sets post-processor for one response key. Post-processor is called only if key exists in
+    #     the response, and value by this key is replaced with post-processor's response.
     #
     #     Note, that if `block` returns `nil`, key will be removed completely.
     #
@@ -343,13 +319,11 @@ module TLAW
     #     @param key [String]
 
     # @!method post_process_items(key, &block)
-    #   Sets post-processors for each items of array, being at `key` (if
-    #   the key is present in response, and if its value is array of
-    #   hashes).
+    #   Sets post-processors for each items of array, being at `key` (if the key is present in
+    #   response, and if its value is array of hashes).
     #
-    #   Inside `block` you can use {#post_process} method as described
-    #   above (but all of its actions will be related only to current
-    #   item of array).
+    #   Inside `block` you can use {#post_process} method as described above (but all of its actions
+    #   will be related only to current item of array).
     #
     #   Example:
     #
@@ -379,11 +353,9 @@ module TLAW
     #   @param key [String]
 
     # @!method post_process_replace(&block)
-    #   Just like {#post_process} for entire response, but _replaces_
-    #   it with what block returns.
+    #   Just like {#post_process} for entire response, but _replaces_ it with what block returns.
     #
-    #   Real-life usage: WorldBank API typically returns responses this
-    #   way:
+    #   Real-life usage: WorldBank API typically returns responses this way:
     #
     #   ```json
     #   [
@@ -391,8 +363,8 @@ module TLAW
     #      {"some_data_variable": [{}, {}, {}]}
     #   ]
     #   ```
-    #   ...e.g. metadata and real response as two items in array, not
-    #   two keys in hash. We can easily fix this:
+    #   ...e.g. metadata and real response as two items in array, not two keys in hash. We can
+    #   easily fix this:
     #
     #   ```ruby
     #   post_process_replace do |response|
@@ -401,6 +373,32 @@ module TLAW
     #   ```
     #
     #   See also {#post_process} for some generic explanation of post-processing.
+
+    # @!method shared_def(name, &block)
+    #   Define reusable parts of definition, which can be utilized with {#use_def}. Common example
+    #   is pagination (for one API, pagination logic for all paginated endpoints is typically the
+    #   same):
+    #
+    #   ```ruby
+    #   # at "whole API definition" level:
+    #   shared_def :pagination do
+    #     param :page, Integer, field: :pg, desc: "Page number, starts from 0"
+    #     param :per_page, enum: (5..50), field: :per, desc: "Number of items per page"
+    #   end
+    #
+    #   # at each particulare endpoint definition, just
+    #   use_def :pagination
+    #   # ...instead of repeating the param description above.
+    #   ```
+    #
+    #   Shared definition block may contain any DSL elements.
+    #
+    #   **Works for:** API, namespace, endpoint
+
+    # @!method use_def(name)
+    #   Use shared definition defined earlier. See {#shared_def} for explanation and examples.
+    #
+    #   **Works for:** API, namespace, endpoint
 
     # @private
     # If there is no content in class, YARD got mad with directives.

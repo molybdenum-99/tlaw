@@ -27,7 +27,7 @@ module TLAW
           path: path,
           description: description,
           docs_link: docs_link,
-          params: param_defs.map { |p| [p.name, p.to_h] }.to_h
+          params: param_defs&.map { |p| [p.name, p.to_h] }.to_h || {}
         }
       end
 

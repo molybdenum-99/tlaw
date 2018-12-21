@@ -1,17 +1,20 @@
 # frozen_string_literal: true
 
 module TLAW
-  # API is just a top-level {Namespace}.
+  # API is a main TLAW class (and the only one you need to use directly).
   #
-  # Basically, you start creating your endpoint by descending from API
-  # and defining namespaces and endpoints through a {DSL} like this:
+  # Basically, you start creating your definition by descending from API and defining namespaces and
+  # endpoints through a {DSL} like this:
   #
   # ```ruby
-  # class MyCoolAPI < TLAW::API
+  # class SomeImagesAPI < TLAW::API
   #   define do
   #     base 'http://api.mycool.com'
   #
-  #     namespace :awesome do
+  #     namespace :gifs do
+  #       endpoint :search do
+  #         param :query
+  #       end
   #       # ...and so on
   #     end
   #   end
@@ -21,16 +24,16 @@ module TLAW
   # And then, you use it:
   #
   # ```ruby
-  # api = MyCoolAPI.new
-  # api.awesome.cool(param: 'value')
+  # api = SomeImagesAPI.new
+  # api.gifs.search(query: 'butterfly')
   # ```
   #
-  # See {DSL} for explanation of API definition, {Namespace} for explanation
-  # of possible usages and {Endpoint} for real calls performing.
+  # See {DSL} for detailed information of API definition, and {Namespace} for explanation about
+  # dynamically generated methods ({API} is also an instance of a {Namespace}).
   #
   class API < Namespace
-    # Thrown when there are an error during call. Contains real URL which
-    # was called at the time of an error.
+    # Thrown when there are an error during call. Contains real URL which was called at the time of
+    # an error.
     class Error < RuntimeError
     end
 
@@ -44,19 +47,6 @@ module TLAW
         DSL::ApiBuilder.new(self, &block).finalize
         self
       end
-
-      # @method describe
-      #   Returns detailed description of an API, like this:
-      #
-      #   ```ruby
-      #   MyCoolAPI.describe
-      #   # MyCoolAPI.new()
-      #   #   This is cool API.
-      #   #
-      #   #   Namespaces:
-      #   #   .awesome()
-      #   #     This is awesome.
-      #   ```
 
       # @private
       def setup(base_url: nil, **args)
@@ -83,6 +73,31 @@ module TLAW
 
     private :parent
 
+    # Create an instance of your API descendant.
+    # Params to pass here correspond to `param`s defined at top level of the DSL, e.g.
+    #
+    # ```ruby
+    # # if you defined your API like this...
+    # class MyAPI < TLAW::API
+    #   define do
+    #     param :api_key
+    #     # ....
+    #   end
+    # end
+    #
+    # # the instance should be created like this:
+    # api = MyAPI.new(api_key: '<some-api-key>')
+    # ```
+    #
+    # If the block is passed, it is called with an instance of
+    # [Faraday::Connection](https://www.rubydoc.info/gems/faraday/Faraday/Connection) object which
+    # would be used for API requests, allowing to set up some connection configuration:
+    #
+    # ```ruby
+    # api = MyAPI.new(api_key: '<some-api-key>') { |conn| conn.basic_auth 'login', 'pass' }
+    # ```
+    #
+    # @yield [Faraday::Connection]
     def initialize(**params, &block)
       super(nil, **params)
 

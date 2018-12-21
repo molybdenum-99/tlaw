@@ -6,19 +6,13 @@ require 'addressable/template'
 require 'crack'
 
 module TLAW
-  # This class does all the hard work: actually calling some HTTP API
-  # and processing responses.
+  # Represents API endpoint.
   #
-  # Each real API endpoint is this class descendant, defining its own
-  # params and response processors. On each call small instance of this
-  # class is created, {#call}-ed and dies as you don't need it anymore.
-  #
-  # Typically, you will neither create nor use endpoint descendants or
-  # instances directly:
+  # You will neither create nor use endpoint descendants or instances directly:
   #
   # * endpoint class definition is performed through {DSL} helpers,
-  # * and then, containing namespace obtains `.<current_endpoint_name>()`
-  #   method, which is (almost) everything you need to know.
+  # * and then, containing namespace obtains `.<endpoint_name>()` method, which is (almost)
+  #   everything you need to know.
   #
   class Endpoint < APIPath
     class << self
@@ -33,12 +27,15 @@ module TLAW
       # some_api.some_namespace.endpoint(:my_endpoint)
       # # => <SomeApi::SomeNamespace::MyEndpoint call-sequence: my_endpoint(param1, param2: nil), docs: .describe>
       # ```
+      #
+      # @return [String]
       def inspect
         return super unless is_defined?
 
         Formatting::Inspect.endpoint_class(self)
       end
 
+      # @return [Formatting::Description]
       def describe
         return '' unless is_defined?
 
@@ -58,8 +55,7 @@ module TLAW
     # @private
     attr_reader :url, :request_params
 
-    # Creates endpoint class (or  descendant) instance. Typically, you
-    # never use it directly.
+    # Creates endpoint class (or  descendant) instance. Typically, you never use it directly.
     #
     # Params defined in parent namespace are passed here.
     #
@@ -73,21 +69,19 @@ module TLAW
       @request_params = prepared_params.reject { |k,| url_keys.include?(k) }
     end
 
-    # Does the real call to the API, with all params passed to this method
-    # and to parent namespace.
+    # Does the real call to the API, with all params passed to this method and to parent namespace.
     #
-    # Typically, you don't use it directly, that's what called when you
-    # do `some_namespace.endpoint_name(**params)`.
+    # Typically, you don't use it directly, that's what called when you do
+    # `some_namespace.endpoint_name(**params)`.
     #
-    # @return [Hash,Array] Parsed, flattened and post-processed response
-    #   body.
+    # @return [Hash,Array] Parsed, flattened and post-processed response body.
     def call
       # TODO: we have a whole response here, so we can potentially have processors that
       # extract some useful information (pagination, rate-limiting) from _headers_.
       api.request(url, **request_params).body.yield_self(&method(:parse))
     end
 
-    # @retun [String]
+    # @return [String]
     def inspect
       Formatting::Inspect.endpoint(self)
     end
