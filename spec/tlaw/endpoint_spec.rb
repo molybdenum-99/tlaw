@@ -9,9 +9,10 @@ RSpec.describe TLAW::Endpoint do
 
   let(:cls) {
     described_class
-      .define(symbol: :ep, path: '/foo', param_defs: param_defs)
+      .define(symbol: :ep, path: path, param_defs: param_defs)
       .tap { |cls| cls.parent = parent_class }
   }
+  let(:path) { '/foo' }
 
   describe 'class behavior' do
     describe 'formatting' do
@@ -40,9 +41,17 @@ RSpec.describe TLAW::Endpoint do
 
     subject(:endpoint) { cls.new(parent, a: 1, b: 2) }
 
-    its(:url) { is_expected.to eq 'http://example.com/bar/foo' }
     its(:request_params) { are_expected.to eq(y: 'baz', a: '1', b: '2') }
     its(:parents) { are_expected.to eq [parent] }
+
+    describe '#url' do
+      its(:url) { is_expected.to eq 'http://example.com/bar/foo' }
+
+      context 'with .. in template' do
+        let(:path) { '/../foo' }
+        its(:url) { is_expected.to eq 'http://example.com/foo' }
+      end
+    end
 
     describe 'formatting' do
       before {

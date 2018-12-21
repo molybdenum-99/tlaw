@@ -64,7 +64,8 @@ module TLAW
 
       template = Addressable::Template.new(url_template)
 
-      @url = template.expand(**prepared_params).to_s.yield_self(&method(:fix_slash))
+      # .normalize fixes ../ in path
+      @url = template.expand(**prepared_params).normalize.to_s.yield_self(&method(:fix_slash))
       url_keys = template.keys.map(&:to_sym)
       @request_params = prepared_params.reject { |k,| url_keys.include?(k) }
     end
