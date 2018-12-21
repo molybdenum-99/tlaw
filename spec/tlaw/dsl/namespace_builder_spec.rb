@@ -37,6 +37,14 @@ RSpec.describe TLAW::DSL::NamespaceBuilder do
         .with(symbol: :foo, path: '/bar', context: instance_of(described_class)).calling_original
     }
 
+    context 'with string symbol' do
+      subject { builder.namespace('foo') }
+
+      its_block {
+        is_expected.to change(builder, :children).to match(foo: have_attributes(symbol: :foo))
+      }
+    end
+
     context 'when it is second definition' do
       before {
         builder.namespace(:foo, '/bar') {

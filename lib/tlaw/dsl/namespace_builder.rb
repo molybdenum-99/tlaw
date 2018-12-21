@@ -49,6 +49,7 @@ module TLAW
       private
 
       def child(builder_class, symbol, path, **opts, &block)
+        symbol = symbol.to_sym
         target_class = CHILD_CLASSES.fetch(builder_class)
         existing = children[symbol]
           &.tap { |c|
