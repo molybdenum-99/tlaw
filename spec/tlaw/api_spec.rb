@@ -58,11 +58,11 @@ RSpec.describe TLAW::API do
 
     context 'on error' do
       before {
-        stub_request(:get, /.*/).to_return(status: 404)
+        stub_request(:get, /.*/).to_return(status: 404, body: 'unparseable error')
       }
 
       its_block {
-        is_expected.to raise_error TLAW::API::Error, 'HTTP 404 at http://foo/bar?x=1&y=2'
+        is_expected.to raise_error TLAW::API::Error, 'HTTP 404 at http://foo/bar?x=1&y=2: unparseable error'
       }
     end
 
