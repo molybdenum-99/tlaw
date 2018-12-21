@@ -32,7 +32,7 @@ class TMDB < TLAW::API
 
     namespace :search do
       endpoint :movie do
-        param :query, required: true, keyword_argument: false
+        param :query, required: true, keyword: false
 
         #post_process_items 'results', 'release_date', &Date.method(:parse)
         # TODO: post-process image pathes!

@@ -112,7 +112,8 @@ module TLAW
         .map { |dfn| [dfn, arguments[dfn.name]] }
         .reject { |_, v| v.nil? }
         .map { |dfn, arg| dfn.(arg) }
-        .inject(&:merge) || {}
+        .inject(&:merge)
+        &.transform_keys(&:to_sym) || {}
     end
 
     def guard_unknown!(arguments)

@@ -1,7 +1,4 @@
-require 'pp'
-
-$:.unshift 'lib'
-require 'tlaw'
+require_relative '../demo_base'
 
 class CurrencyLayer < TLAW::API
   define do
@@ -16,6 +13,9 @@ class CurrencyLayer < TLAW::API
     endpoint :historical do
       param :date, :to_date, required: :true, keyword: false, format: ->(d) { d.strftime('%Y-%m-%d') }
       param :currencies, Array
+
+      post_process 'date', &Date.method(:parse)
+      post_process 'timestamp', &Time.method(:at)
     end
   end
 end

@@ -36,7 +36,7 @@ class Nominatim < TLAW::API
     end
 
     endpoint :lookup, '/lookup?format=json&osm_ids={ids}' do
-      param :ids, splat: true
+      param :ids # , splat: true -- TODO
     end
   end
 end

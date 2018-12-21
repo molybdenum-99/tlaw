@@ -1,13 +1,11 @@
-require 'pp'
-
-$:.unshift 'lib'
-require 'tlaw'
-
-#https://www.apixu.com/doc/
+require_relative '../demo_base'
 
 class APIXU < TLAW::API
   define do
+    docs 'https://www.apixu.com/doc/'
+
     base 'http://api.apixu.com/v1'
+
     param :key, required: true
     param :lang
 

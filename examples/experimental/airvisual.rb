@@ -1,7 +1,4 @@
-require 'pp'
-
-$:.unshift 'lib'
-require 'tlaw'
+require_relative '../demo_base'
 
 class AirVisual < TLAW::API
   define do

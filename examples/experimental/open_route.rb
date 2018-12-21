@@ -1,7 +1,4 @@
-require 'pp'
-
-$:.unshift 'lib'
-require 'tlaw'
+require_relative '../demo_base'
 require 'geo/coord'
 
 class OpenRouteService < TLAW::API
@@ -15,7 +12,7 @@ class OpenRouteService < TLAW::API
         res['route'] = res['routes'].first
       }
       param :coordinates, :to_a, keyword: false,
-        format: ->(coords) { coords.map { |c| c.to_a.join(',') }.join('|') }
+        format: ->(coords) { coords.map { |c| c.latlng.join(',') }.join('|') }
       param :profile
       param :geometry
       param :geometry_format

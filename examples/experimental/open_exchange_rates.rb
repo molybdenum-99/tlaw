@@ -1,7 +1,4 @@
-require 'pp'
-
-$:.unshift 'lib'
-require 'tlaw'
+require_relative '../demo_base'
 
 class OpenExchangeRate < TLAW::API
   define do

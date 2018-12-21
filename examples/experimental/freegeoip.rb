@@ -3,7 +3,6 @@ require 'pp'
 $:.unshift 'lib'
 require 'tlaw'
 
-
 class FreeGeoIP < TLAW::API
   define do
     base 'http://freegeoip.net/json/'

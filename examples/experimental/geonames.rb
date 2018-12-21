@@ -1,8 +1,4 @@
-require 'pp'
-
-$:.unshift 'lib'
-require 'tlaw'
-
+require_relative '../demo_base'
 require 'geo/coord'
 
 #http://www.geonames.org/export/web-services.html
@@ -59,8 +55,8 @@ class GeoNames < TLAW::API
     end
 
     namespace :near, path: '' do
-      param :lat, keyword_argument: false
-      param :lng, keyword_argument: false
+      param :lat, keyword: false
+      param :lng, keyword: false
 
       endpoint :ocean, path: '/oceanJSON'
       endpoint :country, path: '/countryCodeJSON'
@@ -88,7 +84,7 @@ class GeoNames < TLAW::API
   end
 end
 
-gn = GeoNames.new(username: 'realitygeo')
+gn = GeoNames.new(username: ENV.fetch('GEONAMES'))
 
 #pp gn.search.name_equals('Kharkiv')['geonames'].to_a
 #pp gn.postal_codes.countries['geonames'].detect { |r| r['countryName'].include?('Thai') }

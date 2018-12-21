@@ -1,7 +1,4 @@
-require 'pp'
-
-$:.unshift 'lib'
-require 'tlaw'
+require_relative '../demo_base'
 
 #http://docs.themoviedb.apiary.io/#reference/movies/movielatest
 

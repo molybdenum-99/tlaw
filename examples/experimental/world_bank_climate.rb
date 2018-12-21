@@ -12,7 +12,7 @@ class WorldBankClimate < TLAW::API
       country: :country_iso3
     }.each do |namespace_name, param_name|
       namespace namespace_name do
-        param param_name, keyword_argument: false, required: true
+        param param_name, keyword: false, required: true
 
         {
           :temperature => 'tas',
@@ -26,7 +26,7 @@ class WorldBankClimate < TLAW::API
               annual_anomaly: 'annualanom'
             }.each do |typename, type|
               endpoint typename, path: "/#{type}/#{var}/{since}/{#{param_name}}.json" do
-                param :since, keyword_argument: true, required: true,
+                param :since, keyword: true, required: true,
                   enum: {
                     1920 => '1920/1939',
                     1940 => '1940/1959',

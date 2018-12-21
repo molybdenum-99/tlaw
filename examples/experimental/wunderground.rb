@@ -5,7 +5,7 @@ module TLAW
         base 'http://api.wunderground.com/api/{api_key}{/features}{/lang}/q'
 
         param :api_key, required: true
-        param :lang, format: ->(l) { "lang:#{l}" }
+        param :lang, format: 'lang:#%s'.method(:%)
 
         FEATURES = %i[
           alerts
@@ -29,22 +29,21 @@ module TLAW
           planner
         ]
 
-        COMMON_PARAMS = lambda do |*|
+        shared_def :common_params do
           param :features, Array, format: ->(a) { a.join('/') }
-            #TODO: enum: FEATURES
+            #TODO: enum: FEATURES -- doesn't work with Array
           param :pws, enum: {false => 0, true => 1}
           param :bestfct, enum: {false => 0, true => 1}
         end
 
         post_process { |h|
-          h.key?('response.error.type') and
-            fail h['response.error.type']
+          h.key?('response.error.type') and fail h['response.error.type']
         }
 
         endpoint :city, '{/country}/{city}.json' do
           param :city, required: true
 
-          instance_eval(&COMMON_PARAMS)
+          use_def :common_params
         end
 
         endpoint :us_zipcode do

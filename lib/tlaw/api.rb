@@ -130,10 +130,11 @@ module TLAW
 
     def extract_message(body)
       # FIXME: well, that's just awful
+      # ...minimal is at least extract *_message key (TMDB has status_message, for ex.)
       data = JSON.parse(body) rescue nil
-      return unless data.is_a?(Hash)
+      return body unless data.is_a?(Hash)
 
-      data.values_at('message', 'error').compact.first
+      data.values_at('message', 'error').compact.first || body
     end
   end
 end
