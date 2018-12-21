@@ -15,16 +15,16 @@ class Quandl < TLAW::API
         param :per_page, :to_i
       end
 
-      endpoint :search, path: '.json?query={query}' do
+      endpoint :search, '.json?query={query}' do
         param :query, required: true
       end
 
-      namespace :[], path: '/{code}' do
-        endpoint :meta, path: '.json'
-        endpoint :codes, path: '/codes.csv'
+      namespace :[], '/{code}' do
+        endpoint :meta, '.json'
+        endpoint :codes, '/codes.csv'
 
-        namespace :datasets, path: '/../../datasets/{code}' do
-          endpoint :[], path: '/{dataset_code}.json' do
+        namespace :datasets, '/../../datasets/{code}' do
+          endpoint :[], '/{dataset_code}.json' do
             param :code
 
             post_process { |h|
@@ -37,7 +37,6 @@ class Quandl < TLAW::API
               post_process 'Date', &Date.method(:parse)
             end
           end
-
         end
       end
     end
